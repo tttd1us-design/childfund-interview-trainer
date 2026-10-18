@@ -3,16 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>초록우산 어린이재단 기관장 승진 실전 AI 면접 시뮬레이터 (신지애 팀장 전용)</title>
+  <title>초록우산 어린이재단 기관장 승진 실전 AI 면접 시뮬레이터 (보안 전용)</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=Noto+Serif+KR:wght@500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&family=Noto+Serif+KR:wght@600;700;900&display=swap" rel="stylesheet">
   <!-- Chart.js CDN for Evaluation Charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div id="app" class="app-container">
+
+  <!-- ==================== 1. 보안 인증 게이트웨이 (비밀번호: 1014) ==================== -->
+  <div id="security-gateway" class="security-gateway-overlay">
+    <div class="security-card">
+      <div class="security-icon">🔒</div>
+      <div class="security-header">
+        <span class="security-badge">초록우산 대외비 보안 구역</span>
+        <h2>기관장 승진 심사 시스템 인증</h2>
+        <p>본 시스템은 심사 대상자의 상세 이력 및 기관 평가 데이터가 포함된 비공개 훈련 시스템입니다. 허가된 인원만 보안 코드를 입력하여 접속하십시오.</p>
+      </div>
+
+      <form id="form-security-login" class="security-form" onsubmit="event.preventDefault(); app.verifyPasscode();">
+        <div class="input-group">
+          <label for="passcode-input">보안 접속 비밀번호</label>
+          <div class="passcode-field-wrap">
+            <input type="password" id="passcode-input" maxlength="10" placeholder="비밀번호 4자리 입력" autocomplete="off" autofocus inputmode="numeric">
+            <button type="submit" id="btn-unlock" class="btn-unlock">인증 및 접속</button>
+          </div>
+          <div id="passcode-error-msg" class="passcode-error" style="display: none;">
+            ⚠️ 비밀번호가 일치하지 않습니다. 다시 확인 후 입력해 주세요.
+          </div>
+        </div>
+      </form>
+
+      <div class="security-footer">
+        <span>어린이재단 인재개발팀 & 복지사업부서장 승진평가 보안시스템</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. 실제 시뮬레이터 본체 (인증 성공 시 해제) ==================== -->
+  <div id="app" class="app-container" style="display: none;">
     <!-- Top Header -->
     <header class="app-header">
       <div class="logo-area">
@@ -20,21 +51,24 @@
         <div class="title-group">
           <div class="badge-row">
             <span class="sub-badge">초록우산 2026 역량모델 기준</span>
-            <span class="online-pill">● 언제 어디서나 실시간 연습</span>
+            <span class="online-pill">● 실시간 실전 면접</span>
           </div>
-          <h1>기관장 승진 실전 AI 면접 시뮬레이터</h1>
+          <h1>어린이재단 기관장 승진 실전 AI 면접 시뮬레이터</h1>
         </div>
       </div>
 
       <!-- Quick Accessibility & Controls -->
       <div class="header-controls">
-        <div class="font-resizer" title="질문 글자 크기 조절">
-          <button id="btn-font-sm" class="btn-tool" aria-label="글자 작게">A-</button>
-          <button id="btn-font-md" class="btn-tool active" aria-label="글자 보통">A</button>
-          <button id="btn-font-lg" class="btn-tool" aria-label="글자 크게">A+</button>
+        <div class="font-resizer" title="전체 폰트 크기 확대/축소">
+          <button id="btn-font-md" class="btn-tool" aria-label="기본 크기">보통</button>
+          <button id="btn-font-lg" class="btn-tool active" aria-label="크게 보기">크게</button>
+          <button id="btn-font-xl" class="btn-tool" aria-label="아주 크게 보기">특대</button>
         </div>
         <button id="btn-theme-toggle" class="btn-tool theme-btn" title="다크 모드 / 라이트 모드 전환">
           <span id="theme-icon">🌙</span>
+        </button>
+        <button id="btn-lock-screen" class="btn-tool lock-btn" title="보안 잠금" onclick="app.lockScreen()">
+          <span>🔒 잠금</span>
         </button>
         <div class="candidate-tag">
           <span class="rank-badge">심사 대상</span>
@@ -50,8 +84,8 @@
       <section id="view-setup" class="view-panel active">
         <div class="hero-banner">
           <div class="hero-text">
-            <h2>실전과 100% 동일한 30분 기관장 심층 면접</h2>
-            <p>4인의 전문 면접관(대표, 실무이사, 인사팀장, 외부면접관)이 남성/여성의 실제 목소리로 질문하며 텍스트로도 동시 표출됩니다. 120개 기출 질문과 포트폴리오를 기반으로 음성 답변과 실제 음성 녹음 재생, 회차별 정밀 AI 분석 보고서를 지원합니다.</p>
+            <h2>실전과 100% 동일한 30분 기관장 심층 면접 훈련</h2>
+            <p>4인의 전문 면접관(대표이사, 실무이사, 인사팀장, 외부면접관)이 남성/여성의 실제 육성으로 질문하며, 텍스트로도 크고 선명하게 화면에 표시됩니다. 120개 기출 질문과 포트폴리오를 기반으로 실제 음성 답변 녹음 및 회차별 정밀 AI 분석 보고서를 지원합니다.</p>
           </div>
           <div class="quick-stats">
             <div class="stat-card">
@@ -63,8 +97,8 @@
               <span class="label">남/여 전문 면접관</span>
             </div>
             <div class="stat-card">
-              <span class="num">120개</span>
-              <span class="label">전체 기출 문항</span>
+              <span class="num">120문항</span>
+              <span class="label">전체 기출 DB</span>
             </div>
             <div class="stat-card">
               <span class="num">5단계</span>
@@ -79,7 +113,7 @@
           <div class="card config-card">
             <div class="card-title">
               <span class="icon">🎯</span>
-              <h3>면접 난이도 설정</h3>
+              <h3>면접 난이도 선택</h3>
             </div>
             <p class="card-desc">1단계(기본 소양)부터 5단계(송곳 압박 및 꼬리 질문)까지 선택할 수 있습니다.</p>
             <div class="difficulty-selector">
@@ -273,10 +307,10 @@
               </div>
               <span class="category-tag" id="current-category-tag">자기소개 및 포부</span>
               <span class="diff-tag" id="current-diff-tag">Level 3</span>
-              <button id="btn-replay-tts" class="btn-text" title="질문 다시 듣기">🔊 다시 듣기</button>
+              <button id="btn-replay-tts" class="btn-text" title="질문 다시 듣기">🔊 질문 다시 듣기</button>
             </div>
             
-            <!-- Realtime Highlighted Question Text -->
+            <!-- Realtime Highlighted Big Font Question Text -->
             <div class="question-container">
               <div class="question-text" id="current-question-text">
                 면접관 질문이 생성되고 있습니다...
@@ -310,7 +344,7 @@
 
             <!-- Text / Speech Realtime Box -->
             <div class="answer-box-wrap">
-              <textarea id="txt-candidate-answer" class="candidate-textarea" placeholder="[🎙️ 음성 답변 시작] 버튼을 누르고 실제 면접처럼 소리 내어 말씀하시면 자동으로 실시간 텍스트 변환 및 음성 파일이 동시 녹음됩니다. 직접 키보드로 수정하거나 보완할 수도 있습니다."></textarea>
+              <textarea id="txt-candidate-answer" class="candidate-textarea" placeholder="[🎙️ 음성 답변 시작] 버튼을 누르고 실제 면접장처럼 소리 내어 말씀하시면 자동으로 실시간 텍스트 변환 및 음성 파일이 동시 녹음됩니다. 직접 키보드로 수정하거나 보완할 수도 있습니다."></textarea>
               <div class="char-count"><span id="lbl-char-count">0</span> 자</div>
             </div>
 
@@ -414,7 +448,7 @@
             <span>💾 데이터 JSON 백업</span>
           </button>
           <button id="btn-copy-url" class="btn btn-secondary">
-            <span>🔗 웹 주소 공유하기</span>
+            <span>🔗 웹 주소 복사하기</span>
           </button>
           <button id="btn-retry-interview" class="btn btn-primary">
             <span>🔄 새로운 회차 실전 훈련 시작</span>
@@ -454,7 +488,7 @@
     <footer class="app-footer">
       <div class="footer-content">
         <p>초록우산 어린이재단 기관장 승진 실전 면접 시뮬레이터 | 경기남부가정위탁지원센터 신지애 팀장 특화 에디션</p>
-        <span class="tech-stack">Powered by Web Speech API (남/여 4인 멀티 보이스 TTS / STT) & Audio Recorder</span>
+        <span class="tech-stack">보안 인증 시스템 활성화 (비밀번호: 1014) | Web Speech API (남/여 4인 멀티 보이스 TTS/STT) & Audio Recorder</span>
       </div>
     </footer>
   </div>

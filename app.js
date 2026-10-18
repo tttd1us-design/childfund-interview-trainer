@@ -45,17 +45,67 @@ class InterviewSimulator {
     this.STORAGE_KEY = "childfund_interview_sessions_shin";
     this.THEME_KEY = "childfund_interview_theme";
     this.FONT_KEY = "childfund_interview_fontsize";
+    this.AUTH_KEY = "childfund_security_auth_shin";
+    this.CORRECT_PASSCODE = "1014"; // 보안 인증 비밀번호
 
     this.init();
   }
 
   init() {
+    this.checkAuthentication();
     this.loadThemeAndFont();
     this.loadHistory();
     this.setupSpeechRecognition();
     this.setupVoices();
     this.bindEvents();
     this.renderHistoryTable();
+  }
+
+  // Security Passcode (1014) Verification
+  checkAuthentication() {
+    const isAuth = sessionStorage.getItem(this.AUTH_KEY);
+    const gateway = document.getElementById("security-gateway");
+    const appEl = document.getElementById("app");
+
+    if (isAuth === "true") {
+      if (gateway) gateway.style.display = "none";
+      if (appEl) appEl.style.display = "flex";
+    } else {
+      if (gateway) gateway.style.display = "flex";
+      if (appEl) appEl.style.display = "none";
+      setTimeout(() => {
+        const inp = document.getElementById("passcode-input");
+        if (inp) inp.focus();
+      }, 300);
+    }
+  }
+
+  verifyPasscode() {
+    const inp = document.getElementById("passcode-input");
+    const errBox = document.getElementById("passcode-error-msg");
+    const entered = inp ? inp.value.trim() : "";
+
+    if (entered === this.CORRECT_PASSCODE) {
+      sessionStorage.setItem(this.AUTH_KEY, "true");
+      if (errBox) errBox.style.display = "none";
+      this.checkAuthentication();
+    } else {
+      if (errBox) {
+        errBox.style.display = "block";
+        errBox.classList.remove("shake");
+        void errBox.offsetWidth; // trigger reflow
+        errBox.classList.add("shake");
+      }
+      if (inp) {
+        inp.value = "";
+        inp.focus();
+      }
+    }
+  }
+
+  lockScreen() {
+    sessionStorage.removeItem(this.AUTH_KEY);
+    this.checkAuthentication();
   }
 
   // Dark/Light Theme & Font Size
@@ -65,7 +115,7 @@ class InterviewSimulator {
     const themeIcon = document.getElementById("theme-icon");
     if (themeIcon) themeIcon.textContent = savedTheme === "dark" ? "☀️" : "🌙";
 
-    const savedFont = localStorage.getItem(this.FONT_KEY) || "md";
+    const savedFont = localStorage.getItem(this.FONT_KEY) || "lg";
     this.applyFontSize(savedFont);
   }
 
@@ -83,10 +133,20 @@ class InterviewSimulator {
     const btn = document.getElementById(`btn-font-${size}`);
     if (btn) btn.classList.add("active");
 
-    let val = "1.28rem";
-    if (size === "sm") val = "1.1rem";
-    if (size === "lg") val = "1.55rem";
-    document.documentElement.style.setProperty("--q-font-size", val);
+    let qVal = "1.65rem";
+    let bodyVal = "1.12rem";
+    if (size === "md") {
+      qVal = "1.35rem";
+      bodyVal = "1.02rem";
+    } else if (size === "lg") {
+      qVal = "1.65rem";
+      bodyVal = "1.12rem";
+    } else if (size === "xl") {
+      qVal = "2.05rem"; // 시원시원한 특대형 폰트
+      bodyVal = "1.25rem";
+    }
+    document.documentElement.style.setProperty("--q-font-size", qVal);
+    document.documentElement.style.setProperty("--body-font-size", bodyVal);
     localStorage.setItem(this.FONT_KEY, size);
   }
 
@@ -243,9 +303,9 @@ class InterviewSimulator {
   bindEvents() {
     // Theme & Font
     document.getElementById("btn-theme-toggle").addEventListener("click", () => this.toggleTheme());
-    document.getElementById("btn-font-sm").addEventListener("click", () => this.applyFontSize("sm"));
     document.getElementById("btn-font-md").addEventListener("click", () => this.applyFontSize("md"));
     document.getElementById("btn-font-lg").addEventListener("click", () => this.applyFontSize("lg"));
+    document.getElementById("btn-font-xl").addEventListener("click", () => this.applyFontSize("xl"));
 
     // Start Interview Button
     document.getElementById("btn-start-interview").addEventListener("click", () => this.startInterview());
