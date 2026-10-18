@@ -57,9 +57,9 @@ class GeminiEvaluator {
     return this.generateBuiltinDeepReport(sessionData, candidateProfile);
   }
 
-  // Google Gemini 공식 REST API 직접 호출 (gemini-2.5-flash -> gemini-2.0-flash -> gemini-1.5-flash 다중 폴백)
+  // Google Gemini 공식 REST API 직접 호출 (gemini-3.8-flash -> gemini-flash-latest -> gemini-3.5-flash -> gemini-2.5-flash-lite 다중 폴백)
   async callGeminiApi(apiKey, sessionData, candidateProfile) {
-    const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"];
+    const models = ["gemini-3.8-flash", "gemini-flash-latest", "gemini-3.5-flash", "gemini-2.5-flash-lite"];
     let lastError = null;
 
     const promptText = `
@@ -82,8 +82,8 @@ class GeminiEvaluator {
 [오늘 진행된 모의면접 질의응답 기록 (총 ${sessionData.answers.length}문항)]
 ${sessionData.answers.map((a, i) => `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-질문 ${i + 1} [${a.question.qNumber}] (${a.question.category} / Level ${a.question.difficulty}):
-면접관: ${a.question.question}
+질문 ${i + 1} [${a.question?.qNumber || a.questionId || (i + 1)}] (${a.question?.category || '종합면접'} / Level ${a.question?.difficulty || 3}):
+면접관: ${a.question?.question || a.questionText || '질문 내용'}
 후보자 답변:
 "${a.answerText || '(답변을 입력하지 않음)'}"
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

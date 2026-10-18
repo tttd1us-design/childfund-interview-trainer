@@ -624,36 +624,46 @@ class InterviewSimulator {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 7500);
 
+    const ttsModels = ["gemini-3.8-flash-tts", "gemini-3.1-flash-tts-preview", "gemini-2.5-flash-preview-tts"];
+
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${encodeURIComponent(apiKey)}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          signal: controller.signal,
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: `${styleGuide}${questionObj.question}` }] }],
-            generationConfig: {
-              responseModalities: ["AUDIO"],
-              speechConfig: {
-                voiceConfig: {
-                  prebuiltVoiceConfig: { voiceName }
+      for (const ttsModel of ttsModels) {
+        try {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${ttsModel}:generateContent?key=${encodeURIComponent(apiKey)}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              signal: controller.signal,
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: `${styleGuide}${questionObj.question}` }] }],
+                generationConfig: {
+                  responseModalities: ["AUDIO"],
+                  speechConfig: {
+                    voiceConfig: {
+                      prebuiltVoiceConfig: { voiceName }
+                    }
+                  }
                 }
-              }
+              })
             }
-          })
+          );
+
+          if (!response.ok) continue;
+          const data = await response.json();
+          const inlineData = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+          if (!inlineData || !inlineData.data) continue;
+
+          clearTimeout(timeoutId);
+          const wavUrl = this.pcm16Base64ToWavUrl(inlineData.data, 24000);
+          this.ttsAudioCache.set(cacheKey, wavUrl);
+          return wavUrl;
+        } catch (innerErr) {
+          // try next TTS model
         }
-      );
+      }
       clearTimeout(timeoutId);
-
-      if (!response.ok) return null;
-      const data = await response.json();
-      const inlineData = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
-      if (!inlineData || !inlineData.data) return null;
-
-      const wavUrl = this.pcm16Base64ToWavUrl(inlineData.data, 24000);
-      this.ttsAudioCache.set(cacheKey, wavUrl);
-      return wavUrl;
+      return null;
     } catch (err) {
       clearTimeout(timeoutId);
       return null;
