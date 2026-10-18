@@ -6,40 +6,44 @@ const INTERVIEW_PANEL = {
     id: "ceo",
     title: "대표이사 / 회장",
     name: "정문기 대표",
+    gender: "male", // 남성 (중후하고 깊은 저음)
     role: "기관 총괄 비전, 재단 2030 가치관, 경영 마인드, 최종 책임자 검증",
     avatar: "👔",
-    voicePitch: 0.9,
-    voiceRate: 0.95,
+    voicePitch: 0.82,  // 묵직한 중저음
+    voiceRate: 0.94,   // 신중하고 무게감 있는 속도
     personality: "중후하고 깊이 있는 어조로 조직의 철학과 아동 권리, 재단과 기관의 미래 비전과 방향성을 엄중히 묻습니다."
   },
   EXEC_DIRECTOR: {
     id: "director",
     title: "실무진 이사 (복지사업총괄)",
     name: "박서진 이사",
+    gender: "female", // 여성 (명확하고 단호한 복지 전문성 톤)
     role: "가정위탁 전문성, 국가사업 전환 대응, 현장 위기사례 개입, 평가지표 TF 검증",
-    avatar: "📋",
-    voicePitch: 1.0,
-    voiceRate: 1.0,
+    avatar: "👩‍💼",
+    voicePitch: 1.18,  // 명확하고 또렷한 여성 톤
+    voiceRate: 1.02,   // 정확하고 단호한 속도
     personality: "복지 현장과 정책 변화의 디테일을 날카롭게 파고들며 사업의 실효성과 근거, 전문적 대처 능력을 집요하게 검증합니다."
   },
   HR_DIRECTOR: {
     id: "hr",
     title: "인사기획팀장",
     name: "김태호 팀장",
+    gender: "male", // 남성 (차분하고 논리적인 인사 행정 톤)
     role: "직원 육성, 신입 9명 조직관리, 경력자 소진, 노무·처우, 조직 갈등 조정",
-    avatar: "👥",
-    voicePitch: 1.05,
-    voiceRate: 1.02,
+    avatar: "👨‍💼",
+    voicePitch: 0.95,  // 지적이고 차분한 남성 톤
+    voiceRate: 1.00,   // 안정적인 속도
     personality: "조직 내 인적 자원 관리, 직원들과의 소통, 원칙과 배려의 균형, 후계 인재 육성 등 인사·조직운영 관점에서 조명합니다."
   },
   EXTERNAL_EXAMINER: {
     id: "external",
-    title: "외부 전문 면접관 (사회복지학 교수/경영평가위원)",
+    title: "외부 전문 면접관 (사회복지학 교수/평가위원)",
     name: "이선우 교수",
+    gender: "female", // 여성 (지적이고 예리한 학자/평가위원 톤)
     role: "객관적 검증, 윤리의식, 투명성, 취약점(위기관리 2점) 및 모순점 압박 검증",
-    avatar: "⚖️",
-    voicePitch: 1.15,
-    voiceRate: 0.98,
+    avatar: "👩‍🏫",
+    voicePitch: 1.28,  // 예리하고 지적인 고음 톤
+    voiceRate: 0.97,   // 서두르지 않고 핵심을 찌르는 템포
     personality: "객관적인 외부 시각에서 날카로운 압박 질문과 반대 사례를 던지며, 지원자의 논리성과 자기객관화 수준을 시험합니다."
   }
 };

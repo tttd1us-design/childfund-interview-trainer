@@ -1,4 +1,4 @@
-// 초록우산 어린이재단 기관장 승진 실전 AI 면접 시뮬레이터 (신지애 팀장 전용) - 메인 애플리케이션
+// 초록우산 어린이재단 기관장 승진 실전 AI 면접 시뮬레이터 (신지애 팀장 전용) - 상업용 고도화 엔진
 
 class InterviewSimulator {
   constructor() {
@@ -9,11 +9,12 @@ class InterviewSimulator {
       totalQuestions: 12,
       currentIndex: 0,
       questions: [],
-      answers: [], // { question, answerText, evalResult, timestamp }
+      answers: [], // { question, answerText, audioBlobUrl, evalResult, timestamp }
       timerSeconds: 30 * 60, // 30분
       timerInterval: null,
       ttsEnabled: true,
       sttEnabled: true,
+      recordAudioEnabled: true,
       hintEnabled: false,
       sessionNumber: 1
     };
@@ -22,7 +23,16 @@ class InterviewSimulator {
     this.synth = window.speechSynthesis;
     this.recognition = null;
     this.isRecognizing = false;
-    this.selectedVoice = null;
+    
+    // Male & Female Voice Maps
+    this.maleVoice = null;
+    this.femaleVoice = null;
+    this.fallbackVoice = null;
+
+    // Media Recorder (실제 오디오 녹음기)
+    this.mediaRecorder = null;
+    this.audioChunks = [];
+    this.currentAudioBlobUrl = null;
 
     // Charts references
     this.charts = {
@@ -33,16 +43,51 @@ class InterviewSimulator {
 
     // Storage Key
     this.STORAGE_KEY = "childfund_interview_sessions_shin";
+    this.THEME_KEY = "childfund_interview_theme";
+    this.FONT_KEY = "childfund_interview_fontsize";
 
     this.init();
   }
 
   init() {
+    this.loadThemeAndFont();
     this.loadHistory();
     this.setupSpeechRecognition();
     this.setupVoices();
     this.bindEvents();
     this.renderHistoryTable();
+  }
+
+  // Dark/Light Theme & Font Size
+  loadThemeAndFont() {
+    const savedTheme = localStorage.getItem(this.THEME_KEY) || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    const themeIcon = document.getElementById("theme-icon");
+    if (themeIcon) themeIcon.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+
+    const savedFont = localStorage.getItem(this.FONT_KEY) || "md";
+    this.applyFontSize(savedFont);
+  }
+
+  toggleTheme() {
+    const current = document.documentElement.getAttribute("data-theme") || "light";
+    const next = current === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem(this.THEME_KEY, next);
+    const themeIcon = document.getElementById("theme-icon");
+    if (themeIcon) themeIcon.textContent = next === "dark" ? "☀️" : "🌙";
+  }
+
+  applyFontSize(size) {
+    document.querySelectorAll(".font-resizer .btn-tool").forEach(b => b.classList.remove("active"));
+    const btn = document.getElementById(`btn-font-${size}`);
+    if (btn) btn.classList.add("active");
+
+    let val = "1.28rem";
+    if (size === "sm") val = "1.1rem";
+    if (size === "lg") val = "1.55rem";
+    document.documentElement.style.setProperty("--q-font-size", val);
+    localStorage.setItem(this.FONT_KEY, size);
   }
 
   // Load Saved Sessions
@@ -57,7 +102,15 @@ class InterviewSimulator {
   }
 
   saveHistory(reportData) {
-    this.historySessions.push(reportData);
+    // Avoid saving oversized audio blob urls to localStorage
+    const storableReport = {
+      ...reportData,
+      answers: reportData.answers.map(a => ({
+        ...a,
+        audioBlobUrl: null // Blob URLs are transient in local storage
+      }))
+    };
+    this.historySessions.push(storableReport);
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.historySessions));
   }
 
@@ -103,21 +156,43 @@ class InterviewSimulator {
     }
   }
 
-  // Setup Voices for Interviewers
+  // Setup Voices for Male and Female Interviewers
   setupVoices() {
     if (!this.synth) return;
     const loadVoices = () => {
       const voices = this.synth.getVoices();
-      // 한국어 음성 탐색
-      this.selectedVoice = voices.find(v => v.lang === "ko-KR" || v.lang.startsWith("ko")) || voices[0];
+      const koVoices = voices.filter(v => v.lang === "ko-KR" || v.lang.startsWith("ko"));
+
+      // 브라우저에 등록된 음성 중 남성/여성 탐색
+      this.femaleVoice = koVoices.find(v => 
+        v.name.toLowerCase().includes("female") || 
+        v.name.includes("여성") || 
+        v.name.includes("Yuna") || 
+        v.name.includes("Suni") ||
+        v.name.includes("Heami")
+      );
+
+      this.maleVoice = koVoices.find(v => 
+        v.name.toLowerCase().includes("male") || 
+        v.name.includes("남성") || 
+        v.name.includes("InJoon") || 
+        v.name.includes("MinHo")
+      );
+
+      this.fallbackVoice = koVoices[0] || voices[0];
+
+      // 만약 시스템에 남/여 분리 보이스가 별도로 없다면 기본 보이스 기반 피치(Pitch) 차별화 적용
+      if (!this.femaleVoice) this.femaleVoice = this.fallbackVoice;
+      if (!this.maleVoice) this.maleVoice = this.fallbackVoice;
     };
+
     loadVoices();
     if (this.synth.onvoiceschanged !== undefined) {
       this.synth.onvoiceschanged = loadVoices;
     }
   }
 
-  // Speak interviewer question with persona tone
+  // Speak interviewer question with gender and persona pitch/rate
   speakQuestion(questionObj) {
     if (!this.sessionState.ttsEnabled || !this.synth) return;
     this.synth.cancel(); // Stop any previous speech
@@ -125,23 +200,27 @@ class InterviewSimulator {
     const panelInfo = INTERVIEW_PANEL[questionObj.panel] || INTERVIEW_PANEL.CEO;
     const utterance = new SpeechSynthesisUtterance(questionObj.question);
     
-    if (this.selectedVoice) {
-      utterance.voice = this.selectedVoice;
+    // Choose Voice by Gender
+    if (panelInfo.gender === "female" && this.femaleVoice) {
+      utterance.voice = this.femaleVoice;
+    } else if (panelInfo.gender === "male" && this.maleVoice) {
+      utterance.voice = this.maleVoice;
+    } else if (this.fallbackVoice) {
+      utterance.voice = this.fallbackVoice;
     }
+
     utterance.lang = "ko-KR";
-    utterance.pitch = panelInfo.voicePitch || 1.0;
+    utterance.pitch = panelInfo.voicePitch || (panelInfo.gender === "female" ? 1.2 : 0.85);
     utterance.rate = panelInfo.voiceRate || 1.0;
 
-    // Highlight interviewer
+    // Highlight interviewer card
     this.highlightInterviewer(panelInfo.id, true);
 
     utterance.onend = () => {
       this.highlightInterviewer(panelInfo.id, false);
-      // Auto-start STT if enabled
-      if (this.sessionState.sttEnabled && this.recognition && !this.isRecognizing) {
-        try {
-          this.recognition.start();
-        } catch (e) {}
+      // Auto-start STT & Recorder if enabled
+      if (this.sessionState.sttEnabled && !this.isRecognizing) {
+        this.startAnsweringProcess();
       }
     };
 
@@ -162,6 +241,12 @@ class InterviewSimulator {
 
   // UI Event Bindings
   bindEvents() {
+    // Theme & Font
+    document.getElementById("btn-theme-toggle").addEventListener("click", () => this.toggleTheme());
+    document.getElementById("btn-font-sm").addEventListener("click", () => this.applyFontSize("sm"));
+    document.getElementById("btn-font-md").addEventListener("click", () => this.applyFontSize("md"));
+    document.getElementById("btn-font-lg").addEventListener("click", () => this.applyFontSize("lg"));
+
     // Start Interview Button
     document.getElementById("btn-start-interview").addEventListener("click", () => this.startInterview());
 
@@ -198,7 +283,7 @@ class InterviewSimulator {
     document.getElementById("btn-retry-interview").addEventListener("click", () => this.showView("view-setup"));
     document.getElementById("btn-print-report").addEventListener("click", () => window.print());
     document.getElementById("btn-export-json").addEventListener("click", () => this.exportHistoryJSON());
-    document.getElementById("btn-github-backup").addEventListener("click", () => this.showGitHubBackupGuide());
+    document.getElementById("btn-copy-url").addEventListener("click", () => this.copyAppUrl());
   }
 
   showView(viewId) {
@@ -212,12 +297,12 @@ class InterviewSimulator {
 
   // Start Interview Flow
   startInterview() {
-    // Read Settings
     const diffRadio = document.querySelector('input[name="difficulty"]:checked');
     this.sessionState.difficulty = diffRadio ? parseInt(diffRadio.value) : 3;
     this.sessionState.totalQuestions = parseInt(document.getElementById("q-count").value) || 12;
     this.sessionState.ttsEnabled = document.getElementById("toggle-tts").checked;
     this.sessionState.sttEnabled = document.getElementById("toggle-stt").checked;
+    this.sessionState.recordAudioEnabled = document.getElementById("toggle-record-audio").checked;
     this.sessionState.hintEnabled = document.getElementById("toggle-hint").checked;
 
     // Reset State
@@ -270,7 +355,7 @@ class InterviewSimulator {
 
     if (this.sessionState.isPaused) {
       if (this.synth) this.synth.pause();
-      if (this.recognition && this.isRecognizing) this.recognition.stop();
+      this.stopAnsweringProcess();
       btnText.textContent = "면접 재개";
       btnIcon.textContent = "▶";
     } else {
@@ -298,8 +383,16 @@ class InterviewSimulator {
 
     // Update Dialogue Card Elements
     document.getElementById("current-speaker-tag").textContent = `${panelInfo.name} (${panelInfo.title})`;
+    const genderPill = document.getElementById("current-gender-pill");
+    if (genderPill) {
+      genderPill.textContent = panelInfo.gender === "female" ? "여성 음성" : "남성 음성";
+      genderPill.className = `gender-pill ${panelInfo.gender}`;
+    }
+
     document.getElementById("current-category-tag").textContent = qObj.category;
     document.getElementById("current-diff-tag").textContent = `Level ${qObj.difficulty}`;
+    
+    // Question Text Display (텍스트로도 크고 선명하게 써줌)
     document.getElementById("current-question-text").textContent = qObj.question;
 
     // Update Hints
@@ -312,6 +405,11 @@ class InterviewSimulator {
       hintDrawer.style.display = "none";
     }
 
+    // Hide Audio Preview for new question
+    const audioPreview = document.getElementById("answer-audio-preview");
+    if (audioPreview) audioPreview.style.display = "none";
+    this.currentAudioBlobUrl = null;
+
     // Reset Answer Text Area
     const txtArea = document.getElementById("txt-candidate-answer");
     txtArea.value = "";
@@ -321,21 +419,66 @@ class InterviewSimulator {
     this.speakQuestion(qObj);
   }
 
-  // Mic Toggle
-  toggleMic() {
-    if (!this.recognition) {
-      alert("현재 브라우저는 Web Speech API 마이크를 지원하지 않습니다. 텍스트로 직접 입력해 주세요.");
-      return;
-    }
-
-    if (this.isRecognizing) {
-      this.recognition.stop();
-    } else {
+  // Start Real Audio Recording & Speech Recognition
+  async startAnsweringProcess() {
+    if (this.recognition && !this.isRecognizing) {
       try {
         this.recognition.start();
-      } catch (e) {
-        console.warn("STT restart error:", e);
+      } catch (e) {}
+    }
+
+    // Real Audio Recording with MediaRecorder
+    if (this.sessionState.recordAudioEnabled && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        this.audioChunks = [];
+        this.mediaRecorder = new MediaRecorder(stream);
+
+        this.mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            this.audioChunks.push(event.data);
+          }
+        };
+
+        this.mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+          this.currentAudioBlobUrl = URL.createObjectURL(audioBlob);
+          const player = document.getElementById("recorded-audio-player");
+          const preview = document.getElementById("answer-audio-preview");
+          if (player && preview) {
+            player.src = this.currentAudioBlobUrl;
+            preview.style.display = "flex";
+          }
+          // Stop stream tracks
+          stream.getTracks().forEach(track => track.stop());
+        };
+
+        this.mediaRecorder.start();
+        const liveInd = document.getElementById("recording-live-indicator");
+        if (liveInd) liveInd.style.display = "inline-block";
+      } catch (err) {
+        console.warn("Audio recording permission or device not available:", err);
       }
+    }
+  }
+
+  stopAnsweringProcess() {
+    if (this.recognition && this.isRecognizing) {
+      this.recognition.stop();
+    }
+    if (this.mediaRecorder && this.mediaRecorder.state !== "inactive") {
+      this.mediaRecorder.stop();
+    }
+    const liveInd = document.getElementById("recording-live-indicator");
+    if (liveInd) liveInd.style.display = "none";
+  }
+
+  // Mic Toggle Button
+  toggleMic() {
+    if (this.isRecognizing || (this.mediaRecorder && this.mediaRecorder.state === "recording")) {
+      this.stopAnsweringProcess();
+    } else {
+      this.startAnsweringProcess();
     }
   }
 
@@ -365,12 +508,8 @@ class InterviewSimulator {
 
   // Submit Answer & Evaluate
   submitAnswerAndNext() {
-    if (this.recognition && this.isRecognizing) {
-      this.recognition.stop();
-    }
-    if (this.synth) {
-      this.synth.cancel();
-    }
+    this.stopAnsweringProcess();
+    if (this.synth) this.synth.cancel();
 
     const currentQ = this.sessionState.questions[this.sessionState.currentIndex];
     const answerText = document.getElementById("txt-candidate-answer").value.trim();
@@ -378,17 +517,18 @@ class InterviewSimulator {
     // Evaluate Answer
     const evalResult = evaluateAnswer(answerText, currentQ);
 
-    // Save Answer Record
+    // Save Answer Record with Recorded Audio
     this.sessionState.answers.push({
       questionIndex: this.sessionState.currentIndex + 1,
       question: currentQ,
       answerText: answerText,
+      audioBlobUrl: this.currentAudioBlobUrl,
       evalResult: evalResult,
       timestamp: new Date().toLocaleTimeString()
     });
 
-    // Check if Follow-up required (난이도 4~5단계이고 꼬리질문이 있는 경우 30% 확률로 꼬리질문 인젝션)
-    if (this.sessionState.difficulty >= 4 && currentQ.followUp && Math.random() < 0.35 && !currentQ._isFollowUp) {
+    // Check if Follow-up required (Level 4~5에서 꼬리질문 발동)
+    if (this.sessionState.difficulty >= 4 && currentQ.followUp && Math.random() < 0.4 && !currentQ._isFollowUp) {
       const followUpQ = {
         id: currentQ.id + 1000,
         qNumber: `${currentQ.qNumber}-꼬리질문`,
@@ -397,10 +537,9 @@ class InterviewSimulator {
         difficulty: 5,
         question: currentQ.followUp,
         keywords: currentQ.keywords.slice(0, 3),
-        idealPoints: ["원칙에 부합하는 소신 답변", "아동의 안전과 기관의 규정을 일관되게 고수"],
+        idealPoints: ["원칙에 부합하는 소신 답변", "아동의 안전과 기관 규정을 일관되게 고수"],
         _isFollowUp: true
       };
-      // 다음 질문으로 꼬리질문 삽입
       this.sessionState.questions.splice(this.sessionState.currentIndex + 1, 0, followUpQ);
     }
 
@@ -417,10 +556,9 @@ class InterviewSimulator {
   finishInterview() {
     clearInterval(this.sessionState.timerInterval);
     this.sessionState.isActive = false;
+    this.stopAnsweringProcess();
     if (this.synth) this.synth.cancel();
-    if (this.recognition && this.isRecognizing) this.recognition.stop();
 
-    // Calculate Final Metrics
     const totalCount = this.sessionState.answers.length || 1;
     let sumScore = 0;
     let commonScores = { child_focus: 0, integrity: 0, professionalism: 0, challenge: 0 };
@@ -505,6 +643,13 @@ class InterviewSimulator {
       const matchedBadges = evalR.matchedKeywords.map(k => `<span class="kw-badge matched">✓ ${k}</span>`).join(" ");
       const missingBadges = evalR.missingKeywords.map(k => `<span class="kw-badge missing">✗ ${k}</span>`).join(" ");
 
+      const audioPlaybackHtml = item.audioBlobUrl ? `
+        <div style="margin: 10px 0;">
+          <span style="font-size:0.82rem; font-weight:600; color:var(--primary);">🎧 내 실제 답변 음성 다시듣기:</span>
+          <audio controls src="${item.audioBlobUrl}" style="width: 100%; height: 36px; margin-top: 4px;"></audio>
+        </div>
+      ` : '';
+
       return `
         <div class="qa-item ${idx === 0 ? 'expanded' : ''}">
           <div class="qa-item-header" onclick="this.parentElement.classList.toggle('expanded')">
@@ -520,6 +665,7 @@ class InterviewSimulator {
             
             <div class="qa-block-title">【신지애 팀장 응답 전문】</div>
             <div class="qa-answer-box">${item.answerText || "(녹음 및 입력된 답변 없음)"}</div>
+            ${audioPlaybackHtml}
 
             <div class="qa-block-title">【면접관 패널 정밀 피드백】</div>
             <div class="qa-feedback-box">${evalR.feedback}</div>
@@ -698,18 +844,15 @@ class InterviewSimulator {
     dlAnchor.click();
   }
 
-  // GitHub Backup Guide
-  showGitHubBackupGuide() {
-    const guideMsg = `[GitHub 백업 및 원격 동기화 안내]
-
-1. [데이터 JSON 백업] 버튼을 눌러 모의면접 결과 파일을 다운로드합니다.
-2. 본인 GitHub 계정의 저장소(예: childfund-interview-practice)에 업로드하거나, GitHub Gist(https://gist.github.com)에 붙여넣어 안전하게 영구 보존할 수 있습니다.
-3. 또는 이 프로젝트 디렉토리 전체를 git remote에 푸시(push)하여 PC, 아이폰, 갤럭시 등 어디서나 GitHub Pages(웹 배포)를 통해 실시간으로 면접 연습을 이어갈 수 있습니다.
-
-지금 바로 JSON 백업을 진행하시겠습니까?`;
-
-    if (confirm(guideMsg)) {
-      this.exportHistoryJSON();
+  // Copy App Web URL
+  copyAppUrl() {
+    const url = window.location.href;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => {
+        alert("🔗 면접 연습 프로그램 접속 주소가 클립보드에 복사되었습니다!\n스마트폰 카카오톡이나 메모장에 붙여넣어 언제든지 접속하세요:\n" + url);
+      });
+    } else {
+      prompt("아래 주소를 복사하여 스마트폰이나 다른 기기에서 접속하세요:", url);
     }
   }
 }
