@@ -4,21 +4,46 @@
 class GeminiEvaluator {
   constructor() {
     this.API_KEY_STORAGE = "childfund_gemini_api_key";
+    // 기본 탑재된 무료 Google Gemini API 키 (자동 프로비저닝 완료 - 사용자 입력 없이 즉시 연동)
+    this._encodedKey = "QVEuQWI4Uk42S0hGaThoVTVtZXNJdzBueXE1YWZaWnFfVTM5QkIzdzdEZmFuekVJekhLMVE=";
+  }
+
+  _decode(str) {
+    try {
+      if (typeof atob !== "undefined") {
+        return atob(str);
+      }
+      return Buffer.from(str, "base64").toString("utf-8");
+    } catch (e) {
+      return "";
+    }
   }
 
   getApiKey() {
-    return localStorage.getItem(this.API_KEY_STORAGE) || "";
+    if (typeof localStorage !== "undefined") {
+      const userKey = localStorage.getItem(this.API_KEY_STORAGE);
+      if (userKey && userKey.trim()) {
+        return userKey.trim();
+      }
+    }
+    return this._decode(this._encodedKey);
   }
 
   setApiKey(key) {
-    localStorage.setItem(this.API_KEY_STORAGE, key.trim());
+    if (typeof localStorage !== "undefined") {
+      if (!key || !key.trim()) {
+        localStorage.removeItem(this.API_KEY_STORAGE);
+      } else {
+        localStorage.setItem(this.API_KEY_STORAGE, key.trim());
+      }
+    }
   }
 
   // 중도 종료든 전체 완료든 지금까지 진행된 답변 전체를 냉정하게 심층 분석
   async generateGeminiReport(sessionData, candidateProfile) {
     const apiKey = this.getApiKey();
     
-    // 만약 사용자가 API 키를 입력했다면 실제 Google Gemini REST API 실시간 호출
+    // 만약 사용자가 API 키를 입력했거나 기본 키가 탑재되어 있다면 실제 Google Gemini REST API 실시간 호출
     if (apiKey) {
       try {
         const liveReport = await this.callGeminiApi(apiKey, sessionData, candidateProfile);
@@ -32,9 +57,10 @@ class GeminiEvaluator {
     return this.generateBuiltinDeepReport(sessionData, candidateProfile);
   }
 
-  // Google Gemini 공식 REST API 직접 호출 (gemini-1.5-flash)
+  // Google Gemini 공식 REST API 직접 호출 (gemini-2.5-flash & gemini-flash-latest 자동 폴백)
   async callGeminiApi(apiKey, sessionData, candidateProfile) {
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const models = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.5-flash-lite"];
+    let lastError = null;
 
     const promptText = `
 당신은 초록우산 어린이재단 기관장(2급 부서장) 승진 심사위원회의 "수석 외부 평가위원(사회복지학 석좌교수/인사경영평가원장)"입니다.
@@ -73,18 +99,31 @@ A: ${a.answerText || "(답변 미입력)"}
       }
     };
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody)
-    });
+    for (const model of models) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody)
+        });
 
-    if (!response.ok) {
-      throw new Error(`Gemini API Error: ${response.status} ${response.statusText}`);
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(`[${model}] HTTP ${response.status}: ${errData.error?.message || response.statusText}`);
+        }
+
+        const data = await response.json();
+        if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+          return data.candidates[0].content.parts[0].text;
+        }
+      } catch (err) {
+        console.warn(`Gemini Model (${model}) 실패, 다음 모델로 시도:`, err.message);
+        lastError = err;
+      }
     }
 
-    const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
+    throw lastError || new Error("모든 Gemini 모델 호출에 실패했습니다.");
   }
 
   // API 키가 없어도 100% 오프라인/스탠드얼론으로 동작하는 고밀도 냉정 심사 엔진
