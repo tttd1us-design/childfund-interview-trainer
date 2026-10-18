@@ -163,31 +163,26 @@ const CHILDFUND_COMPETENCY_MODEL = {
   ]
 };
 
-// 텍스트 답변 분석 평가 알고리즘
+// 텍스트 답변 심층 분석 알고리즘 (객관적·비판적 심사평 & 실전 1등 합격 모범 스크립트 전수 생성)
 function evaluateAnswer(userAnswerText, questionObj) {
-  if (!userAnswerText || userAnswerText.trim().length < 5) {
-    return {
-      score: 20,
-      grade: "D",
-      feedback: "답변이 너무 짧거나 기록되지 않았습니다. 실전 면접에서는 최소 1분~1분 30초 내외로 구체적인 경험과 근거를 제시해야 합니다.",
-      matchedKeywords: [],
-      missingKeywords: questionObj.keywords,
-      analysis: {
-        clarity: 20,
-        competency: 20,
-        evidence: 20,
-        alignment: 20
-      }
-    };
-  }
+  const text = (userAnswerText || "").trim();
+  const cleanText = text.replace(/[\s\n\r\t.,!?'"~]/g, "").toLowerCase();
 
-  const cleanText = userAnswerText.replace(/[\s\n\r\t.,!?'"~]/g, "").toLowerCase();
-  
+  // 패널별 출제 의도 매핑
+  const panelIntentMap = {
+    CEO: "【정문기 대표이사 심사 의도】: 23년 재직의 신지애 후보자가 단순 단위 부서 팀장이 아닌, 재단 2030 가치관과 경영 마인드를 갖춘 최종 책임자로서의 기관장 철학을 갖추었는지 검증합니다.",
+    EXEC_DIRECTOR: "【박서진 실무이사 심사 의도】: 가정위탁 현장의 복합 위기사례 해결 역량과 2027 국가사업 전환, 평가지표 TF 등 제도적·정책적 전문성을 갖추었는지 팩트 기반으로 검증합니다.",
+    HR_DIRECTOR: "【김태호 인사기획팀장 심사 의도】: 신입 9명 육성 성공 경험이 재현 가능한 시스템인지, 경력자 소진 관리와 세대 소통 및 노무 이슈를 균형 있게 조율할 수 있는지 검증합니다.",
+    EXTERNAL_EXAMINER: "【이선우 외부교수 심사 의도】: 위기관리 2점 자평의 약점, 8개월 보호조치 지연, 경력 적합성 등 지원자가 회피하고 싶어 하는 취약점에 대한 객관성과 방어 논리를 송곳 검증합니다."
+  };
+
+  const examinerIntent = panelIntentMap[questionObj.panel] || "【면접관 출제 의도】: 초록우산 기관장으로서의 직무 수행 적격성 및 전략적 리더십을 검증합니다.";
+
   // 키워드 매칭 계산
   let matchedKeywords = [];
   let missingKeywords = [];
 
-  questionObj.keywords.forEach(kw => {
+  (questionObj.keywords || []).forEach(kw => {
     const cleanKw = kw.replace(/[\s\n\r\t.,!?'"~]/g, "").toLowerCase();
     if (cleanText.includes(cleanKw) || cleanText.includes(cleanKw.substring(0, Math.min(4, cleanKw.length)))) {
       matchedKeywords.push(kw);
@@ -196,13 +191,24 @@ function evaluateAnswer(userAnswerText, questionObj) {
     }
   });
 
-  const matchRatio = matchedKeywords.length / (questionObj.keywords.length || 1);
-  const lengthScore = Math.min(100, Math.max(40, (userAnswerText.length / 180) * 100)); // 약 180자 이상 만점 기준
-  
-  let totalScore = Math.round((matchRatio * 55) + (lengthScore * 0.35) + 10);
-  totalScore = Math.min(100, Math.max(35, totalScore));
+  const matchRatio = (questionObj.keywords && questionObj.keywords.length > 0) 
+    ? (matchedKeywords.length / questionObj.keywords.length) 
+    : 0;
 
-  let grade = "B";
+  // 답변 분량 점수 (약 200자 이상 만점 기준)
+  const lengthScore = text.length < 10 
+    ? 20 
+    : Math.min(100, Math.max(35, (text.length / 220) * 100));
+
+  let totalScore = 0;
+  if (text.length < 10) {
+    totalScore = 20;
+  } else {
+    totalScore = Math.round((matchRatio * 55) + (lengthScore * 0.35) + 10);
+    totalScore = Math.min(100, Math.max(30, totalScore));
+  }
+
+  let grade = "B (보통)";
   if (totalScore >= 90) grade = "S (탁월)";
   else if (totalScore >= 80) grade = "A (우수)";
   else if (totalScore >= 70) grade = "B (보통)";
@@ -210,26 +216,84 @@ function evaluateAnswer(userAnswerText, questionObj) {
   else grade = "D (보완 요망)";
 
   // 세부 4대 역량 지표 환산
-  const clarity = Math.min(100, Math.round(lengthScore * 0.9 + Math.random() * 10));
-  const competency = Math.min(100, Math.round(matchRatio * 85 + 15));
-  const evidence = Math.min(100, Math.round((matchedKeywords.length >= 2 ? 85 : 55) + Math.random() * 10));
-  const alignment = Math.min(100, Math.round(matchRatio * 80 + 20));
+  const clarity = text.length < 10 ? 20 : Math.min(100, Math.round(lengthScore * 0.85 + (matchRatio > 0.4 ? 15 : 5)));
+  const competency = text.length < 10 ? 20 : Math.min(100, Math.round(matchRatio * 80 + 20));
+  const evidence = text.length < 10 ? 20 : Math.min(100, Math.round((matchedKeywords.length >= 2 ? 88 : (matchedKeywords.length === 1 ? 65 : 45))));
+  const alignment = text.length < 10 ? 20 : Math.min(100, Math.round(matchRatio * 75 + (text.length > 100 ? 25 : 15)));
 
-  let feedback = "";
-  if (totalScore >= 85) {
-    feedback = `훌륭한 답변입니다. '${matchedKeywords.slice(0, 3).join(", ")}' 등 핵심 포인트를 명확한 근거와 함께 제시하였습니다. 면접관의 의도에 매우 잘 부합합니다.`;
-  } else if (totalScore >= 70) {
-    feedback = `양호한 답변입니다. 다만 더 완벽한 면접관 설득을 위해 [${missingKeywords.slice(0, 2).join(", ")}] 등의 구체적 수치와 제도적 근거를 보강하시면 더욱 강력해집니다.`;
+  // 1. 객관적·비판적 심사평 (팀장 티 vs 기관장 관점 진단)
+  let critiquePoints = [];
+  
+  // 분량 및 태도 비판
+  if (text.length < 50) {
+    critiquePoints.push("⚠️ **[분량 극단적 부족]** 답변이 단답형에 그쳐 실전 면접관에게 '준비 부족' 또는 '위기 상황 회피'라는 치명적 부정적 인상을 줄 수 있습니다. 기관장 면접에서는 최소 1분 15초(약 200~300자) 이상 논리적 완결성을 갖춰야 합니다.");
+  } else if (text.length < 140) {
+    critiquePoints.push("⚠️ **[설득력 및 근거 부족]** 결론은 언급되었으나 이를 입증할 현장 데이터와 제도적 팩트가 빈약하여, 외부 평가위원의 날카로운 꼬리질문에 쉽게 무너질 위험이 있습니다.");
   } else {
-    feedback = `다소 핵심이 분산되었습니다. [${missingKeywords.slice(0, 3).join(", ")}] 관련 구체적인 현장 사례와 수치를 직접 인용하여 주도성을 부각할 필요가 있습니다.`;
+    critiquePoints.push("✅ **[호흡 및 분량 양호]** 답변의 기본 볼륨과 전달력은 안정적인 궤도에 올라와 있습니다.");
+  }
+
+  // 팀장 vs 기관장 시각 팩트체크
+  if (text.includes("제가 직접") || text.includes("열심히 발로") || text.includes("동료들과 친하게")) {
+    critiquePoints.push("⚠️ **['팀장 티' 마이크로매니징 위험 지적]** '내가 직접 발로 뛰어 해결했다'는 실무자형 어휘는 기관장 면접에서 오히려 '위임하지 못하는 협소한 리더'로 비칠 수 있습니다. '직원이 시스템으로 일할 수 있는 매뉴얼과 협업 구조(System)를 설계했다'는 거시적 조직 경영의 어휘로 전환하십시오.");
+  } else {
+    critiquePoints.push("🔍 **[조직 경영 관점 점검]** 단순 실무 나열에 머물지 않고, 기관의 전체 비전과 제도적 지속가능성 관점에서 발언을 마무리하는 연습을 지속하십시오.");
+  }
+
+  // 핵심 키워드/숫자 누락 비판
+  if (missingKeywords.length > 0) {
+    critiquePoints.push(`⚠️ **[결정적 팩트 누락]** 본 질문의 킬러 팩트인 \`[${missingKeywords.slice(0, 3).join(', ')}]\` 관련 수치와 근거가 빠져 있습니다. 면접관은 두루뭉술한 수식어 대신 '신입 9명', '지정후원 1,000만원', '우수기관 3회' 같은 명확한 숫자에 신뢰를 보냅니다.`);
+  }
+
+  if (matchedKeywords.length > 0) {
+    critiquePoints.push(`✅ **[유효 득점 확인]** 핵심 키워드 \`[${matchedKeywords.join(', ')}]\`을(를) 적절히 배치하여 질문의 핵심 의도에 부합하였습니다.`);
+  }
+
+  const criticalReview = critiquePoints.join("<br><br>");
+
+  // 2. 실전 1등 합격 원포인트 모범 답변 스크립트 (기관장 표준 화법: 두괄식 결론 -> 구체적 팩트 -> 기관장 시스템 안착)
+  const idealPoints = questionObj.idealPoints || [];
+  const point1 = idealPoints[0] || "원칙과 기준을 세우고 조직과 끝까지 동행하겠습니다.";
+  const point2 = idealPoints[1] || "현장의 경험과 정확한 팩트를 기반으로 선제 대응하겠습니다.";
+  const point3 = idealPoints[2] || "전문가 및 유관기관과의 협업 체계를 가동하겠습니다.";
+  const point4 = idealPoints[3] || "아동이 안전하고 직원이 성장하는 지속가능한 기관을 확립하겠습니다.";
+
+  const idealModelScript = `
+<strong>「두괄식 결론 ➔ 구체적 팩트 및 지표 ➔ 기관장 시스템 확산」</strong><br>
+"네, 면접위원님. 저는 ${point1} 관점에서 본 사안을 해결해 왔으며, 기관장이 되어서도 이 원칙을 시스템으로 확장하겠습니다.<br>
+실제로 저는 ${point2}의 과정을 거쳤으며, ${point3}을(를) 통해 현장의 혼선 없이 완결 지은 경험이 있습니다.<br>
+기관장 부임 후에는 일선 실무자 개개인의 희생에 의존하지 않고, ${point4}의 구조를 제도화하여 재단 2030 가치관을 관내에서 가장 모범적으로 실현하겠습니다."
+  `.trim();
+
+  // 3. 예상 송곳 꼬리질문 및 철벽 방어 전략
+  let followUpDefense = "";
+  if (questionObj.followUp) {
+    followUpDefense = `
+<strong>🎯 [면접관의 송곳 꼬리질문]</strong>: "${questionObj.followUp}"<br>
+<strong>🛡️ [철벽 방어 핵심 팁]</strong>: 절대 당황하여 변명하거나 남 탓(지자체, 부서원)을 하지 마십시오. 문제 상황에 대한 기관장으로서의 도의적 책임과 원칙을 먼저 1초 만에 인정하고, 구체적인 프로세스 개선안(사후평가 간소화, 6개 기관 공조 체계, 단계적 업무 재분장 등)을 담담하고 자신감 있게 제시하십시오.
+    `.trim();
+  }
+
+  // 기존 한 줄 요약 피드백 (호환성 유지)
+  let shortFeedback = "";
+  if (totalScore >= 85) {
+    shortFeedback = `훌륭한 답변입니다. '${matchedKeywords.slice(0, 3).join(", ")}' 등 핵심 포인트를 명확한 근거와 함께 제시하였습니다. 면접관의 의도에 매우 잘 부합합니다.`;
+  } else if (totalScore >= 70) {
+    shortFeedback = `양호한 답변입니다. 다만 더 완벽한 면접관 설득을 위해 [${missingKeywords.slice(0, 2).join(", ")}] 등의 구체적 수치와 제도적 근거를 보강하시면 더욱 강력해집니다.`;
+  } else {
+    shortFeedback = `다소 핵심이 분산되었습니다. [${missingKeywords.slice(0, 3).join(", ")}] 관련 구체적인 현장 사례와 수치를 직접 인용하여 주도성을 부각할 필요가 있습니다.`;
   }
 
   return {
     score: totalScore,
     grade: grade,
-    feedback: feedback,
+    feedback: shortFeedback,
     matchedKeywords: matchedKeywords,
     missingKeywords: missingKeywords,
+    examinerIntent: examinerIntent,
+    criticalReview: criticalReview,
+    idealModelScript: idealModelScript,
+    followUpDefense: followUpDefense,
     analysis: {
       clarity: clarity,
       competency: competency,

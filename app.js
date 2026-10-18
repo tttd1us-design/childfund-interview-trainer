@@ -1587,8 +1587,23 @@ class InterviewSimulator {
               <div style="text-align:center;"><span style="font-size:0.82rem; color:var(--text-muted); display:block;">재단 방향 일치</span><strong style="color:#4f46e5; font-size:1.1rem;">${ana.alignment}점</strong></div>
             </div>
 
-            <div class="qa-block-title">【면접관 패널 정밀 피드백 & 답변 분석】</div>
-            <div class="qa-feedback-box">${evalR.feedback}</div>
+            <!-- 1. 출제 의도 및 채점 잣대 -->
+            <div class="qa-block-title">💡 【면접관 출제 의도 및 필수 채점 잣대】</div>
+            <div class="qa-intent-box">${evalR.examinerIntent || '초록우산 기관장으로서의 직무 수행 적격성 및 전략적 리더십을 검증합니다.'}</div>
+
+            <!-- 2. 객관적·비판적 심사평 (팀장 관점 vs 기관장 관점 진단) -->
+            <div class="qa-block-title">⚠️ 【객관적·비판적 심사평 & '팀장 티' 취약점 진단】</div>
+            <div class="qa-critique-box">${evalR.criticalReview || evalR.feedback}</div>
+
+            <!-- 3. 실전 합격 원포인트 모범 답변 스크립트 -->
+            <div class="qa-block-title">🏆 【실전 1등 합격 원포인트 모범 답변 스크립트】</div>
+            <div class="qa-model-box">${evalR.idealModelScript || '원칙과 기준을 세우고 조직과 끝까지 동행하겠습니다.'}</div>
+
+            <!-- 4. 예상 송곳 꼬리질문 및 철벽 방어 전략 -->
+            ${evalR.followUpDefense ? `
+              <div class="qa-block-title">🗡️ 【예상 송곳 꼬리질문 & 철벽 방어 가이드】</div>
+              <div class="qa-followup-box">${evalR.followUpDefense}</div>
+            ` : ''}
 
             <div class="qa-block-title" style="margin-top: 14px;">【포트폴리오 핵심 키워드 매칭 검증】</div>
             <div class="qa-tags-wrap">
