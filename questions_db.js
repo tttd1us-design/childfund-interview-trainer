@@ -2485,37 +2485,37 @@ const QUESTIONS_DB = [
   }
 ];
 
-function generateInterviewSet(difficultyLevel = 3, questionCount = 12) {
+function generateInterviewSet(difficultyLevel = 3, questionCount = 12, activePanels = ["CEO", "EXEC_DIRECTOR", "HR_DIRECTOR", "EXTERNAL_EXAMINER"]) {
   // 난이도별 대상 풀 구성
   let primaryPool = [];
   if (difficultyLevel === 1) {
-    // Level 1 (기본 소양/워밍업): Level 1 & 2 중심
     primaryPool = QUESTIONS_DB.filter(q => q.difficulty <= 2);
   } else if (difficultyLevel === 2) {
-    // Level 2 (실무 리더십): Level 2 & 3 중심
     primaryPool = QUESTIONS_DB.filter(q => q.difficulty >= 2 && q.difficulty <= 3);
   } else if (difficultyLevel === 3) {
-    // Level 3 (실전 기관장 표준): Level 2, 3, 4 표준 믹스
     primaryPool = QUESTIONS_DB.filter(q => q.difficulty >= 2 && q.difficulty <= 4);
   } else if (difficultyLevel === 4) {
-    // Level 4 (심층 정책/돌발): Level 3, 4, 5 고난도 믹스
     primaryPool = QUESTIONS_DB.filter(q => q.difficulty >= 3);
   } else if (difficultyLevel === 5) {
-    // Level 5 (송곳 압박): Level 4 & 5 최고난도
     primaryPool = QUESTIONS_DB.filter(q => q.difficulty >= 4);
   }
 
-  if (primaryPool.length < questionCount) {
-    primaryPool = [...QUESTIONS_DB];
+  // 선택된 면접관 패널 풀로 필터링
+  const validPanels = (activePanels && activePanels.length > 0) ? activePanels : ["CEO", "EXEC_DIRECTOR", "HR_DIRECTOR", "EXTERNAL_EXAMINER"];
+  let panelFilteredPool = primaryPool.filter(q => validPanels.includes(q.panel));
+  if (panelFilteredPool.length < questionCount) {
+    panelFilteredPool = QUESTIONS_DB.filter(q => validPanels.includes(q.panel));
+  }
+  if (panelFilteredPool.length === 0) {
+    panelFilteredPool = [...QUESTIONS_DB];
   }
 
-  // 필수 시작 질문 Q1 (자기소개) 및 마무리 질문 Q120 (역질문) 보장
-  const introQ = QUESTIONS_DB.find(q => q.qNumber === "Q1") || primaryPool[0];
-  const closingQ = QUESTIONS_DB.find(q => q.qNumber === "Q120") || primaryPool[primaryPool.length - 1];
+  // 필수 시작 질문 Q1 (자기소개) 및 마무리 질문 Q120 (역질문)
+  const introQ = panelFilteredPool.find(q => q.qNumber === "Q1") || panelFilteredPool[0];
+  const closingQ = panelFilteredPool.find(q => q.qNumber === "Q120") || panelFilteredPool[panelFilteredPool.length - 1];
 
-  // 4인 면접관별 균형 풀 구성 (CEO, EXEC_DIRECTOR, HR_DIRECTOR, EXTERNAL_EXAMINER)
   const getFromPool = (panel, excludeIds) => {
-    const candidates = primaryPool.filter(q => q.panel === panel && !excludeIds.has(q.id));
+    const candidates = panelFilteredPool.filter(q => q.panel === panel && !excludeIds.has(q.id));
     if (candidates.length > 0) {
       return candidates[Math.floor(Math.random() * candidates.length)];
     }
@@ -2526,72 +2526,28 @@ function generateInterviewSet(difficultyLevel = 3, questionCount = 12) {
   const selected = [introQ];
   const selectedIds = new Set([introQ.id, closingQ.id]);
 
-  // 서사적 면접 진행 템플릿 (10문항, 12문항, 15문항 대응)
-  // [도입 -> 인사/조직 -> 실무정책 -> 외부압박/위기 -> 미래비전 -> 마무리]
-  let panelSequence = [];
-  if (questionCount === 10) {
-    panelSequence = [
-      "HR_DIRECTOR",       // Q2: 인사 및 팀워크
-      "EXEC_DIRECTOR",     // Q3: 실무 전문성
-      "EXTERNAL_EXAMINER", // Q4: 객관적 검증
-      "HR_DIRECTOR",       // Q5: 소진 및 조직문화
-      "EXEC_DIRECTOR",     // Q6: 2027 정책 대책
-      "EXTERNAL_EXAMINER", // Q7: 위기관리 압박
-      "CEO",               // Q8: 경영 비전
-      "EXTERNAL_EXAMINER"  // Q9: 취약점 송곳 질문
-    ];
-  } else if (questionCount === 15) {
-    panelSequence = [
-      "CEO",               // Q2: 경영철학
-      "HR_DIRECTOR",       // Q3: 인재육성
-      "EXEC_DIRECTOR",     // Q4: 사업전문성
-      "EXTERNAL_EXAMINER", // Q5: 객관적 성과
-      "HR_DIRECTOR",       // Q6: 팀간 갈등
-      "EXEC_DIRECTOR",     // Q7: 지자체 거버넌스
-      "EXTERNAL_EXAMINER", // Q8: 위기개입 8개월
-      "EXTERNAL_EXAMINER", // Q9: 위기관리 2점 자평
-      "EXEC_DIRECTOR",     // Q10: 2027 국가사업
-      "HR_DIRECTOR",       // Q11: 세대소통/노무
-      "CEO",               // Q12: 2030 미래전략
-      "EXTERNAL_EXAMINER", // Q13: 최후의 송곳검증
-      "CEO"                // Q14: 기관장 결단력
-    ];
-  } else {
-    // 기본 12문항 (표준)
-    panelSequence = [
-      "HR_DIRECTOR",       // Q2: 신입 육성 및 팀장 리더십
-      "EXEC_DIRECTOR",     // Q3: 무연고 영아 및 가정위탁 전문성
-      "EXTERNAL_EXAMINER", // Q4: 객관적 실적 검증
-      "HR_DIRECTOR",       // Q5: 경력자 소진 및 조직관리
-      "EXEC_DIRECTOR",     // Q6: 2027 국가사업 전환
-      "EXTERNAL_EXAMINER", // Q7: 8개월 보호조치 지연 위기
-      "EXTERNAL_EXAMINER", // Q8: 위기관리 2점 자평 약점
-      "EXEC_DIRECTOR",     // Q9: 지자체 협력 및 평가지표 TF
-      "HR_DIRECTOR",       // Q10: 세대 소통 및 노무 이슈
-      "CEO"                // Q11: 기관장 경영 철학 및 2030 비전
-    ];
-  }
-
-  // 순서대로 질문 선발
-  for (const panel of panelSequence) {
-    const q = getFromPool(panel, selectedIds);
+  // 선택된 면접관들 사이에서 교대로 질문 배정
+  let panelIdx = 0;
+  while (selected.length < questionCount - 1) {
+    const currentPanel = validPanels[panelIdx % validPanels.length];
+    panelIdx++;
+    const q = getFromPool(currentPanel, selectedIds);
     if (q) {
       selected.push(q);
       selectedIds.add(q.id);
+    } else {
+      const remaining = panelFilteredPool.filter(item => !selectedIds.has(item.id));
+      if (remaining.length === 0) break;
+      const pick = remaining[Math.floor(Math.random() * remaining.length)];
+      selected.push(pick);
+      selectedIds.add(pick.id);
     }
   }
 
-  // 만약 목표 문항 수보다 부족하면 남은 풀에서 보충
-  while (selected.length < questionCount - 1) {
-    const available = primaryPool.filter(q => !selectedIds.has(q.id));
-    if (available.length === 0) break;
-    const randomPick = available[Math.floor(Math.random() * available.length)];
-    selected.push(randomPick);
-    selectedIds.add(randomPick.id);
+  // 마무리 질문 추가
+  if (selected.length < questionCount) {
+    selected.push(closingQ);
   }
-
-  // 마지막 질문으로 Q120(역질문) 추가
-  selected.push(closingQ);
 
   return selected;
 }

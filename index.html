@@ -145,6 +145,11 @@
         <span class="nav-icon">🎙️</span>
         <span class="nav-text">실전 AI 모의면접</span>
       </button>
+      <button id="nav-btn-study" class="nav-tab" onclick="app.switchMainTab('study')">
+        <span class="nav-icon">📖</span>
+        <span class="nav-text">기관장 승진 핵심 요약집</span>
+        <span class="nav-badge" style="background:#e65100;">합격 바이블</span>
+      </button>
       <button id="nav-btn-qbank" class="nav-tab" onclick="app.switchMainTab('qbank')">
         <span class="nav-icon">📚</span>
         <span class="nav-text">300대 실전 예상질문 도서관</span>
@@ -188,16 +193,29 @@
             </div>
           </div>
 
-          <!-- Mobile Direct Quick Jump Banner -->
-          <div class="mobile-qbank-jump-banner" onclick="app.switchMainTab('qbank')" style="margin-top: 1rem; padding: 12px 16px; background: linear-gradient(135deg, #008450 0%, #005a36 100%); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; box-shadow: 0 4px 12px rgba(0,132,80,0.25);">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span style="font-size: 1.5rem;">📚</span>
-              <div>
-                <strong style="font-size: 1rem; display: block;">300대 실전 예상질문 도서관 바로가기</strong>
-                <span style="font-size: 0.82rem; opacity: 0.9;">P1(출제확실) 40선, 1등 모범답변, 꼬리질문 방어대본 열람</span>
+          <!-- Mobile Direct Quick Jump Banner Grid -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; margin-top: 1rem;">
+            <div class="mobile-qbank-jump-banner" onclick="app.switchMainTab('study')" style="padding: 12px 16px; background: linear-gradient(135deg, #e65100 0%, #bf360c 100%); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; box-shadow: 0 4px 12px rgba(230,81,0,0.25);">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.5rem;">📖</span>
+                <div>
+                  <strong style="font-size: 0.98rem; display: block;">기관장 승진 핵심 요약집 (필독 요약본)</strong>
+                  <span style="font-size: 0.8rem; opacity: 0.95;">음성 없이 눈으로 빠르게 3대 아킬레스건·핵심수치 암기</span>
+                </div>
               </div>
+              <span style="font-size: 0.95rem; font-weight: bold; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px;">열람 →</span>
             </div>
-            <span style="font-size: 1.2rem; font-weight: bold; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px;">이동 →</span>
+
+            <div class="mobile-qbank-jump-banner" onclick="app.switchMainTab('qbank')" style="padding: 12px 16px; background: linear-gradient(135deg, #008450 0%, #005a36 100%); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; box-shadow: 0 4px 12px rgba(0,132,80,0.25);">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.5rem;">📚</span>
+                <div>
+                  <strong style="font-size: 0.98rem; display: block;">300대 실전 예상질문 도서관 바로가기</strong>
+                  <span style="font-size: 0.8rem; opacity: 0.95;">P1(출제확실) 40선, 1등 모범답변, 꼬리질문 방어대본</span>
+                </div>
+              </div>
+              <span style="font-size: 0.95rem; font-weight: bold; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px;">이동 →</span>
+            </div>
           </div>
         </div>
 
@@ -256,11 +274,24 @@
               <h3>진행 및 음성 설정</h3>
             </div>
             <div class="setting-item">
+              <label for="select-interview-time">⏱️ 총 면접 진행 시간</label>
+              <select id="select-interview-time" class="form-select" onchange="app.changeInterviewDuration(this.value)">
+                <option value="15">15분 (스피드 집중 점검)</option>
+                <option value="20">20분 (핵심 압축 면접)</option>
+                <option value="30" selected>30분 (초록우산 표준 심사 - 추천)</option>
+                <option value="45">45분 (심층 종합 심사)</option>
+                <option value="60">60분 (마라톤 완벽 대비)</option>
+              </select>
+            </div>
+            <div class="setting-item">
               <label for="q-count">출제 질문 개수</label>
               <select id="q-count" class="form-select">
+                <option value="5">5문항 (초단기 5문 5답)</option>
+                <option value="8">8문항 (약식 실무 점검)</option>
                 <option value="10">10문항 (표준 패스트트랙 - 문항당 약 3분)</option>
                 <option value="12" selected>12문항 (추천 실전 모의면접 - 문항당 2.5분)</option>
                 <option value="15">15문항 (고밀도 심층 검증 - 문항당 2분)</option>
+                <option value="20">20문항 (전방위 집중 검증)</option>
               </select>
             </div>
             <div class="setting-item">
@@ -317,44 +348,71 @@
           </div>
         </div>
 
-        <!-- 4 Interviewers Showcase -->
+        <!-- 4 Interviewers Showcase & Participation Selector -->
         <div class="panel-preview-area">
-          <h3 class="section-title">오늘의 4인 남/여 전문 면접관 패널 (아나운서급 자연스러운 육성)</h3>
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+            <h3 class="section-title" style="margin: 0;">👥 면접관 패널 선택 (체크하여 원하는 면접관만 1~4명 선택)</h3>
+            <div class="panel-preset-actions" style="display: flex; gap: 6px;">
+              <button type="button" class="btn btn-sm btn-secondary" onclick="app.setPanelSelection(['CEO','EXEC_DIRECTOR','HR_DIRECTOR','EXTERNAL_EXAMINER'])">전체 4인</button>
+              <button type="button" class="btn btn-sm btn-secondary" onclick="app.setPanelSelection(['CEO'])">정문기 대표 1:1</button>
+              <button type="button" class="btn btn-sm btn-secondary" onclick="app.setPanelSelection(['EXTERNAL_EXAMINER'])">송곳 압박 1:1</button>
+              <button type="button" class="btn btn-sm btn-secondary" onclick="app.setPanelSelection(['CEO','EXEC_DIRECTOR'])">경영/실무 2인</button>
+            </div>
+          </div>
+          <p class="panel-desc" style="font-size: 0.88rem; color: #666; margin-bottom: 1rem;">
+            체크된 면접관만 모의면접 질의응답에 참여합니다. 1명만 선택하여 집중 1:1 면접을 진행하거나 원하는 조합을 직접 구성해 보세요.
+          </p>
           <div class="panel-grid">
-            <div class="interviewer-intro-card">
+            <div class="interviewer-intro-card" id="card-panel-ceo">
+              <label class="panel-select-checkbox-label" style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; margin-bottom: 8px;">
+                <input type="checkbox" class="chk-panel-select" value="CEO" checked onchange="app.updateSelectedPanelsUI()">
+                <span>면접 참여</span>
+              </label>
               <div class="avatar">👔</div>
               <h4>정문기 대표이사 <span class="gender-tag male">남성 음성</span></h4>
               <span class="badge">총괄 비전 & 경영</span>
               <p>따뜻하고 신뢰감 있는 편안한 중저음으로 재단 2030 가치관, 조직 비전 제시, 경영 마인드를 질문합니다.</p>
               <button type="button" class="btn-voice-preview" onclick="app.previewInterviewerVoice('CEO')">
-                <span>🔊 따뜻한 목소리 미리듣기</span>
+                <span>🔊 목소리 미리듣기</span>
               </button>
             </div>
-            <div class="interviewer-intro-card">
+            <div class="interviewer-intro-card" id="card-panel-director">
+              <label class="panel-select-checkbox-label" style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; margin-bottom: 8px;">
+                <input type="checkbox" class="chk-panel-select" value="EXEC_DIRECTOR" checked onchange="app.updateSelectedPanelsUI()">
+                <span>면접 참여</span>
+              </label>
               <div class="avatar">👩‍💼</div>
               <h4>박서진 실무이사 <span class="gender-tag female">여성 음성</span></h4>
               <span class="badge">복지사업 & 정책</span>
               <p>부드럽고 맑은 아나운서 톤으로 무연고 영아 시범사업, 2027 국가사업 전환, 평가지표 TF를 질문합니다.</p>
               <button type="button" class="btn-voice-preview" onclick="app.previewInterviewerVoice('EXEC_DIRECTOR')">
-                <span>🔊 부드러운 목소리 미리듣기</span>
+                <span>🔊 목소리 미리듣기</span>
               </button>
             </div>
-            <div class="interviewer-intro-card">
+            <div class="interviewer-intro-card" id="card-panel-hr">
+              <label class="panel-select-checkbox-label" style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; margin-bottom: 8px;">
+                <input type="checkbox" class="chk-panel-select" value="HR_DIRECTOR" checked onchange="app.updateSelectedPanelsUI()">
+                <span>면접 참여</span>
+              </label>
               <div class="avatar">👨‍💼</div>
               <h4>김태호 인사기획팀장 <span class="gender-tag male">남성 음성</span></h4>
               <span class="badge">조직 & 인적자원</span>
               <p>차분하고 온화한 남성 톤으로 신입 9명 육성, 경력자 소진관리, 노무 및 세대 소통을 편안하게 묻습니다.</p>
               <button type="button" class="btn-voice-preview" onclick="app.previewInterviewerVoice('HR_DIRECTOR')">
-                <span>🔊 차분한 목소리 미리듣기</span>
+                <span>🔊 목소리 미리듣기</span>
               </button>
             </div>
-            <div class="interviewer-intro-card">
+            <div class="interviewer-intro-card" id="card-panel-external">
+              <label class="panel-select-checkbox-label" style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; margin-bottom: 8px;">
+                <input type="checkbox" class="chk-panel-select" value="EXTERNAL_EXAMINER" checked onchange="app.updateSelectedPanelsUI()">
+                <span>면접 참여</span>
+              </label>
               <div class="avatar">👩‍🏫</div>
               <h4>이선우 외부면접관 <span class="gender-tag female">여성 음성</span></h4>
               <span class="badge">송곳 압박 & 객관성</span>
               <p>지적이고 차분한 여성 톤으로 위기관리 2점 자평의 약점, 8개월 보호조치 지연의 핵심을 날카롭게 짚어줍니다.</p>
               <button type="button" class="btn-voice-preview" onclick="app.previewInterviewerVoice('EXTERNAL_EXAMINER')">
-                <span>🔊 지적인 목소리 미리듣기</span>
+                <span>🔊 목소리 미리듣기</span>
               </button>
             </div>
           </div>
@@ -661,6 +719,137 @@
               <!-- Injected via JS -->
             </tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- VIEW 6: 기관장 승진 핵심 요약집 (Study Bible - 텍스트 독서형 합격 바이블) -->
+      <section id="view-study" class="view-panel">
+        <div class="qbank-header-banner" style="background: linear-gradient(135deg, #bf360c 0%, #d84315 50%, #e65100 100%);">
+          <div class="qbank-title-group">
+            <div class="qbank-badge" style="background: rgba(255,255,255,0.25); color: #fff;">📖 2026 초록우산 기관장 승진 필독 요약집</div>
+            <h2>신지애 후보자 기관장 승진 핵심 요약집 (Study Bible)</h2>
+            <p>음성을 듣지 않아도 출퇴근길이나 대기실에서 스마트폰으로 빠르게 읽고 암기할 수 있는 텍스트 집중 학습관입니다. 3대 아킬레스건 철벽 방어 논리, 23년 핵심 성과 수치, 2026 초록우산 8대 핵심역량 행동지표, 1분 구술 3단 뼈대 공식을 한눈에 마스터하세요.</p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+            <button class="btn btn-sm btn-secondary" onclick="window.print()" style="background: rgba(255,255,255,0.2); color:#fff; border:none;">🖨️ 요약집 인쇄</button>
+            <button class="btn btn-sm btn-secondary" onclick="app.switchMainTab('qbank')" style="background: rgba(255,255,255,0.2); color:#fff; border:none;">📚 300대 도서관 바로가기 →</button>
+          </div>
+        </div>
+
+        <!-- 4대 핵심 학습 모듈 탭/카드 -->
+        <div class="study-modules-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+          
+          <!-- 모듈 1: 3대 아킬레스건 송곳 질문 & 철벽 방어 공식 -->
+          <div class="card study-card" style="border-top: 4px solid #d32f2f;">
+            <div class="card-title">
+              <span class="icon">🛡️</span>
+              <h3 style="color: #c62828;">[필수 암기] 3대 아킬레스건 철벽 방어 공식</h3>
+            </div>
+            <div class="study-content-body" style="font-size: 0.93rem; line-height: 1.7; color: var(--text-color);">
+              <div style="margin-bottom: 1rem; padding: 10px; background: rgba(211,47,47,0.06); border-radius: 8px;">
+                <strong style="color: #c62828; display: block; margin-bottom: 4px;">🚨 아킬레스건 1: 위기관리 역량 2점 자평</strong>
+                <p style="margin: 0; font-size: 0.88rem;">
+                  <strong>• 면접관 질문:</strong> "기관장은 위기관리의 최종 책임자인데, 역량평가표에 위기관리를 왜 2점으로 낮게 부여했습니까?"<br>
+                  <strong>• 1등 방어 공식:</strong> "위기 대처 실패가 아니라, <strong>'사후 체계화(L4)' 기준을 최고 수준으로 엄격히 잣대질한 자평</strong>입니다. 3대 분야 25명 전 직원의 위기 체크리스트를 이미 개발 완료했으며, 4분기 간소화 매뉴얼로 표준화 중입니다."
+                </p>
+              </div>
+
+              <div style="margin-bottom: 1rem; padding: 10px; background: rgba(211,47,47,0.06); border-radius: 8px;">
+                <strong style="color: #c62828; display: block; margin-bottom: 4px;">🚨 아킬레스건 2: 학대사례 8개월 보호조치 변경 지연</strong>
+                <p style="margin: 0; font-size: 0.88rem;">
+                  <strong>• 면접관 질문:</strong> "아동 학대 정황이 있는데 보호조치 변경에 왜 8개월이나 걸렸습니까? 늑장 대응 아닙니까?"<br>
+                  <strong>• 1등 방어 공식:</strong> "행정 공백이 아니라, 위탁모의 비협조와 구청의 이견 속에서 <strong>6개 유관기관의 법적·심리적 근거를 완벽히 구축하여 2차 피해 없이 안전하게 분리</strong>해 낸 집요한 거버넌스의 승리였습니다."
+                </p>
+              </div>
+
+              <div style="padding: 10px; background: rgba(211,47,47,0.06); border-radius: 8px;">
+                <strong style="color: #c62828; display: block; margin-bottom: 4px;">🚨 아킬레스건 3: 2027 가정위탁 국가사업 공공화 전환 위기</strong>
+                <p style="margin: 0; font-size: 0.88rem;">
+                  <strong>• 면접관 질문:</strong> "2027년 위탁사업이 지자체 공공화되면 센터 조직이 축소되거나 위태로워질 텐데 어떻게 돌파하겠습니까?"<br>
+                  <strong>• 1등 방어 공식:</strong> "단순 위탁업무에 머물지 않고, <strong>전문 가정위탁·경계선 지능(느린학습자) 특화 거점센터로 기능 고도화</strong>하고, 지자체 TF 경험을 살려 공공이 못 하는 고난도 전문서비스를 선제 제안하겠습니다."
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 모듈 2: 1초 암기 정량 수치 팩트 시트 -->
+          <div class="card study-card" style="border-top: 4px solid #1976d2;">
+            <div class="card-title">
+              <span class="icon">📊</span>
+              <h3 style="color: #1565c0;">[팩트 시트] 1초 암기 핵심 정량 수치</h3>
+            </div>
+            <div class="study-content-body" style="font-size: 0.92rem; line-height: 1.7;">
+              <ul style="padding-left: 1.2rem; margin: 0 0 1rem 0;">
+                <li><strong>총 재직 기간:</strong> 23년 8개월 (초록우산 복지 외길)</li>
+                <li><strong>가정위탁 전문 경력:</strong> 11년 (서울가정위탁 5년 + 경기남부 6년)</li>
+                <li><strong>경기남부 총괄 규모:</strong> 1,007세대 1,228명 위탁아동 관리</li>
+                <li><strong>신입 온보딩 성공률:</strong> 과장 3명 전보 위기 속 <strong>신입 9명 전원 정착(이탈 0명)</strong></li>
+                <li><strong>평가 실적:</strong> 재단 경영평가 2연속 우수 + 보건복지부 평가 우수기관 달성</li>
+                <li><strong>선도 시범사업:</strong> 무연고 영아 7명 가정위탁 및 지정후원 1,000만 원 유치</li>
+                <li><strong>외부 전문성:</strong> 복지부 평가지표 TF 위원 (전국 18개 센터 40개 지표 조율), 인재원 강사(4.31점)</li>
+              </ul>
+              <div style="padding: 8px 12px; background: rgba(25,118,210,0.08); border-radius: 8px; font-weight: bold; color: #1565c0;">
+                💡 면접 시 "열심히 했습니다" 대신 "1,007세대와 신입 9명 온보딩의 데이터"를 반드시 구술하세요!
+              </div>
+            </div>
+          </div>
+
+          <!-- 모듈 3: 초록우산 2026 역량모델 핵심 채점 잣대 -->
+          <div class="card study-card" style="border-top: 4px solid #388e3c;">
+            <div class="card-title">
+              <span class="icon">🌿</span>
+              <h3 style="color: #2e7d32;">[역량 모델] 8대 행동지표 채점 잣대</h3>
+            </div>
+            <div class="study-content-body" style="font-size: 0.9rem; line-height: 1.6;">
+              <div style="margin-bottom: 8px;">
+                <strong style="color: #2e7d32;">1. 아동중심:</strong> 모든 결정에서 아동의 최선의 이익을 수호하는가
+              </div>
+              <div style="margin-bottom: 8px;">
+                <strong style="color: #2e7d32;">2. 진정성:</strong> 자신의 약점을 정직하게 인정하고 개선 대안을 제시하는가
+              </div>
+              <div style="margin-bottom: 8px;">
+                <strong style="color: #2e7d32;">3. 전문성:</strong> 23년 경험을 구조화하여 매뉴얼과 시스템으로 남겼는가
+              </div>
+              <div style="margin-bottom: 8px;">
+                <strong style="color: #2e7d32;">4. 소통과 협력:</strong> 지자체·유관기관의 갈등을 R&R과 거버넌스로 푸는가
+              </div>
+              <div style="margin-bottom: 8px;">
+                <strong style="color: #2e7d32;">5. 전략적 사고:</strong> 2027 공공화 전환 등 외부 환경 변화를 예측하는가
+              </div>
+              <div style="margin-bottom: 8px;">
+                <strong style="color: #2e7d32;">6. 변화 주도:</strong> 관행을 타파하고 선제적 시범 모델을 설계하는가
+              </div>
+              <div style="margin-bottom: 8px;">
+                <strong style="color: #2e7d32;">7. 성과 창출:</strong> 목표 달성 및 팀원들의 업무 효율을 구조화하는가
+              </div>
+              <div>
+                <strong style="color: #2e7d32;">8. 인재 육성:</strong> 실무자를 혼자 두지 않고 동행 코칭과 심리적 안정감을 주는가
+              </div>
+            </div>
+          </div>
+
+          <!-- 모듈 4: 실전 1분 스피치 3단 공식 (두괄식 만능 템플릿) -->
+          <div class="card study-card" style="border-top: 4px solid #7b1fa2;">
+            <div class="card-title">
+              <span class="icon">🎙️</span>
+              <h3 style="color: #6a1b9a;">[스피치 비법] 1분 두괄식 만능 3단 뼈대</h3>
+            </div>
+            <div class="study-content-body" style="font-size: 0.92rem; line-height: 1.7;">
+              <div style="margin-bottom: 10px;">
+                <strong style="color: #6a1b9a;">[1단계] 두괄식 결론 (15초):</strong><br>
+                "네, 위원님. 저는 그 과제를 <strong>'사람이 남고 시스템으로 지켜지는 구조'</strong>로 해결하겠습니다."
+              </div>
+              <div style="margin-bottom: 10px;">
+                <strong style="color: #6a1b9a;">[2단계] 정량적 실적 팩트 (30초):</strong><br>
+                "실제로 경기남부에서 과장 3명 공백 당시 <strong>선배 동행제와 3대 분야 매뉴얼</strong>을 가동하여 <strong>신입 9명 전원 정착과 우수기관 3회</strong>를 달성했습니다."
+              </div>
+              <div>
+                <strong style="color: #6a1b9a;">[3단계] 기관장 비전 연결 (15초):</strong><br>
+                "기관장이 되어서도 특정 개인의 희생에 기대지 않고, <strong>어떤 위기에도 흔들리지 않는 튼튼한 거버넌스</strong>로 기관을 경영하겠습니다."
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 

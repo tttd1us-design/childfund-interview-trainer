@@ -10,6 +10,8 @@ class InterviewSimulator {
       currentIndex: 0,
       questions: [],
       answers: [], // { question, answerText, audioBlobUrl, evalResult, timestamp }
+      durationMinutes: parseInt(localStorage.getItem("childfund_interview_duration")) || 30,
+      selectedPanels: JSON.parse(localStorage.getItem("childfund_selected_panels") || '["CEO","EXEC_DIRECTOR","HR_DIRECTOR","EXTERNAL_EXAMINER"]'),
       timerSeconds: 30 * 60, // 30분
       timerInterval: null,
       ttsEnabled: true,
@@ -96,6 +98,14 @@ class InterviewSimulator {
     this.bindEvents();
     this.renderHistoryTable();
     this.initQBank();
+    
+    // Apply initial stored duration and panel selection
+    const timeSelect = document.getElementById("select-interview-time");
+    if (timeSelect) {
+      timeSelect.value = String(this.sessionState.durationMinutes || 30);
+      this.changeInterviewDuration(this.sessionState.durationMinutes || 30);
+    }
+    this.setPanelSelection(this.sessionState.selectedPanels);
   }
 
   // Multi-User Management System
@@ -651,14 +661,51 @@ class InterviewSimulator {
     }
   }
 
-  changeFemaleTone(tone) {
-    this.femaleVoiceTone = tone;
-    localStorage.setItem("childfund_female_tone", tone);
-    // Update INTERVIEW_PANEL dynamically
-    if (tone === "aoede" || tone === "kore") {
-      INTERVIEW_PANEL.EXEC_DIRECTOR.geminiVoice = tone === "kore" ? "Kore" : "Aoede";
-      INTERVIEW_PANEL.EXTERNAL_EXAMINER.geminiVoice = tone === "aoede" ? "Aoede" : "Kore";
+  changeInterviewDuration(minutes) {
+    const mins = parseInt(minutes) || 30;
+    this.sessionState.durationMinutes = mins;
+    localStorage.setItem("childfund_interview_duration", mins);
+    const startBtnText = document.querySelector("#btn-start-interview span:last-child");
+    if (startBtnText) {
+      startBtnText.textContent = `${mins}분 실전 모의면접 시작하기`;
     }
+  }
+
+  setPanelSelection(panelList) {
+    this.sessionState.selectedPanels = panelList;
+    localStorage.setItem("childfund_selected_panels", JSON.stringify(panelList));
+    document.querySelectorAll(".chk-panel-select").forEach(chk => {
+      chk.checked = panelList.includes(chk.value);
+    });
+    this.updateSelectedPanelsUI();
+  }
+
+  updateSelectedPanelsUI() {
+    const checked = Array.from(document.querySelectorAll(".chk-panel-select:checked")).map(c => c.value);
+    if (checked.length === 0) {
+      alert("최소 1명의 면접관은 선택되어야 합니다.");
+      const ceoChk = document.querySelector('.chk-panel-select[value="CEO"]');
+      if (ceoChk) ceoChk.checked = true;
+      this.sessionState.selectedPanels = ["CEO"];
+    } else {
+      this.sessionState.selectedPanels = checked;
+    }
+    localStorage.setItem("childfund_selected_panels", JSON.stringify(this.sessionState.selectedPanels));
+
+    // Update active chairs visibility and opacity
+    const panelCards = {
+      CEO: document.getElementById("card-panel-ceo"),
+      EXEC_DIRECTOR: document.getElementById("card-panel-director"),
+      HR_DIRECTOR: document.getElementById("card-panel-hr"),
+      EXTERNAL_EXAMINER: document.getElementById("card-panel-external")
+    };
+    Object.entries(panelCards).forEach(([panelKey, cardEl]) => {
+      if (cardEl) {
+        const isIncluded = this.sessionState.selectedPanels.includes(panelKey);
+        cardEl.style.opacity = isIncluded ? "1" : "0.55";
+        cardEl.style.border = isIncluded ? "2px solid #008450" : "1px solid #ddd";
+      }
+    });
   }
 
   // Request Ultra-Natural Human-Like Speech from Google Gemini 2.5 Neural TTS
@@ -978,9 +1025,12 @@ class InterviewSimulator {
     });
   }
 
-  // Switch Top Level Tabs (Interview / Question Bank / History)
+  // Switch Top Level Tabs (Interview / Study / Question Bank / History)
   switchMainTab(tabName) {
-    if (tabName === "qbank") {
+    if (tabName === "study") {
+      this.showView("view-study");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (tabName === "qbank") {
       this.showView("view-qbank");
       this.initQBank();
       // 스마트폰/모바일 환경에서 탭 전환 시 즉각 강제 렌더링 및 상단 이동
@@ -1009,22 +1059,14 @@ class InterviewSimulator {
 
     // Sync Navigation Tab States
     const navInterview = document.getElementById("nav-btn-interview");
+    const navStudy = document.getElementById("nav-btn-study");
     const navQBank = document.getElementById("nav-btn-qbank");
     const navHistory = document.getElementById("nav-btn-history");
 
-    if (navInterview && navQBank && navHistory) {
-      navInterview.classList.remove("active");
-      navQBank.classList.remove("active");
-      navHistory.classList.remove("active");
-
-      if (viewId === "view-qbank") {
-        navQBank.classList.add("active");
-      } else if (viewId === "view-history-dash") {
-        navHistory.classList.add("active");
-      } else {
-        navInterview.classList.add("active");
-      }
-    }
+    if (navInterview) navInterview.classList.toggle("active", viewId === "view-setup" || viewId === "view-interview" || viewId === "view-report");
+    if (navStudy) navStudy.classList.toggle("active", viewId === "view-study");
+    if (navQBank) navQBank.classList.toggle("active", viewId === "view-qbank");
+    if (navHistory) navHistory.classList.toggle("active", viewId === "view-history-dash");
   }
 
   // Start Interview Flow
@@ -1032,6 +1074,10 @@ class InterviewSimulator {
     const diffRadio = document.querySelector('input[name="difficulty"]:checked');
     this.sessionState.difficulty = diffRadio ? parseInt(diffRadio.value) : 3;
     this.sessionState.totalQuestions = parseInt(document.getElementById("q-count").value) || 12;
+    
+    const timeSelect = document.getElementById("select-interview-time");
+    this.sessionState.durationMinutes = timeSelect ? parseInt(timeSelect.value) : (this.sessionState.durationMinutes || 30);
+
     this.sessionState.ttsEnabled = document.getElementById("toggle-tts").checked;
     this.sessionState.sttEnabled = document.getElementById("toggle-stt").checked;
     this.sessionState.recordAudioEnabled = document.getElementById("toggle-record-audio").checked;
@@ -1042,7 +1088,7 @@ class InterviewSimulator {
     this.sessionState.isPaused = false;
     this.sessionState.currentIndex = 0;
     this.sessionState.answers = [];
-    this.sessionState.timerSeconds = 30 * 60; // 30분 카운트다운
+    this.sessionState.timerSeconds = this.sessionState.durationMinutes * 60; // 사용자 설정 분 카운트다운
 
     // 사용자 제스처(시작 버튼 클릭) 시점에 미리 마이크 권한을 승인받아 브라우저 정책 차단 방지
     if ((this.sessionState.recordAudioEnabled || this.sessionState.sttEnabled) && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -1055,11 +1101,29 @@ class InterviewSimulator {
       }
     }
 
+    // 선택된 패널 가져오기
+    const checkedPanels = Array.from(document.querySelectorAll(".chk-panel-select:checked")).map(c => c.value);
+    this.sessionState.selectedPanels = checkedPanels.length > 0 ? checkedPanels : ["CEO", "EXEC_DIRECTOR", "HR_DIRECTOR", "EXTERNAL_EXAMINER"];
+
     // Generate Question Set
-    this.sessionState.questions = generateInterviewSet(this.sessionState.difficulty, this.sessionState.totalQuestions);
+    this.sessionState.questions = generateInterviewSet(this.sessionState.difficulty, this.sessionState.totalQuestions, this.sessionState.selectedPanels);
 
     // Show View & Start Timer
     this.showView("view-interview");
+
+    // 면접실 상단 의자(chairs) 표시 상태 동기화
+    const chairMap = {
+      CEO: document.getElementById("chair-ceo"),
+      EXEC_DIRECTOR: document.getElementById("chair-director"),
+      HR_DIRECTOR: document.getElementById("chair-hr"),
+      EXTERNAL_EXAMINER: document.getElementById("chair-external")
+    };
+    Object.entries(chairMap).forEach(([pkey, chairEl]) => {
+      if (chairEl) {
+        chairEl.style.display = this.sessionState.selectedPanels.includes(pkey) ? "flex" : "none";
+      }
+    });
+
     this.startTimer();
     this.loadQuestion(0);
   }
@@ -1076,7 +1140,7 @@ class InterviewSimulator {
 
         if (this.sessionState.timerSeconds <= 0) {
           clearInterval(this.sessionState.timerInterval);
-          alert("30분 실전 면접 시간이 모두 종료되었습니다. 최종 평가 보고서를 생성합니다.");
+          alert(`설정하신 ${this.sessionState.durationMinutes}분의 면접 시간이 모두 종료되었습니다. 최종 평가 보고서를 생성합니다.`);
           this.finishInterview();
         }
       }
