@@ -1452,6 +1452,118 @@ body {
   height: 280px;
 }
 
+/* ==================== Google Gemini AI 심층 보고서 카드 스타일 ==================== */
+.gemini-report-card {
+  background: var(--bg-card);
+  border: 2px solid #818cf8;
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.gemini-report-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #4f46e5 0%, #818cf8 50%, #008450 100%);
+}
+
+.gemini-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.gemini-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.gemini-content-box {
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 26px;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--text-main);
+}
+
+.gemini-content-box h3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #4f46e5;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 6px;
+}
+
+[data-theme="dark"] .gemini-content-box h3 {
+  color: #a5b4fc;
+}
+
+.gemini-content-box h3:first-child {
+  margin-top: 0;
+}
+
+.gemini-content-box hr {
+  border: 0;
+  height: 1px;
+  background: var(--border-color);
+  margin: 20px 0;
+}
+
+.gemini-content-box ul, .gemini-content-box ol {
+  padding-left: 24px;
+  margin: 10px 0;
+}
+
+.gemini-content-box li {
+  margin-bottom: 8px;
+}
+
+.gemini-content-box blockquote {
+  border-left: 4px solid #6366f1;
+  padding: 10px 18px;
+  background: rgba(99, 102, 241, 0.08);
+  border-radius: 4px;
+  margin: 14px 0;
+  font-style: normal;
+}
+
+.gemini-loading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 24px;
+  color: #4f46e5;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(79, 70, 229, 0.2);
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* QA ACCORDION */
 .qa-details-card {
   margin-bottom: 28px;

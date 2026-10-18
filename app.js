@@ -871,14 +871,37 @@ class InterviewSimulator {
     }
   }
 
-  // Finish Interview & Generate Comprehensive Report
-  finishInterview() {
+  // Finish Interview & Generate Comprehensive Report (중도 완료 및 전체 완료 모두 완벽 지원)
+  async finishInterview() {
     clearInterval(this.sessionState.timerInterval);
     this.sessionState.isActive = false;
     this.stopAnsweringProcess();
     if (this.synth) this.synth.cancel();
 
-    const totalCount = this.sessionState.answers.length || 1;
+    // 현재 작성 중이던 답변이 있고 아직 제출되지 않았다면 자동 취합
+    const txtArea = document.getElementById("txt-candidate-answer");
+    const currentQ = this.sessionState.questions[this.sessionState.currentIndex];
+    const currentTxt = txtArea ? txtArea.value.trim() : "";
+
+    // 이미 등록된 답변 수가 현재 인덱스보다 적다면 현재 답변 자동 등록
+    if (currentQ && this.sessionState.answers.length <= this.sessionState.currentIndex && currentTxt.length > 0) {
+      const evalResult = evaluateAnswer(currentTxt, currentQ);
+      this.sessionState.answers.push({
+        questionIndex: this.sessionState.currentIndex + 1,
+        question: currentQ,
+        answerText: currentTxt,
+        audioBlobUrl: this.currentAudioBlobUrl,
+        evalResult: evalResult,
+        timestamp: new Date().toLocaleTimeString()
+      });
+    }
+
+    const totalCount = this.sessionState.answers.length;
+    if (totalCount === 0) {
+      alert("아직 작성된 답변이 없습니다. 최소 1문항 이상 답변을 진행한 후 완료해 주세요.");
+      return;
+    }
+
     let sumScore = 0;
     let commonScores = { child_focus: 0, integrity: 0, professionalism: 0, challenge: 0 };
     let leadershipScores = { vision_setting: 0, business_mindset: 0, decision_making: 0, performance_mgmt: 0, motivation: 0 };
@@ -921,6 +944,8 @@ class InterviewSimulator {
       durationStr: `${durationMinutes}분 ${durationRemainSeconds}초`,
       difficulty: this.sessionState.difficulty,
       questionCount: totalCount,
+      plannedCount: this.sessionState.totalQuestions,
+      isPartial: totalCount < this.sessionState.totalQuestions,
       finalScore: finalAvg,
       finalGrade: finalGrade,
       commonScores: commonScores,
@@ -929,10 +954,69 @@ class InterviewSimulator {
       comment: this.generateOverallComment(finalAvg, commonScores, leadershipScores)
     };
 
+    this.currentReportData = reportData;
+
     // Save to History
     this.saveHistory(reportData);
     this.renderReport(reportData);
     this.showView("view-report");
+
+    // Google Gemini AI 심층 보고서 비동기 생성 트리거
+    this.requestGeminiAnalysis(reportData);
+  }
+
+  // Google Gemini AI 심층 분석 요청 및 렌더링
+  async requestGeminiAnalysis(reportData) {
+    const contentBox = document.getElementById("gemini-report-content");
+    if (!contentBox) return;
+
+    contentBox.innerHTML = `
+      <div class="gemini-loading">
+        <span class="spinner"></span>
+        <span>Google Gemini AI가 질의응답 ${reportData.questionCount}문항을 팩트체크하여 냉정하게 심층 심사 중입니다...</span>
+      </div>
+    `;
+
+    try {
+      const candidateProfile = {
+        name: this.currentUser ? this.currentUser.name : "신지애 팀장",
+        center: this.currentUser ? this.currentUser.dept : "경기남부센터",
+        currentRank: "3급",
+        totalTenure: "23년 8개월"
+      };
+
+      const markdownText = await geminiEvaluator.generateGeminiReport(reportData, candidateProfile);
+      
+      // Render Markdown using marked.js if available, else plain text with line breaks
+      if (typeof marked !== 'undefined') {
+        contentBox.innerHTML = marked.parse(markdownText);
+      } else {
+        contentBox.innerHTML = markdownText.replace(/\n/g, "<br>");
+      }
+    } catch (err) {
+      contentBox.innerHTML = `<p style="color:var(--danger);">Gemini 분석 생성 중 오류가 발생했습니다: ${err.message}</p>`;
+    }
+  }
+
+  promptGeminiApiKey() {
+    const currentKey = geminiEvaluator.getApiKey();
+    const newKey = prompt("Google Gemini API 키를 입력해 주세요.\n(입력하시면 Google Gemini 1.5/2.0의 실제 AI 심층 분석이 실시간 연동됩니다. 취소하거나 비워두면 초록우산 2026 역량모델 내장 고성능 AI 엔진으로 작동합니다):", currentKey);
+
+    if (newKey !== null) {
+      geminiEvaluator.setApiKey(newKey);
+      alert(newKey.trim() ? "Gemini API 키가 안전하게 등록되었습니다!" : "API 키가 초기화되었습니다. 내장 AI 심사 엔진으로 작동합니다.");
+      if (this.currentReportData) {
+        this.requestGeminiAnalysis(this.currentReportData);
+      }
+    }
+  }
+
+  regenerateGeminiAnalysis() {
+    if (this.currentReportData) {
+      this.requestGeminiAnalysis(this.currentReportData);
+    } else {
+      alert("재분석할 면접 리포트 데이터가 없습니다.");
+    }
   }
 
   generateOverallComment(score, common, lead) {

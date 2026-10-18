@@ -466,6 +466,31 @@
           </div>
         </div>
 
+        <!-- ==================== Google Gemini AI 심층 종합 심사 보고서 ==================== -->
+        <div class="card gemini-report-card">
+          <div class="gemini-card-header">
+            <div class="card-title">
+              <span class="icon">🤖</span>
+              <h3>Google Gemini AI 심층 종합 심사평 (객관적·냉정 분석)</h3>
+            </div>
+            <div class="gemini-controls">
+              <button id="btn-config-gemini-key" class="btn btn-sm btn-outline" onclick="app.promptGeminiApiKey()">
+                <span>🔑 Gemini API 키 설정</span>
+              </button>
+              <button id="btn-refresh-gemini" class="btn btn-sm btn-secondary" onclick="app.regenerateGeminiAnalysis()">
+                <span>🔄 재분석</span>
+              </button>
+            </div>
+          </div>
+          <p class="card-desc">제미나이 AI가 심사 대상자의 답변 태도, 23년 경력 방어 논리, 2026 역량모델 지표 충족 여부를 가장 엄격하고 직설적으로 팩트체크하여 송곳 꼬리질문과 개선 스크립트를 제공합니다.</p>
+          <div id="gemini-report-content" class="gemini-content-box">
+            <div class="gemini-loading">
+              <span class="spinner"></span>
+              <span>제미나이 AI가 질의응답 데이터를 종합 분석하고 있습니다...</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Question-by-Question Detailed Review -->
         <div class="card qa-details-card">
           <div class="card-title">
@@ -544,8 +569,10 @@
   </div>
 
   <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="questions_db.js"></script>
   <script src="profile_and_rubric.js"></script>
+  <script src="gemini_evaluator.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
