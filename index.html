@@ -8,6 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&family=Noto+Serif+KR:wght@600;700;900&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="초록우산 면접">
+  <meta name="theme-color" content="#008450">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <!-- Open Source Libraries from GitHub -->
   <!-- Chart.js (chartjs/Chart.js) for Comprehensive Competency Radar & Trend Charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -172,10 +178,26 @@
               <span class="num">120문항</span>
               <span class="label">전체 기출 DB</span>
             </div>
+            <div class="stat-card" style="cursor: pointer; background: rgba(0, 132, 80, 0.1); border-color: #008450;" onclick="app.switchMainTab('qbank')">
+              <span class="num" style="color: #008450;">300제</span>
+              <span class="label" style="font-weight: 700; color: #008450;">📚 실전 도서관 바로가기</span>
+            </div>
             <div class="stat-card">
               <span class="num">5단계</span>
               <span class="label">난이도 레벨</span>
             </div>
+          </div>
+
+          <!-- Mobile Direct Quick Jump Banner -->
+          <div class="mobile-qbank-jump-banner" onclick="app.switchMainTab('qbank')" style="margin-top: 1rem; padding: 12px 16px; background: linear-gradient(135deg, #008450 0%, #005a36 100%); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; box-shadow: 0 4px 12px rgba(0,132,80,0.25);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 1.5rem;">📚</span>
+              <div>
+                <strong style="font-size: 1rem; display: block;">300대 실전 예상질문 도서관 바로가기</strong>
+                <span style="font-size: 0.82rem; opacity: 0.9;">P1(출제확실) 40선, 1등 모범답변, 꼬리질문 방어대본 열람</span>
+              </div>
+            </div>
+            <span style="font-size: 1.2rem; font-weight: bold; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px;">이동 →</span>
           </div>
         </div>
 
@@ -247,6 +269,29 @@
                 <input type="checkbox" id="toggle-tts" checked>
                 <span class="toggle-slider"></span>
               </label>
+            </div>
+            <div class="setting-item">
+              <label for="select-tts-engine">🎙️ TTS 음성 합성 엔진</label>
+              <select id="select-tts-engine" class="form-select" onchange="app.changeTtsEngine(this.value)">
+                <option value="gemini" selected>✨ Google Gemini 2.5 신경망 AI 음성 (초실사 중저음 남성 & 지적 여성)</option>
+                <option value="webspeech">🔊 스마트폰/브라우저 내장 음성 (데이터 소모 제로 & 0ms 즉시 재생)</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label for="select-male-tone">👔 남성 면접관 음색 (대표이사/인사팀장)</label>
+              <select id="select-male-tone" class="form-select" onchange="app.changeMaleTone(this.value)">
+                <option value="charon" selected>Charon (중후하고 깊이 있는 중저음 아나운서 - 추천)</option>
+                <option value="puck">Puck (차분하고 온화한 지적 남성 톤)</option>
+                <option value="deep_baritone">중저음 바리톤 (중후한 무게감 & 피치 최적화)</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label for="select-female-tone">👩‍💼 여성 면접관 음색 (실무이사/외부교수)</label>
+              <select id="select-female-tone" class="form-select" onchange="app.changeFemaleTone(this.value)">
+                <option value="aoede" selected>Aoede (부드럽고 맑은 아나운서 톤 - 추천)</option>
+                <option value="kore">Kore (지적이고 차분한 교수/평가위원 톤)</option>
+                <option value="warm_calm">따뜻하고 편안한 톤 (부드러운 호흡 & 피치 최적화)</option>
+              </select>
             </div>
             <div class="setting-item">
               <label class="toggle-label">
@@ -586,8 +631,16 @@
       <!-- VIEW 4: Cumulative History Dashboard -->
       <section id="view-history-dash" class="view-panel">
         <div class="history-dash-header">
-          <h2>누적 모의면접 회차별 기록 보관소</h2>
-          <button id="btn-back-to-setup" class="btn btn-secondary btn-sm">← 메인으로 돌아가기</button>
+          <div class="history-title-group">
+            <h2>누적 모의면접 회차별 기록 보관소</h2>
+            <p class="history-subtitle">면접자별로 진행된 모든 모의면접 회차와 AI 심층 채점 보고서가 안전하게 보관됩니다.</p>
+          </div>
+          <div class="history-header-actions">
+            <button id="btn-clear-all-history" class="btn btn-danger btn-sm" onclick="app.clearCurrentHistory()">
+              <span>🗑️ 현재 면접자 기록 전체 초기화</span>
+            </button>
+            <button id="btn-back-to-setup" class="btn btn-secondary btn-sm">← 메인으로 돌아가기</button>
+          </div>
         </div>
         <div class="history-table-wrap">
           <table class="history-table">
@@ -601,6 +654,7 @@
                 <th>종합 점수</th>
                 <th>판정 등급</th>
                 <th>상세 보기</th>
+                <th>기록 관리</th>
               </tr>
             </thead>
             <tbody id="history-tbody">

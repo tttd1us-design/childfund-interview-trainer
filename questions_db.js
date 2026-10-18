@@ -33,7 +33,7 @@ const INTERVIEW_PANEL = {
     "title": "인사기획팀장",
     "name": "김태호 팀장",
     "gender": "male",
-    "geminiVoice": "Orus",
+    "geminiVoice": "Puck",
     "voicePrompt": "차분하고 정중하며 편안한 남성 목소리로 질문해 주세요: ",
     "role": "직원 육성, 신입 9명 조직관리, 경력자 소진, 노무·처우, 조직 갈등 조정",
     "avatar": "👨‍💼",

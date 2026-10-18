@@ -31,6 +31,9 @@ class InterviewSimulator {
     this.ttsAudioCache = new Map();
     this.currentTtsAudio = null;
     this.ttsRequestId = 0;
+    this.ttsEngine = localStorage.getItem("childfund_tts_engine") || "gemini"; // "gemini" or "webspeech"
+    this.maleVoiceTone = localStorage.getItem("childfund_male_tone") || "charon";
+    this.femaleVoiceTone = localStorage.getItem("childfund_female_tone") || "aoede";
 
     // Media Recorder (실제 오디오 녹음기) & Web Audio API Visualizer
     this.mediaRecorder = null;
@@ -633,9 +636,34 @@ class InterviewSimulator {
     return URL.createObjectURL(blob);
   }
 
+  changeTtsEngine(engine) {
+    this.ttsEngine = engine;
+    localStorage.setItem("childfund_tts_engine", engine);
+  }
+
+  changeMaleTone(tone) {
+    this.maleVoiceTone = tone;
+    localStorage.setItem("childfund_male_tone", tone);
+    // Update INTERVIEW_PANEL dynamically
+    if (tone === "charon" || tone === "puck") {
+      INTERVIEW_PANEL.CEO.geminiVoice = tone === "puck" ? "Puck" : "Charon";
+      INTERVIEW_PANEL.HR_DIRECTOR.geminiVoice = tone === "charon" ? "Charon" : "Puck";
+    }
+  }
+
+  changeFemaleTone(tone) {
+    this.femaleVoiceTone = tone;
+    localStorage.setItem("childfund_female_tone", tone);
+    // Update INTERVIEW_PANEL dynamically
+    if (tone === "aoede" || tone === "kore") {
+      INTERVIEW_PANEL.EXEC_DIRECTOR.geminiVoice = tone === "kore" ? "Kore" : "Aoede";
+      INTERVIEW_PANEL.EXTERNAL_EXAMINER.geminiVoice = tone === "aoede" ? "Aoede" : "Kore";
+    }
+  }
+
   // Request Ultra-Natural Human-Like Speech from Google Gemini 2.5 Neural TTS
   async fetchGeminiNeuralTtsUrl(questionObj, panelInfo) {
-    const cacheKey = `${questionObj.panel}_${questionObj.id}_${questionObj.question.slice(0, 30)}`;
+    const cacheKey = `${panelInfo.id}_${questionObj.id}_${questionObj.question.slice(0, 30)}`;
     if (this.ttsAudioCache.has(cacheKey)) {
       return this.ttsAudioCache.get(cacheKey);
     }
@@ -644,13 +672,23 @@ class InterviewSimulator {
     const apiKey = geminiEvaluator.getApiKey();
     if (!apiKey) return null;
 
-    const voiceName = panelInfo.geminiVoice || (panelInfo.gender === "female" ? "Aoede" : "Charon");
-    const styleGuide = panelInfo.voicePrompt || "따뜻하고 부드러우며 귀에 편안하게 들리는 아나운서 목소리로 천천히 자연스럽게 질문해 주세요: ";
+    // Determine voice by gender and tone
+    let voiceName = "Charon"; // default deep male
+    if (panelInfo.gender === "female") {
+      voiceName = panelInfo.id === "director" ? "Aoede" : "Kore";
+      if (this.femaleVoiceTone === "aoede") voiceName = "Aoede";
+      else if (this.femaleVoiceTone === "kore") voiceName = "Kore";
+    } else {
+      voiceName = panelInfo.id === "ceo" ? "Charon" : "Puck";
+      if (this.maleVoiceTone === "charon") voiceName = "Charon";
+      else if (this.maleVoiceTone === "puck") voiceName = "Puck";
+    }
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 7500);
+    const timeoutId = setTimeout(() => controller.abort(), 4000); // 4초 타임아웃
 
-    const ttsModels = ["gemini-3.8-flash-tts", "gemini-3.1-flash-tts-preview", "gemini-2.5-flash-preview-tts"];
+    // 검증된 최신 TTS 모델
+    const ttsModels = ["gemini-2.5-flash-preview-tts", "gemini-3.8-flash"];
 
     try {
       for (const ttsModel of ttsModels) {
@@ -662,7 +700,7 @@ class InterviewSimulator {
               headers: { "Content-Type": "application/json" },
               signal: controller.signal,
               body: JSON.stringify({
-                contents: [{ parts: [{ text: `${styleGuide}${questionObj.question}` }] }],
+                contents: [{ parts: [{ text: questionObj.question }] }],
                 generationConfig: {
                   responseModalities: ["AUDIO"],
                   speechConfig: {
@@ -685,7 +723,7 @@ class InterviewSimulator {
           this.ttsAudioCache.set(cacheKey, wavUrl);
           return wavUrl;
         } catch (innerErr) {
-          // try next TTS model
+          // try next model
         }
       }
       clearTimeout(timeoutId);
@@ -719,44 +757,55 @@ class InterviewSimulator {
     this.highlightInterviewer(panelInfo.id, true);
     if (replayBtn) replayBtn.textContent = "🔊 질문 듣는 중...";
 
-    // 1. 이미 캐시된 고음질 신경망 오디오가 있으면 즉시 재생
-    const cacheKey = `${questionObj.panel}_${questionObj.id}_${questionObj.question.slice(0, 30)}`;
-    const cachedNeuralUrl = this.ttsAudioCache.get(cacheKey);
+    // 1. 만약 Gemini Neural TTS 엔진이 활성화되어 있다면:
+    if (this.ttsEngine === "gemini") {
+      // 캐시 확인
+      const cacheKey = `${panelInfo.id}_${questionObj.id}_${questionObj.question.slice(0, 30)}`;
+      let neuralWavUrl = this.ttsAudioCache.get(cacheKey);
 
-    if (cachedNeuralUrl) {
-      try {
-        const audio = new Audio(cachedNeuralUrl);
-        audio.volume = 0.95;
-        this.currentTtsAudio = audio;
+      if (!neuralWavUrl) {
+        if (replayBtn) replayBtn.textContent = "🔊 실사 AI 음성 생성 중...";
+        neuralWavUrl = await this.fetchGeminiNeuralTtsUrl(questionObj, panelInfo);
+      }
 
-        audio.onended = () => {
-          if (currentReqId !== this.ttsRequestId) return;
-          this.highlightInterviewer(panelInfo.id, false);
-          this.currentTtsAudio = null;
+      if (currentReqId !== this.ttsRequestId) return;
+
+      if (neuralWavUrl) {
+        try {
           if (replayBtn) replayBtn.textContent = "🔊 질문 다시 듣기";
-          if (this.sessionState.sttEnabled && !this.isRecognizing && !this.sessionState.isPaused) {
-            this.startAnsweringProcess();
-          }
-        };
+          const audio = new Audio(neuralWavUrl);
+          audio.volume = 0.95;
+          this.currentTtsAudio = audio;
 
-        audio.onerror = () => {
-          if (currentReqId !== this.ttsRequestId) return;
+          audio.onended = () => {
+            if (currentReqId !== this.ttsRequestId) return;
+            this.highlightInterviewer(panelInfo.id, false);
+            this.currentTtsAudio = null;
+            if (replayBtn) replayBtn.textContent = "🔊 질문 다시 듣기";
+            if (this.sessionState.sttEnabled && !this.isRecognizing && !this.sessionState.isPaused) {
+              this.startAnsweringProcess();
+            }
+          };
+
+          audio.onerror = () => {
+            if (currentReqId !== this.ttsRequestId) return;
+            this.currentTtsAudio = null;
+            this.speakWithNaturalWebSpeech(questionObj, panelInfo, currentReqId);
+          };
+
+          await audio.play();
+          return;
+        } catch (err) {
           this.currentTtsAudio = null;
-          this.speakWithNaturalWebSpeech(questionObj, panelInfo, currentReqId);
-        };
-
-        await audio.play();
-        return;
-      } catch (err) {
-        this.currentTtsAudio = null;
+        }
       }
     }
 
-    // 2. 대기시간 0ms 즉시 발성: 불필요한 네트워크 지연(3~7초) 없이 즉시 브라우저의 부드러운 자연 음성으로 재생
+    // 2. 브라우저/스마트폰 내장 음성 엔진 (확실한 남/여 구분 & 0ms 지연)
     this.speakWithNaturalWebSpeech(questionObj, panelInfo, currentReqId);
   }
 
-  // Silky-Smooth, Natural Human Tone (0ms Zero-Latency, Pitch 1.0 No Distortion)
+  // Silky-Smooth, Natural Human Tone (0ms Zero-Latency, Distinct Male/Female)
   speakWithNaturalWebSpeech(questionObj, panelInfo, reqId) {
     if (!this.synth || reqId !== this.ttsRequestId) return;
     this.synth.cancel();
@@ -776,20 +825,25 @@ class InterviewSimulator {
 
     const utterance = new SpeechSynthesisUtterance(comfortableText);
 
-    // 가장 부드럽고 듣기 편한 아나운서 음성 매칭
-    if (panelInfo.gender === "female" && this.femaleVoice) {
+    // 남/여 면접관 음성 확실한 분리
+    const isFemale = panelInfo.gender === "female";
+
+    if (isFemale && this.femaleVoice) {
       utterance.voice = this.femaleVoice;
-    } else if (panelInfo.gender === "male" && this.maleVoice) {
+      utterance.pitch = 1.05; // 맑고 또렷한 여성 아나운서 피치
+      utterance.rate = 0.92;
+    } else if (!isFemale && this.maleVoice && this.maleVoice !== this.femaleVoice) {
       utterance.voice = this.maleVoice;
-    } else if (this.fallbackVoice) {
-      utterance.voice = this.fallbackVoice;
+      utterance.pitch = 0.85; // 중후하고 차분한 대표이사 남성 중저음
+      utterance.rate = 0.89;
+    } else {
+      // 만약 시스템에 한국어 음성이 1개뿐인 환경(예: 일부 안드로이드)인 경우, 피치 변조로 남/여를 완벽히 구분
+      utterance.voice = this.femaleVoice || this.fallbackVoice;
+      utterance.pitch = isFemale ? 1.08 : 0.82; // 여성이면 1.08(고음), 남성이면 0.82(중저음)
+      utterance.rate = isFemale ? 0.92 : 0.88;
     }
 
     utterance.lang = "ko-KR";
-    // 피치 변조(0.9미만 또는 1.0초과) 시 발생하는 모바일/PC 디지털 쇳소리 왜곡을 원천 박멸 (스튜디오 원음 1.0 유지)
-    utterance.pitch = 1.0;
-    // 너무 빠르지 않고 귀에 쏙쏙 박히는 차분하고 정돈된 아나운서 속도 (0.91)
-    utterance.rate = 0.91;
     utterance.volume = 0.95;
 
     this.highlightInterviewer(panelInfo.id, true);
@@ -1844,7 +1898,7 @@ class InterviewSimulator {
     if (!tbody) return;
 
     if (this.historySessions.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 24px; color: #94a3b8;">아직 진행된 모의면접 회차가 없습니다. 실전 면접을 시작해 보세요.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 28px; color: #94a3b8; font-size: 0.95rem;">아직 진행된 모의면접 회차가 없습니다. 상단 [실전 AI 모의면접] 탭에서 면접을 시작해 보세요.</td></tr>`;
       return;
     }
 
@@ -1857,7 +1911,8 @@ class InterviewSimulator {
         <td>${s.durationStr}</td>
         <td><strong style="color:var(--primary);">${s.finalScore}점</strong></td>
         <td><span class="badge">${s.finalGrade}</span></td>
-        <td><button class="btn btn-sm btn-outline" onclick="app.viewPastSession('${s.sessionId}')">결과 보기</button></td>
+        <td><button class="btn btn-sm btn-outline" onclick="app.viewPastSession('${s.sessionId}')">결과 보고서</button></td>
+        <td><button class="btn btn-sm btn-danger-outline" onclick="app.deleteHistorySession('${s.sessionId}')" title="이 회차 기록 삭제">삭제</button></td>
       </tr>
     `).join("");
   }
@@ -1867,6 +1922,39 @@ class InterviewSimulator {
     if (found) {
       this.renderReport(found);
       this.showView("view-report");
+    }
+  }
+
+  // Delete Individual Session
+  deleteHistorySession(sessionId) {
+    const session = this.historySessions.find(s => s.sessionId === sessionId);
+    const sessionName = session ? `제 ${session.sessionNumber}회차` : "해당 회차";
+    if (confirm(`'${sessionName}' 모의면접 기록 및 평가 보고서를 영구 삭제하시겠습니까?`)) {
+      this.historySessions = this.historySessions.filter(s => s.sessionId !== sessionId);
+      const userId = this.currentUser ? this.currentUser.id : "user_shin";
+      localStorage.setItem(`childfund_interview_sessions_${userId}`, JSON.stringify(this.historySessions));
+      this.renderHistoryTable();
+      this.renderUserProfiles();
+      alert(`${sessionName} 기록이 정상적으로 삭제되었습니다.`);
+    }
+  }
+
+  // Clear All History for Current User (테스트 기록 완전 정리)
+  clearCurrentHistory() {
+    const userName = this.currentUser ? this.currentUser.name : "현재 면접자";
+    if (this.historySessions.length === 0) {
+      alert("삭제할 누적 면접 기록이 없습니다.");
+      return;
+    }
+
+    if (confirm(`정말로 '${userName}' 면접자의 누적된 모든 모의면접 회차 기록(${this.historySessions.length}건)을 초기화하시겠습니까?\n\n(테스트로 진행하신 데이터를 정리하고 깨끗한 상태에서 실전 연습을 시작하실 때 유용합니다.)`)) {
+      this.historySessions = [];
+      const userId = this.currentUser ? this.currentUser.id : "user_shin";
+      localStorage.removeItem(`childfund_interview_sessions_${userId}`);
+      this.sessionState.sessionNumber = 1;
+      this.renderHistoryTable();
+      this.renderUserProfiles();
+      alert("누적 모의면접 회차 기록이 깨끗하게 초기화되었습니다.");
     }
   }
 

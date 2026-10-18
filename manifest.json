@@ -1,0 +1,22 @@
+{
+  "name": "초록우산 기관장 승진 실전 AI 면접 시뮬레이터",
+  "short_name": "초록우산 면접",
+  "description": "경기남부가정위탁지원센터 신지애 팀장 특화 2026 기관장 승진 실전 AI 면접 시뮬레이터 & 300대 질문 도서관",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#064e3b",
+  "theme_color": "#008450",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

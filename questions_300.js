@@ -8500,6 +8500,12 @@ const QUESTIONS_300_DB = [
   }
 ];
 
+if (typeof window !== 'undefined') {
+  window.PRIORITY_META = PRIORITY_META;
+  window.QUESTIONS_300_CATEGORIES = QUESTIONS_300_CATEGORIES;
+  window.QUESTIONS_300_DB = QUESTIONS_300_DB;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { PRIORITY_META, QUESTIONS_300_CATEGORIES, QUESTIONS_300_DB };
 }
