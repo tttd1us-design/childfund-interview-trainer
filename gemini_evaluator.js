@@ -4,8 +4,8 @@
 class GeminiEvaluator {
   constructor() {
     this.API_KEY_STORAGE = "childfund_gemini_api_key";
-    // 기본 탑재된 무료 Google Gemini API 키 (자동 프로비저닝 완료 - 사용자 입력 없이 즉시 연동)
-    this._encodedKey = "QVEuQWI4Uk42S0hGaThoVTVtZXNJdzBueXE1YWZaWnFfVTM5QkIzdzdEZmFuekVJekhLMVE=";
+    // 기본 탑재된 Google Gemini API 키 (사용자 제공 최신 정품 키 연동 완료)
+    this._encodedKey = "QVEuQWI4Uk42TG1mdEZHMVJ0UVN2YzBlUDZPU1FKanJmN3lhSVhjbDhDYVdnRWZvX2l3YlE=";
   }
 
   _decode(str) {
@@ -206,12 +206,11 @@ ${sessionData.answers.map((a, i) => `
 
 ## 📋 5. 실전 1등 합격을 위한 3단계 즉각 실천 액션 플랜
 1. **Step 1 (말버릇 클리닉)**: "제가 직접" $\rightarrow$ **"저희 센터의 시스템으로"**, "열심히" $\rightarrow$ **"정확한 기준과 지표로"**
-2. **Step 2 (필수 암기 수치 4가지)**: `1,007세대 1,228명` / `신입 9명 100% 잔류` / `지정후원 1,000만원 7명 완결` / `우수기관 3회`
+2. **Step 2 (필수 암기 수치 4가지)**: \`1,007세대 1,228명\` / \`신입 9명 100% 잔류\` / \`지정후원 1,000만원 7명 완결\` / \`우수기관 3회\`
 3. **Step 3 (1분 자기소개 공식)**:
    - *"안녕하십니까. 구조로 일해 온 준비된 기관장 후보 신지애입니다. 지난 23년간 서울센터 무연고 영아 7명 시범사업 구조화, 경기남부 신입 9명 온보딩과 우수기관 3회를 이끌었습니다. 사람이 남고 아동의 안전이 시스템으로 지켜지는 기관을 만들겠습니다."*
 `;
   }
-}
 }
 
 // Global Evaluator Instance
