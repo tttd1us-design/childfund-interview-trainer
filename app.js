@@ -1029,27 +1029,31 @@ class InterviewSimulator {
     }
   }
 
-  // Render Report View & Charts
+  // Render Report View & Charts (중도 완료 및 전체 완료 완벽 지원)
   renderReport(reportData) {
-    document.getElementById("report-session-badge").textContent = `제 ${reportData.sessionNumber}회차 실전 모의면접`;
-    document.getElementById("report-date-text").textContent = `${reportData.date} ${reportData.time} | 소요 시간: ${reportData.durationStr} | 출제 문항: ${reportData.questionCount}문항 (Level ${reportData.difficulty})`;
+    const candidateName = reportData.candidateName || (this.currentUser ? this.currentUser.name : "신지애 팀장");
+    const partialNotice = reportData.isPartial ? ` (중도 완료: ${reportData.questionCount}문항 / 계획: ${reportData.plannedCount}문항)` : ` (전체 ${reportData.questionCount}문항 완주)`;
+
+    document.getElementById("report-session-badge").textContent = `제 ${reportData.sessionNumber}회차 실전 모의면접${partialNotice}`;
+    document.getElementById("report-date-text").textContent = `${reportData.date} ${reportData.time} | 소요 시간: ${reportData.durationStr} | 평가 진행: ${reportData.questionCount}문항 응답 완료 (난이도 Level ${reportData.difficulty})`;
     document.getElementById("report-final-score").textContent = reportData.finalScore;
     document.getElementById("report-final-grade").textContent = reportData.finalGrade;
     document.getElementById("report-overall-comment").textContent = reportData.comment;
     document.getElementById("report-qa-count").textContent = reportData.questionCount;
 
-    // Render QA Accordion
+    // Render QA Accordion (각 문항별 점수, 응답 전문, 오디오 녹음, 대응 분석 완벽 시각화)
     const qaList = document.getElementById("report-qa-list");
     qaList.innerHTML = reportData.answers.map((item, idx) => {
       const q = item.question;
       const evalR = item.evalResult;
       const matchedBadges = evalR.matchedKeywords.map(k => `<span class="kw-badge matched">✓ ${k}</span>`).join(" ");
       const missingBadges = evalR.missingKeywords.map(k => `<span class="kw-badge missing">✗ ${k}</span>`).join(" ");
+      const ana = evalR.analysis || { clarity: 80, competency: 80, evidence: 80, alignment: 80 };
 
       const audioPlaybackHtml = item.audioBlobUrl ? `
-        <div style="margin: 10px 0;">
-          <span style="font-size:0.82rem; font-weight:600; color:var(--primary);">🎧 내 실제 답변 음성 다시듣기:</span>
-          <audio controls src="${item.audioBlobUrl}" style="width: 100%; height: 36px; margin-top: 4px;"></audio>
+        <div style="margin: 12px 0; background: var(--bg-card); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <span style="font-size:0.9rem; font-weight:700; color:var(--primary);">🎧 내가 답변한 실제 녹음 음성 다시듣기:</span>
+          <audio controls src="${item.audioBlobUrl}" style="width: 100%; height: 38px; margin-top: 6px;"></audio>
         </div>
       ` : '';
 
@@ -1058,22 +1062,33 @@ class InterviewSimulator {
           <div class="qa-item-header" onclick="this.parentElement.classList.toggle('expanded')">
             <div class="qa-item-title">
               <span class="badge">${q.qNumber}</span>
-              <span>${q.question.substring(0, 50)}...</span>
+              <span><strong>${q.question.substring(0, 55)}${q.question.length > 55 ? '...' : ''}</strong></span>
             </div>
-            <div class="qa-item-score">${evalR.score}점 (${evalR.grade})</div>
+            <div class="qa-item-score" style="font-size: 1.15rem; font-weight: 800;">
+              ${evalR.score}점 <span class="badge" style="margin-left: 6px;">${evalR.grade}</span>
+            </div>
           </div>
           <div class="qa-item-body">
             <div class="qa-block-title">【면접관 전체 질문】</div>
-            <p><strong>${q.question}</strong></p>
+            <p style="font-family: var(--font-serif); font-size: 1.15rem; line-height: 1.6; margin-bottom: 12px;"><strong>${q.question}</strong></p>
             
-            <div class="qa-block-title">【신지애 팀장 응답 전문】</div>
+            <div class="qa-block-title">【${candidateName} 실제 답변 내용 전문】</div>
             <div class="qa-answer-box">${item.answerText || "(녹음 및 입력된 답변 없음)"}</div>
             ${audioPlaybackHtml}
 
-            <div class="qa-block-title">【면접관 패널 정밀 피드백】</div>
+            <!-- 세부 대응 역량 분석 4대 지표 -->
+            <div class="qa-block-title">【문항별 세부 대응 역량 지표 분석】</div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; background: var(--bg-main); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+              <div style="text-align:center;"><span style="font-size:0.82rem; color:var(--text-muted); display:block;">논리 명확성</span><strong style="color:var(--primary); font-size:1.1rem;">${ana.clarity}점</strong></div>
+              <div style="text-align:center;"><span style="font-size:0.82rem; color:var(--text-muted); display:block;">역량 적합도</span><strong style="color:#1a56db; font-size:1.1rem;">${ana.competency}점</strong></div>
+              <div style="text-align:center;"><span style="font-size:0.82rem; color:var(--text-muted); display:block;">근거 충실도</span><strong style="color:#c29938; font-size:1.1rem;">${ana.evidence}점</strong></div>
+              <div style="text-align:center;"><span style="font-size:0.82rem; color:var(--text-muted); display:block;">재단 방향 일치</span><strong style="color:#4f46e5; font-size:1.1rem;">${ana.alignment}점</strong></div>
+            </div>
+
+            <div class="qa-block-title">【면접관 패널 정밀 피드백 & 답변 분석】</div>
             <div class="qa-feedback-box">${evalR.feedback}</div>
 
-            <div class="qa-block-title">【키워드 및 역량 반영도 검증】</div>
+            <div class="qa-block-title" style="margin-top: 14px;">【포트폴리오 핵심 키워드 매칭 검증】</div>
             <div class="qa-tags-wrap">
               ${matchedBadges || '<span class="kw-badge">일치 키워드 없음</span>'}
               ${missingBadges}
