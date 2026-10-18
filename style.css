@@ -1825,12 +1825,15 @@ body {
   }
   .app-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 12px;
   }
   .header-controls {
     width: 100%;
-    justify-content: space-between;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-start;
   }
   .candidate-tag {
     display: none;
@@ -1868,6 +1871,33 @@ body {
   }
   .btn-large {
     width: 100%;
+  }
+  .chart-canvas-wrap {
+    height: 260px;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .gemini-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .gemini-controls {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .qa-eval-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .report-export-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .report-export-bar .btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
