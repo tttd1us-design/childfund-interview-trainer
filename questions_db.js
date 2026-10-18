@@ -11,8 +11,8 @@ const INTERVIEW_PANEL = {
     "voicePrompt": "따뜻하고 인자하며 신뢰감을 주는 부드러운 목소리로 편안하게 질문해 주세요: ",
     "role": "기관 총괄 비전, 재단 2030 가치관, 경영 마인드, 최종 책임자 검증",
     "avatar": "👔",
-    "voicePitch": 0.96,
-    "voiceRate": 0.92,
+    "voicePitch": 1.0,
+    "voiceRate": 0.91,
     "personality": "따뜻하고 품격 있는 어조로 조직의 철학과 아동 권리, 재단과 기관의 미래 비전과 방향성을 편안하게 묻습니다."
   },
   "EXEC_DIRECTOR": {
@@ -24,8 +24,8 @@ const INTERVIEW_PANEL = {
     "voicePrompt": "부드럽고 친절하며 귀에 편안하게 들리는 아나운서 톤으로 질문해 주세요: ",
     "role": "가정위탁 전문성, 국가사업 전환 대응, 현장 위기사례 개입, 평가지표 TF 검증",
     "avatar": "👩‍💼",
-    "voicePitch": 1.02,
-    "voiceRate": 0.94,
+    "voicePitch": 1.0,
+    "voiceRate": 0.91,
     "personality": "복지 현장과 정책 변화의 핵심을 부드럽고 차분한 목소리로 물으며, 면접자가 편안하게 역량을 펼칠 수 있도록 유도합니다."
   },
   "HR_DIRECTOR": {
@@ -37,8 +37,8 @@ const INTERVIEW_PANEL = {
     "voicePrompt": "차분하고 정중하며 편안한 남성 목소리로 질문해 주세요: ",
     "role": "직원 육성, 신입 9명 조직관리, 경력자 소진, 노무·처우, 조직 갈등 조정",
     "avatar": "👨‍💼",
-    "voicePitch": 0.98,
-    "voiceRate": 0.94,
+    "voicePitch": 1.0,
+    "voiceRate": 0.91,
     "personality": "조직 내 인적 자원 관리와 직원 소통, 후계 인재 육성 등을 온화하고 차분한 어조로 질문합니다."
   },
   "EXTERNAL_EXAMINER": {
@@ -50,8 +50,8 @@ const INTERVIEW_PANEL = {
     "voicePrompt": "차분하고 지적이면서도 부드럽고 편안한 어조로 질문해 주세요: ",
     "role": "객관적 검증, 윤리의식, 투명성, 취약점(위기관리 2점) 및 모순점 심층 검증",
     "avatar": "👩‍🏫",
-    "voicePitch": 1.04,
-    "voiceRate": 0.93,
+    "voicePitch": 1.0,
+    "voiceRate": 0.91,
     "personality": "객관적인 외부 시각에서 핵심을 짚어주되, 차분하고 품위 있는 목소리로 지원자의 논리성을 경청합니다."
   }
 };

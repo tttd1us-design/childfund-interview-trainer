@@ -379,7 +379,7 @@ class InterviewSimulator {
     const themeIcon = document.getElementById("theme-icon");
     if (themeIcon) themeIcon.textContent = savedTheme === "dark" ? "☀️" : "🌙";
 
-    const savedFont = localStorage.getItem(this.FONT_KEY) || "lg";
+    const savedFont = localStorage.getItem(this.FONT_KEY) || "md";
     this.applyFontSize(savedFont);
   }
 
@@ -397,17 +397,18 @@ class InterviewSimulator {
     const btn = document.getElementById(`btn-font-${size}`);
     if (btn) btn.classList.add("active");
 
-    let qVal = "1.65rem";
-    let bodyVal = "1.12rem";
+    // 눈이 편안하고 피로감이 없는 인체공학적 황금 비율 폰트 스케일
+    let qVal = "1.12rem";
+    let bodyVal = "0.96rem";
     if (size === "md") {
-      qVal = "1.35rem";
-      bodyVal = "1.02rem";
+      qVal = "1.12rem";
+      bodyVal = "0.96rem";
     } else if (size === "lg") {
-      qVal = "1.65rem";
-      bodyVal = "1.12rem";
+      qVal = "1.24rem";
+      bodyVal = "1.02rem";
     } else if (size === "xl") {
-      qVal = "2.05rem"; // 시원시원한 특대형 폰트
-      bodyVal = "1.25rem";
+      qVal = "1.38rem"; // 부담스럽지 않으면서 시원하게 읽히는 최적 크기
+      bodyVal = "1.10rem";
     }
     document.documentElement.style.setProperty("--q-font-size", qVal);
     document.documentElement.style.setProperty("--body-font-size", bodyVal);
@@ -521,34 +522,38 @@ class InterviewSimulator {
     }
   }
 
-  // Setup High-Quality Natural Voices for Male and Female Interviewers (Fallback Engine)
+  // Setup High-Quality Natural Voices for Male and Female Interviewers (Silky Smooth Engine)
   setupVoices() {
     if (!this.synth) return;
     const loadVoices = () => {
       const voices = this.synth.getVoices();
       const koVoices = voices.filter(v => v.lang === "ko-KR" || v.lang.startsWith("ko"));
 
-      // 보이스 자연스러움(Natural/Online/Neural) 우선순위 점수 계산 함수
+      // 음성 부드러움(자연어 호흡, 노이즈 및 쇳소리 제로) 정밀 스코어링 함수
       const scoreVoice = (v, targetGender) => {
         let score = 0;
         const n = v.name;
         const nl = n.toLowerCase();
 
-        // 1순위: Microsoft Natural Online / Neural 고품질 음성 (까칠함이 전혀 없는 아나운서급 보이스)
-        if (nl.includes("natural") || nl.includes("online") || nl.includes("neural")) score += 100;
-        if (nl.includes("google")) score += 60;
-        if (nl.includes("apple") || nl.includes("siri") || n.includes("Yuna") || n.includes("Sora")) score += 50;
+        // 1순위: Microsoft Natural Online / Neural 실사 음성 (스튜디오 아나운서급 원음)
+        if (nl.includes("natural") || nl.includes("online") || nl.includes("neural")) score += 200;
+        // 2순위: Google 고품질 신경망 한국어 음성
+        if (nl.includes("google")) score += 120;
+        // 3순위: Apple Siri / Yuna Enhanced (아이폰/아이패드/맥 최상급 육성)
+        if (nl.includes("apple") || nl.includes("siri") || n.includes("Yuna") || n.includes("유나")) score += 110;
+        // 4순위: Samsung 고품질 한국어
+        if (nl.includes("samsung")) score += 90;
 
         if (targetGender === "female") {
-          if (n.includes("SunHi") || n.includes("선희")) score += 50;
-          if (n.includes("SeoHyeon") || n.includes("서현") || n.includes("SoonBok")) score += 45;
-          if (n.includes("Yuna") || n.includes("유나") || n.includes("Sora") || n.includes("소라")) score += 40;
+          if (n.includes("SunHi") || n.includes("선희")) score += 80;
+          if (n.includes("SeoHyeon") || n.includes("서현") || n.includes("SoonBok") || n.includes("순복")) score += 60;
+          if (n.includes("Yuna") || n.includes("유나") || n.includes("Sora") || n.includes("소라")) score += 50;
           if (nl.includes("female") || n.includes("여성")) score += 30;
-          if (n.includes("Heami") || n.includes("혜미")) score += 10; // 구형 데스크톱 음성은 후순위
+          if (n.includes("Heami") || n.includes("혜미")) score -= 50; // 구형 데스크톱 쇳소리 음성은 감점
         } else {
-          if (n.includes("InJoon") || n.includes("인준")) score += 50;
-          if (n.includes("BongJin") || n.includes("봉진") || n.includes("GookMin") || n.includes("국민")) score += 45;
-          if (n.includes("MinHo") || n.includes("민호")) score += 40;
+          if (n.includes("InJoon") || n.includes("인준")) score += 80;
+          if (n.includes("BongJin") || n.includes("봉진") || n.includes("GookMin") || n.includes("국민")) score += 60;
+          if (n.includes("MinHo") || n.includes("민호")) score += 50;
           if (nl.includes("male") || n.includes("남성")) score += 30;
         }
         return score;
@@ -558,7 +563,7 @@ class InterviewSimulator {
         const sortedFemale = [...koVoices].sort((a, b) => scoreVoice(b, "female") - scoreVoice(a, "female"));
         const sortedMale = [...koVoices].sort((a, b) => scoreVoice(b, "male") - scoreVoice(a, "male"));
         this.femaleVoice = sortedFemale[0];
-        this.maleVoice = sortedMale[0];
+        this.maleVoice = sortedMale[0] || sortedFemale[0];
         this.fallbackVoice = sortedFemale[0] || koVoices[0];
       } else {
         this.fallbackVoice = voices[0] || null;
@@ -701,7 +706,7 @@ class InterviewSimulator {
     this.fetchGeminiNeuralTtsUrl(nextQ, panelInfo).catch(() => {});
   }
 
-  // Speak interviewer question using Gemini Neural Voice (Primary) or Warm Natural Web Speech (Fallback)
+  // Speak interviewer question with 0ms Zero-Latency & Silky-Smooth Natural Tone
   async speakQuestion(questionObj) {
     if (!this.sessionState.ttsEnabled) return;
     this.stopSpeaking();
@@ -712,16 +717,15 @@ class InterviewSimulator {
 
     // Highlight interviewer card immediately
     this.highlightInterviewer(panelInfo.id, true);
-    if (replayBtn) replayBtn.textContent = "🔊 부드러운 음성 연결 중...";
+    if (replayBtn) replayBtn.textContent = "🔊 질문 듣는 중...";
 
-    // 1순위: Google Gemini 2.5 Neural TTS (아나운서급 따뜻하고 편안한 육성)
-    const neuralWavUrl = await this.fetchGeminiNeuralTtsUrl(questionObj, panelInfo);
-    if (currentReqId !== this.ttsRequestId) return; // 다른 질문으로 넘어갔거나 중지된 경우 무시
+    // 1. 이미 캐시된 고음질 신경망 오디오가 있으면 즉시 재생
+    const cacheKey = `${questionObj.panel}_${questionObj.id}_${questionObj.question.slice(0, 30)}`;
+    const cachedNeuralUrl = this.ttsAudioCache.get(cacheKey);
 
-    if (neuralWavUrl) {
+    if (cachedNeuralUrl) {
       try {
-        if (replayBtn) replayBtn.textContent = "🔊 질문 다시 듣기";
-        const audio = new Audio(neuralWavUrl);
+        const audio = new Audio(cachedNeuralUrl);
         audio.volume = 0.95;
         this.currentTtsAudio = audio;
 
@@ -729,6 +733,7 @@ class InterviewSimulator {
           if (currentReqId !== this.ttsRequestId) return;
           this.highlightInterviewer(panelInfo.id, false);
           this.currentTtsAudio = null;
+          if (replayBtn) replayBtn.textContent = "🔊 질문 다시 듣기";
           if (this.sessionState.sttEnabled && !this.isRecognizing && !this.sessionState.isPaused) {
             this.startAnsweringProcess();
           }
@@ -737,33 +742,41 @@ class InterviewSimulator {
         audio.onerror = () => {
           if (currentReqId !== this.ttsRequestId) return;
           this.currentTtsAudio = null;
-          this.speakWithWebSpeechFallback(questionObj, panelInfo, currentReqId);
+          this.speakWithNaturalWebSpeech(questionObj, panelInfo, currentReqId);
         };
 
         await audio.play();
         return;
-      } catch (playErr) {
+      } catch (err) {
         this.currentTtsAudio = null;
       }
     }
 
-    // 2순위: 브라우저 고품질 Natural Web Speech API 폴백 (피치 왜곡 제거 & 부드러운 호흡 조율)
-    if (replayBtn) replayBtn.textContent = "🔊 질문 다시 듣기";
-    this.speakWithWebSpeechFallback(questionObj, panelInfo, currentReqId);
+    // 2. 대기시간 0ms 즉시 발성: 불필요한 네트워크 지연(3~7초) 없이 즉시 브라우저의 부드러운 자연 음성으로 재생
+    this.speakWithNaturalWebSpeech(questionObj, panelInfo, currentReqId);
   }
 
-  // Warm, Unhurried Web Speech Fallback (No metallic pitch distortion)
-  speakWithWebSpeechFallback(questionObj, panelInfo, reqId) {
+  // Silky-Smooth, Natural Human Tone (0ms Zero-Latency, Pitch 1.0 No Distortion)
+  speakWithNaturalWebSpeech(questionObj, panelInfo, reqId) {
     if (!this.synth || reqId !== this.ttsRequestId) return;
     this.synth.cancel();
 
-    // 문장 사이 호흡이 자연스럽고 편안하게 이어지도록 쉼표/마침표 뒤 미세 여백 정리
-    const comfortableText = questionObj.question
+    const replayBtn = document.getElementById("btn-replay-tts");
+
+    // 질문 텍스트에서 특수기호나 괄호로 인한 발음 튐/쇳소리/깨짐 원천 방지 및 편안한 호흡 정제
+    let comfortableText = questionObj.question
+      .replace(/\(([^)]+)\)/g, ", $1, ") // 괄호를 자연스러운 쉼표 호흡으로 변환
+      .replace(/·/g, ", ")
+      .replace(/\//g, " 및 ")
+      .replace(/~/g, "에서 ")
+      .replace(/([0-9]+)%/g, "$1 퍼센트")
+      .replace(/([.?!])\s*/g, "$1  ") // 문장 마침표 뒤에 자연스러운 음절 호흡 부여
       .replace(/\s+/g, " ")
-      .replace(/([.?!])\s*/g, "$1  ");
+      .trim();
 
     const utterance = new SpeechSynthesisUtterance(comfortableText);
 
+    // 가장 부드럽고 듣기 편한 아나운서 음성 매칭
     if (panelInfo.gender === "female" && this.femaleVoice) {
       utterance.voice = this.femaleVoice;
     } else if (panelInfo.gender === "male" && this.maleVoice) {
@@ -773,10 +786,10 @@ class InterviewSimulator {
     }
 
     utterance.lang = "ko-KR";
-    // 피치를 과도하게 꺾으면 기계음/까칠함이 발생하므로 0.96 ~ 1.04 이내의 가장 자연스러운 육성 대역 유지
-    utterance.pitch = panelInfo.voicePitch || (panelInfo.gender === "female" ? 1.02 : 0.96);
-    // 다그치듯 빠르지 않고 편안하게 들리는 속도 (0.92 ~ 0.94)
-    utterance.rate = panelInfo.voiceRate || 0.93;
+    // 피치 변조(0.9미만 또는 1.0초과) 시 발생하는 모바일/PC 디지털 쇳소리 왜곡을 원천 박멸 (스튜디오 원음 1.0 유지)
+    utterance.pitch = 1.0;
+    // 너무 빠르지 않고 귀에 쏙쏙 박히는 차분하고 정돈된 아나운서 속도 (0.91)
+    utterance.rate = 0.91;
     utterance.volume = 0.95;
 
     this.highlightInterviewer(panelInfo.id, true);
@@ -784,6 +797,7 @@ class InterviewSimulator {
     utterance.onend = () => {
       if (reqId !== this.ttsRequestId) return;
       this.highlightInterviewer(panelInfo.id, false);
+      if (replayBtn) replayBtn.textContent = "🔊 질문 다시 듣기";
       if (this.sessionState.sttEnabled && !this.isRecognizing && !this.sessionState.isPaused) {
         this.startAnsweringProcess();
       }
@@ -792,6 +806,7 @@ class InterviewSimulator {
     utterance.onerror = () => {
       if (reqId !== this.ttsRequestId) return;
       this.highlightInterviewer(panelInfo.id, false);
+      if (replayBtn) replayBtn.textContent = "🔊 질문 다시 듣기";
     };
 
     this.synth.speak(utterance);
@@ -914,6 +929,11 @@ class InterviewSimulator {
     if (tabName === "qbank") {
       this.showView("view-qbank");
       this.initQBank();
+      // 스마트폰/모바일 환경에서 탭 전환 시 즉각 강제 렌더링 및 상단 이동
+      setTimeout(() => {
+        this.renderQBankList();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 30);
     } else if (tabName === "history") {
       this.showView("view-history-dash");
     } else {
@@ -922,10 +942,14 @@ class InterviewSimulator {
   }
 
   showView(viewId) {
-    document.querySelectorAll(".view-panel").forEach(el => el.classList.remove("active"));
+    document.querySelectorAll(".view-panel").forEach(el => {
+      el.classList.remove("active");
+      el.style.display = "none";
+    });
     const target = document.getElementById(viewId);
     if (target) {
       target.classList.add("active");
+      target.style.display = "block";
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
