@@ -865,7 +865,8 @@ class InterviewSimulator {
       filename: fileName,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, logging: false },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
     html2pdf().set(opt).from(reportElement).save().then(() => {
@@ -1290,7 +1291,7 @@ class InterviewSimulator {
     document.getElementById("lbl-char-count").textContent = count;
   }
 
-  // Preview interviewer's comfortable voice from Setup Lobby
+  // Preview interviewer's comfortable voice from Setup Lobby with interactive feedback
   previewInterviewerVoice(panelKey) {
     const panelInfo = INTERVIEW_PANEL[panelKey] || INTERVIEW_PANEL.CEO;
     const sampleGreetings = {
@@ -1304,10 +1305,18 @@ class InterviewSimulator {
       panel: panelKey,
       question: sampleGreetings[panelKey] || sampleGreetings.CEO
     };
+
+    // If currently speaking this audio, stop it
+    if (this.currentTtsAudio && !this.currentTtsAudio.paused) {
+      this.stopSpeaking();
+      return;
+    }
+
     const prevTts = this.sessionState.ttsEnabled;
     const prevStt = this.sessionState.sttEnabled;
     this.sessionState.ttsEnabled = true;
     this.sessionState.sttEnabled = false;
+
     this.speakQuestion(sampleQ).finally(() => {
       this.sessionState.ttsEnabled = prevTts;
       this.sessionState.sttEnabled = prevStt;

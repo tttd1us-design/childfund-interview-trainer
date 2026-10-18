@@ -2042,9 +2042,11 @@ body {
   #view-report {
     display: block !important;
   }
-  .card, .report-header-card {
+  .card, .report-header-card, .qa-item {
     box-shadow: none !important;
     border: 1px solid #ccc !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
   .qa-item-body {
     display: block !important;
