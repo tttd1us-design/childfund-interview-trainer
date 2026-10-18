@@ -380,27 +380,46 @@
           <div class="candidate-response-area">
             <div class="response-header">
               <div class="user-meta">
-                <span class="user-badge">신지애 팀장 답변석</span>
+                <span class="user-badge" id="lbl-answer-user-title">신지애 팀장 답변석</span>
                 <span id="stt-status-indicator" class="status-indicator">마이크 대기 중</span>
-                <span id="recording-live-indicator" class="recording-live-pill" style="display:none;">● 실제 음성 녹음 중</span>
+                <span id="recording-live-indicator" class="recording-live-pill" style="display:none;">
+                  <span class="pulse-dot"></span>
+                  <span id="lbl-live-recording-status">● 녹음 중</span>
+                  <span id="lbl-recording-time" class="recording-time">00:00</span>
+                </span>
               </div>
               <div class="voice-controls">
-                <button id="btn-toggle-mic" class="btn btn-mic">
+                <button id="btn-toggle-mic" class="btn btn-mic-action btn-start-rec" type="button">
                   <span class="mic-icon">🎙️</span>
-                  <span id="lbl-mic-text">음성 답변 시작</span>
+                  <span id="lbl-mic-text">음성 답변 시작 (녹음 ON)</span>
+                </button>
+                <button id="btn-stop-mic" class="btn btn-mic-action btn-stop-rec" type="button" style="display:none;">
+                  <span class="mic-icon">⏹️</span>
+                  <span>답변 완료 (녹음 끄기)</span>
                 </button>
               </div>
             </div>
 
+            <!-- Realtime Audio Waveform Visualizer Bar -->
+            <div id="recording-visual-bar" class="recording-visual-bar" style="display:none;">
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-text">마이크로 소리를 감지하고 있습니다. 소리 내어 말씀하시면 아래에 실시간 텍스트로 적힙니다.</span>
+            </div>
+
             <!-- Text / Speech Realtime Box -->
             <div class="answer-box-wrap">
-              <textarea id="txt-candidate-answer" class="candidate-textarea" placeholder="[🎙️ 음성 답변 시작] 버튼을 누르고 실제 면접장처럼 소리 내어 말씀하시면 자동으로 실시간 텍스트 변환 및 음성 파일이 동시 녹음됩니다. 직접 키보드로 수정하거나 보완할 수도 있습니다."></textarea>
+              <textarea id="txt-candidate-answer" class="candidate-textarea" placeholder="[🎙️ 음성 답변 시작 (녹음 ON)] 버튼을 누르고 말씀하시면 말씀하신 내용이 실시간 텍스트로 자동 작성되며, 실제 음성 파일도 함께 동시 녹음됩니다. 직접 키보드로 수정하거나 입력하실 수도 있습니다."></textarea>
               <div class="char-count"><span id="lbl-char-count">0</span> 자</div>
             </div>
 
             <!-- Candidate Recorded Audio Preview Player -->
             <div id="answer-audio-preview" class="audio-preview-wrap" style="display:none;">
-              <span class="audio-label">🎧 방금 내가 한 실제 음성 답변 다시듣기:</span>
+              <span class="audio-label">🎧 방금 녹음된 내 실제 답변 음성 파일:</span>
               <audio id="recorded-audio-player" controls class="custom-audio-player"></audio>
             </div>
 

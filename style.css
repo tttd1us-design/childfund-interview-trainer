@@ -1239,31 +1239,109 @@ body {
 }
 
 .recording-live-pill {
-  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
   font-weight: 800;
   color: white;
-  background: var(--danger);
-  padding: 2px 8px;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  padding: 4px 12px;
   border-radius: var(--radius-full);
   margin-left: 8px;
+  box-shadow: 0 0 12px rgba(220, 38, 38, 0.4);
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
   animation: pulse 1s infinite;
 }
 
-.btn-mic {
-  background: var(--bg-main);
-  color: var(--text-main);
-  border: 2px solid var(--border-color);
-  padding: 8px 18px;
-  border-radius: var(--radius-full);
-  font-size: 0.98rem;
-  font-weight: 700;
+.recording-time {
+  font-family: monospace;
+  font-size: 0.88rem;
+  background: rgba(0,0,0,0.2);
+  padding: 1px 6px;
+  border-radius: 4px;
 }
 
-.btn-mic.active {
-  background: var(--danger);
+/* Big Dual Recording Buttons */
+.btn-mic-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: var(--radius-full);
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+}
+
+.btn-start-rec {
+  background: linear-gradient(135deg, #008450 0%, #005f39 100%);
   color: white;
-  border-color: var(--danger);
-  animation: pulse 1.5s infinite;
+  box-shadow: 0 4px 12px rgba(0, 132, 80, 0.3);
+}
+
+.btn-start-rec:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 132, 80, 0.4);
+}
+
+.btn-stop-rec {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+  animation: pulse 2s infinite;
+}
+
+.btn-stop-rec:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.5);
+}
+
+/* Animated Sound Wave Visualizer Bar */
+.recording-visual-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 132, 80, 0.08);
+  border: 1px solid rgba(0, 132, 80, 0.25);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  margin-bottom: 12px;
+}
+
+.wave-bar {
+  width: 4px;
+  height: 16px;
+  background: #008450;
+  border-radius: 2px;
+  animation: waveMotion 1.2s infinite ease-in-out;
+}
+
+.wave-bar:nth-child(1) { animation-delay: 0.1s; height: 12px; }
+.wave-bar:nth-child(2) { animation-delay: 0.3s; height: 22px; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; height: 16px; }
+.wave-bar:nth-child(4) { animation-delay: 0.4s; height: 26px; }
+.wave-bar:nth-child(5) { animation-delay: 0.15s; height: 18px; }
+.wave-bar:nth-child(6) { animation-delay: 0.35s; height: 14px; }
+
+@keyframes waveMotion {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1.4); }
+}
+
+.wave-text {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #008450;
+  margin-left: 10px;
 }
 
 .answer-box-wrap {

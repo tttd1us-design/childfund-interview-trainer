@@ -31,6 +31,7 @@ class InterviewSimulator {
 
     // Media Recorder (실제 오디오 녹음기)
     this.mediaRecorder = null;
+    this.audioStream = null;
     this.audioChunks = [];
     this.currentAudioBlobUrl = null;
 
@@ -428,42 +429,68 @@ class InterviewSimulator {
   // Setup Web Speech Recognition
   setupSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this.recognitionSupported = !!SpeechRecognition;
+    this.accumulatedTranscript = "";
+
     if (SpeechRecognition) {
-      this.recognition = new SpeechRecognition();
-      this.recognition.continuous = true;
-      this.recognition.interimResults = true;
-      this.recognition.lang = "ko-KR";
+      try {
+        this.recognition = new SpeechRecognition();
+        this.recognition.continuous = true;
+        this.recognition.interimResults = true;
+        this.recognition.lang = "ko-KR";
 
-      this.recognition.onstart = () => {
-        this.isRecognizing = true;
-        this.updateMicUI(true);
-      };
+        this.recognition.onstart = () => {
+          this.isRecognizing = true;
+          this.updateMicUI(true);
+        };
 
-      this.recognition.onresult = (event) => {
-        let finalTranscript = "";
-        for (let i = 0; i < event.results.length; ++i) {
-          finalTranscript += event.results[i][0].transcript;
-        }
-        const txtArea = document.getElementById("txt-candidate-answer");
-        if (txtArea) {
-          txtArea.value = finalTranscript;
-          this.updateCharCount();
-        }
-      };
+        this.recognition.onresult = (event) => {
+          let interimTranscript = "";
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              this.accumulatedTranscript += (this.accumulatedTranscript ? " " : "") + transcript;
+            } else {
+              interimTranscript += transcript;
+            }
+          }
 
-      this.recognition.onerror = (event) => {
-        console.warn("Speech recognition notice:", event.error);
-        this.updateMicUI(false);
-      };
+          const txtArea = document.getElementById("txt-candidate-answer");
+          if (txtArea) {
+            const fullText = (this.accumulatedTranscript + (interimTranscript ? " " + interimTranscript : "")).trim();
+            txtArea.value = fullText;
+            this.updateCharCount();
+          }
+        };
 
-      this.recognition.onend = () => {
-        this.isRecognizing = false;
-        this.updateMicUI(false);
-      };
+        this.recognition.onerror = (event) => {
+          console.warn("Speech recognition notice:", event.error);
+          const ind = document.getElementById("stt-status-indicator");
+          if (event.error === "not-allowed") {
+            if (ind) ind.textContent = "⚠️ 마이크 권한이 차단되었습니다. 브라우저 주소창 좌측에서 마이크를 허용해 주세요.";
+          } else if (event.error === "no-speech") {
+            // Keep waiting for user speech
+          }
+        };
+
+        this.recognition.onend = () => {
+          this.isRecognizing = false;
+          // 사용자가 명시적으로 중지하지 않았고 여전히 녹음 중이라면 (특히 모바일/크롬에서 침묵 시 자동종료 방지) 자동 재연결
+          if (this.isAnsweringActive && this.sessionState.sttEnabled) {
+            try {
+              this.recognition.start();
+            } catch (e) {}
+          } else {
+            this.updateMicUI(false);
+          }
+        };
+      } catch (err) {
+        console.warn("SpeechRecognition init failed:", err);
+      }
     } else {
       console.warn("Web Speech Recognition not supported in this browser.");
       const ind = document.getElementById("stt-status-indicator");
-      if (ind) ind.textContent = "브라우저 음성인식 미지원 (키보드 입력 가능)";
+      if (ind) ind.textContent = "🎙️ 음성 녹음 전용 모드 (iOS Safari는 실제 음성 녹음 및 키보드 입력 지원)";
     }
   }
 
@@ -571,8 +598,12 @@ class InterviewSimulator {
       }
     });
 
-    // Mic Button
-    document.getElementById("btn-toggle-mic").addEventListener("click", () => this.toggleMic());
+    // Mic Buttons (Start & Stop)
+    document.getElementById("btn-toggle-mic").addEventListener("click", () => this.startAnsweringProcess());
+    const btnStopMic = document.getElementById("btn-stop-mic");
+    if (btnStopMic) {
+      btnStopMic.addEventListener("click", () => this.stopAnsweringProcess());
+    }
 
     // Replay TTS
     document.getElementById("btn-replay-tts").addEventListener("click", () => {
@@ -615,7 +646,7 @@ class InterviewSimulator {
   }
 
   // Start Interview Flow
-  startInterview() {
+  async startInterview() {
     const diffRadio = document.querySelector('input[name="difficulty"]:checked');
     this.sessionState.difficulty = diffRadio ? parseInt(diffRadio.value) : 3;
     this.sessionState.totalQuestions = parseInt(document.getElementById("q-count").value) || 12;
@@ -630,6 +661,17 @@ class InterviewSimulator {
     this.sessionState.currentIndex = 0;
     this.sessionState.answers = [];
     this.sessionState.timerSeconds = 30 * 60; // 30분 카운트다운
+
+    // 사용자 제스처(시작 버튼 클릭) 시점에 미리 마이크 권한을 승인받아 브라우저 정책 차단 방지
+    if ((this.sessionState.recordAudioEnabled || this.sessionState.sttEnabled) && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        if (!this.audioStream || !this.audioStream.active) {
+          this.audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        }
+      } catch (err) {
+        console.warn("초기 마이크 권한 요청 알림 (사용자 거부 또는 미지원):", err);
+      }
+    }
 
     // Generate Question Set
     this.sessionState.questions = generateInterviewSet(this.sessionState.difficulty, this.sessionState.totalQuestions);
@@ -728,11 +770,22 @@ class InterviewSimulator {
     const audioPreview = document.getElementById("answer-audio-preview");
     if (audioPreview) audioPreview.style.display = "none";
     this.currentAudioBlobUrl = null;
+    this.audioChunks = [];
+    this.accumulatedTranscript = "";
 
     // Reset Answer Text Area
     const txtArea = document.getElementById("txt-candidate-answer");
     txtArea.value = "";
     this.updateCharCount();
+
+    // Update Answer Box User Title
+    const userTitle = document.getElementById("lbl-answer-user-title");
+    if (userTitle) {
+      userTitle.textContent = `${this.currentUser ? this.currentUser.name : "신지애 팀장"} 답변석`;
+    }
+
+    // Reset Mic UI to idle
+    this.stopAnsweringProcess();
 
     // Trigger TTS
     this.speakQuestion(qObj);
@@ -740,61 +793,142 @@ class InterviewSimulator {
 
   // Start Real Audio Recording & Speech Recognition
   async startAnsweringProcess() {
-    if (this.recognition && !this.isRecognizing) {
+    this.isAnsweringActive = true;
+    const ind = document.getElementById("stt-status-indicator");
+    const liveInd = document.getElementById("recording-live-indicator");
+    const visualBar = document.getElementById("recording-visual-bar");
+
+    // 1. Web Speech Recognition STT 활성화
+    if (this.recognition && this.sessionState.sttEnabled) {
       try {
-        this.recognition.start();
-      } catch (e) {}
+        if (!this.isRecognizing) {
+          this.recognition.start();
+        }
+      } catch (e) {
+        console.warn("STT start retry:", e);
+      }
     }
 
-    // Real Audio Recording with MediaRecorder
+    // 2. Real Audio Recording with MediaRecorder (iOS Safari, Android Chrome, PC 완벽 호환)
     if (this.sessionState.recordAudioEnabled && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (!this.audioStream || !this.audioStream.active) {
+          this.audioStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true
+            }
+          });
+        }
+
         this.audioChunks = [];
-        this.mediaRecorder = new MediaRecorder(stream);
+
+        // iOS Safari 및 구형 브라우저 대응 MIME 타입 탐색
+        let mimeType = 'audio/webm';
+        if (typeof MediaRecorder.isTypeSupported === 'function') {
+          if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            mimeType = 'audio/webm;codecs=opus';
+          } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+            mimeType = 'audio/webm';
+          } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+            mimeType = 'audio/mp4'; // iOS Safari 최적 포맷
+          } else if (MediaRecorder.isTypeSupported('audio/aac')) {
+            mimeType = 'audio/aac';
+          } else {
+            mimeType = ''; // 브라우저 기본값
+          }
+        }
+
+        const options = mimeType ? { mimeType } : {};
+        this.mediaRecorder = new MediaRecorder(this.audioStream, options);
 
         this.mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
+          if (event.data && event.data.size > 0) {
             this.audioChunks.push(event.data);
           }
         };
 
         this.mediaRecorder.onstop = () => {
-          const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-          this.currentAudioBlobUrl = URL.createObjectURL(audioBlob);
-          const player = document.getElementById("recorded-audio-player");
-          const preview = document.getElementById("answer-audio-preview");
-          if (player && preview) {
-            player.src = this.currentAudioBlobUrl;
-            preview.style.display = "flex";
+          if (this.audioChunks.length > 0) {
+            const actualMime = this.mediaRecorder.mimeType || mimeType || 'audio/webm';
+            const audioBlob = new Blob(this.audioChunks, { type: actualMime });
+            this.currentAudioBlobUrl = URL.createObjectURL(audioBlob);
+            
+            const player = document.getElementById("recorded-audio-player");
+            const preview = document.getElementById("answer-audio-preview");
+            if (player && preview) {
+              player.src = this.currentAudioBlobUrl;
+              preview.style.display = "flex";
+            }
           }
-          // Stop stream tracks
-          stream.getTracks().forEach(track => track.stop());
         };
 
-        this.mediaRecorder.start();
-        const liveInd = document.getElementById("recording-live-indicator");
-        if (liveInd) liveInd.style.display = "inline-block";
+        // 300ms 단위로 오디오 청크 분할 수집 (데이터 유실 방지)
+        this.mediaRecorder.start(300);
+
+        // 녹음 진행 타이머 시작
+        this.recordingSeconds = 0;
+        clearInterval(this.recordingTimerInterval);
+        this.recordingTimerInterval = setInterval(() => {
+          this.recordingSeconds++;
+          const m = String(Math.floor(this.recordingSeconds / 60)).padStart(2, '0');
+          const s = String(this.recordingSeconds % 60).padStart(2, '0');
+          const timerEl = document.getElementById("lbl-recording-time");
+          if (timerEl) timerEl.textContent = `${m}:${s}`;
+        }, 1000);
+
+        if (liveInd) {
+          liveInd.style.display = "inline-flex";
+        }
+        if (visualBar) {
+          visualBar.style.display = "flex";
+        }
+        this.updateMicUI(true);
       } catch (err) {
-        console.warn("Audio recording permission or device not available:", err);
+        console.warn("마이크 접근 또는 Audio 녹음기 실행 오류:", err);
+        if (ind) {
+          ind.textContent = "⚠️ 마이크 권한을 허용해 주세요 (브라우저 주소창 설정 확인)";
+        }
+        this.updateMicUI(false);
       }
+    } else {
+      this.updateMicUI(true);
     }
   }
 
   stopAnsweringProcess() {
+    this.isAnsweringActive = false;
+    clearInterval(this.recordingTimerInterval);
+
     if (this.recognition && this.isRecognizing) {
-      this.recognition.stop();
+      try {
+        this.recognition.stop();
+      } catch (e) {}
     }
+
     if (this.mediaRecorder && this.mediaRecorder.state !== "inactive") {
-      this.mediaRecorder.stop();
+      try {
+        this.mediaRecorder.stop();
+      } catch (e) {}
     }
+
     const liveInd = document.getElementById("recording-live-indicator");
-    if (liveInd) liveInd.style.display = "none";
+    if (liveInd) {
+      liveInd.style.display = "none";
+    }
+
+    const visualBar = document.getElementById("recording-visual-bar");
+    if (visualBar) {
+      visualBar.style.display = "none";
+    }
+
+    this.updateMicUI(false);
   }
 
   // Mic Toggle Button
   toggleMic() {
-    if (this.isRecognizing || (this.mediaRecorder && this.mediaRecorder.state === "recording")) {
+    if (this.isAnsweringActive || this.isRecognizing || (this.mediaRecorder && this.mediaRecorder.state === "recording")) {
       this.stopAnsweringProcess();
     } else {
       this.startAnsweringProcess();
@@ -802,20 +936,24 @@ class InterviewSimulator {
   }
 
   updateMicUI(isListening) {
-    const btn = document.getElementById("btn-toggle-mic");
-    const label = document.getElementById("lbl-mic-text");
+    const btnStart = document.getElementById("btn-toggle-mic");
+    const btnStop = document.getElementById("btn-stop-mic");
     const ind = document.getElementById("stt-status-indicator");
 
     if (isListening) {
-      btn.classList.add("active");
-      label.textContent = "답변 녹음 중지";
-      ind.textContent = "🎙️ 실시간 음성 듣는 중...";
-      ind.classList.add("listening");
+      if (btnStart) btnStart.style.display = "none";
+      if (btnStop) btnStop.style.display = "inline-flex";
+      if (ind) {
+        ind.textContent = "🎙️ 실시간 음성 듣는 중... (소리 내어 말씀하시면 글자로 써집니다)";
+        ind.classList.add("listening");
+      }
     } else {
-      btn.classList.remove("active");
-      label.textContent = "음성 답변 시작";
-      ind.textContent = "마이크 대기 중";
-      ind.classList.remove("listening");
+      if (btnStart) btnStart.style.display = "inline-flex";
+      if (btnStop) btnStop.style.display = "none";
+      if (ind) {
+        ind.textContent = "마이크 대기 중 (답변을 시작하려면 [음성 답변 시작] 클릭)";
+        ind.classList.remove("listening");
+      }
     }
   }
 
