@@ -614,8 +614,11 @@ class InterviewSimulator {
     // Next Question Button
     document.getElementById("btn-submit-answer").addEventListener("click", () => this.submitAnswerAndNext());
 
-    // Answer text counter
-    document.getElementById("txt-candidate-answer").addEventListener("input", () => this.updateCharCount());
+    // Answer text counter & sync manual edits with STT buffer
+    document.getElementById("txt-candidate-answer").addEventListener("input", (e) => {
+      this.accumulatedTranscript = e.target.value;
+      this.updateCharCount();
+    });
 
     // View History Button
     document.getElementById("btn-view-history").addEventListener("click", () => this.showView("view-history-dash"));
@@ -907,12 +910,6 @@ class InterviewSimulator {
       } catch (e) {}
     }
 
-    if (this.mediaRecorder && this.mediaRecorder.state !== "inactive") {
-      try {
-        this.mediaRecorder.stop();
-      } catch (e) {}
-    }
-
     const liveInd = document.getElementById("recording-live-indicator");
     if (liveInd) {
       liveInd.style.display = "none";
@@ -924,6 +921,24 @@ class InterviewSimulator {
     }
 
     this.updateMicUI(false);
+
+    // MediaRecorder가 작동 중이라면 stop 완료 후 Blob URL이 생성될 때까지 비동기 대기
+    return new Promise((resolve) => {
+      if (this.mediaRecorder && this.mediaRecorder.state !== "inactive") {
+        const prevOnStop = this.mediaRecorder.onstop;
+        this.mediaRecorder.onstop = (e) => {
+          if (prevOnStop) prevOnStop(e);
+          resolve();
+        };
+        try {
+          this.mediaRecorder.stop();
+        } catch (err) {
+          resolve();
+        }
+      } else {
+        resolve();
+      }
+    });
   }
 
   // Mic Toggle Button
@@ -964,8 +979,8 @@ class InterviewSimulator {
   }
 
   // Submit Answer & Evaluate
-  submitAnswerAndNext() {
-    this.stopAnsweringProcess();
+  async submitAnswerAndNext() {
+    await this.stopAnsweringProcess();
     if (this.synth) this.synth.cancel();
 
     const currentQ = this.sessionState.questions[this.sessionState.currentIndex];
@@ -1013,21 +1028,22 @@ class InterviewSimulator {
   async finishInterview() {
     clearInterval(this.sessionState.timerInterval);
     this.sessionState.isActive = false;
-    this.stopAnsweringProcess();
+    await this.stopAnsweringProcess();
     if (this.synth) this.synth.cancel();
 
-    // 현재 작성 중이던 답변이 있고 아직 제출되지 않았다면 자동 취합
+    // 현재 작성 중이던 답변이나 녹음된 오디오가 있고 아직 제출되지 않았다면 자동 취합
     const txtArea = document.getElementById("txt-candidate-answer");
     const currentQ = this.sessionState.questions[this.sessionState.currentIndex];
     const currentTxt = txtArea ? txtArea.value.trim() : "";
 
-    // 이미 등록된 답변 수가 현재 인덱스보다 적다면 현재 답변 자동 등록
-    if (currentQ && this.sessionState.answers.length <= this.sessionState.currentIndex && currentTxt.length > 0) {
-      const evalResult = evaluateAnswer(currentTxt, currentQ);
+    // 이미 등록된 답변 수가 현재 인덱스보다 적다면 현재 답변(텍스트 또는 음성녹음) 자동 등록
+    if (currentQ && this.sessionState.answers.length <= this.sessionState.currentIndex && (currentTxt.length > 0 || this.currentAudioBlobUrl)) {
+      const finalTxt = currentTxt || "(음성 녹음 파일로 답변 제출됨)";
+      const evalResult = evaluateAnswer(finalTxt, currentQ);
       this.sessionState.answers.push({
         questionIndex: this.sessionState.currentIndex + 1,
         question: currentQ,
-        answerText: currentTxt,
+        answerText: finalTxt,
         audioBlobUrl: this.currentAudioBlobUrl,
         evalResult: evalResult,
         timestamp: new Date().toLocaleTimeString()
