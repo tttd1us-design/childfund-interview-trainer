@@ -133,6 +133,23 @@
       </div>
     </div>
 
+    <!-- Global Navigation Tabs -->
+    <nav class="app-navbar" role="tablist">
+      <button id="nav-btn-interview" class="nav-tab active" onclick="app.switchMainTab('interview')">
+        <span class="nav-icon">🎙️</span>
+        <span class="nav-text">실전 AI 모의면접</span>
+      </button>
+      <button id="nav-btn-qbank" class="nav-tab" onclick="app.switchMainTab('qbank')">
+        <span class="nav-icon">📚</span>
+        <span class="nav-text">300대 실전 예상질문 도서관</span>
+        <span class="nav-badge">300제 전수수록</span>
+      </button>
+      <button id="nav-btn-history" class="nav-tab" onclick="app.switchMainTab('history')">
+        <span class="nav-icon">📊</span>
+        <span class="nav-text">누적 평가 & 성장 추이</span>
+      </button>
+    </nav>
+
     <!-- Main Dynamic Container -->
     <main class="main-content">
       <!-- VIEW 1: Interview Setup / Lobby -->
@@ -592,13 +609,90 @@
           </table>
         </div>
       </section>
+
+      <!-- VIEW 5: 300대 실전 예상질문 도서관 (Question Bank) -->
+      <section id="view-qbank" class="view-panel" style="display: none;">
+        <!-- Header Banner -->
+        <div class="qbank-header-banner">
+          <div class="qbank-title-group">
+            <div class="qbank-badge">📚 초록우산 기관장 승진 바이블</div>
+            <h2>300대 실전 예상질문 마스터 도서관</h2>
+            <p>신지애 팀장 23년 경력, 경기남부 1,007세대 위탁아동 관리, 2027 국가사업 공공화 전환, 3대 아킬레스건 방어까지 총망라된 300개 전 문항 기출·예상 문제집입니다. 출제 의도, 1등 합격 모범 답변 대본, 송곳 꼬리질문 방어 가이드를 함께 학습하고 음성으로도 들을 수 있습니다.</p>
+          </div>
+          <div class="qbank-progress-card">
+            <div class="progress-title">
+              <span>📖 학습 진도율</span>
+              <strong id="qbank-progress-percent">0%</strong>
+            </div>
+            <div class="progress-bar-bg">
+              <div id="qbank-progress-fill" class="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+            <span class="progress-sub" id="qbank-progress-count">300문항 중 0개 학습 완료</span>
+          </div>
+        </div>
+
+        <!-- Toolbar & Filter Controls -->
+        <div class="qbank-toolbar">
+          <div class="qbank-search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="qbank-search-input" placeholder="키워드, 문항 번호, 질문 내용 실시간 검색 (예: 2027, 8개월, 위기관리, 예산, 신입 9명)" oninput="app.filterQBank()">
+            <button class="btn-clear-search" onclick="app.clearQBankSearch()">✕</button>
+          </div>
+
+          <div class="qbank-filter-controls">
+            <select id="qbank-panel-filter" class="form-select form-select-sm" onchange="app.filterQBank()">
+              <option value="ALL">전체 면접관 (4인)</option>
+              <option value="CEO">👔 정문기 대표이사 (경영/비전)</option>
+              <option value="EXEC_DIRECTOR">👩‍💼 박서진 복지총괄이사 (전문성/거버넌스)</option>
+              <option value="HR_DIRECTOR">👨‍💼 김태호 인사팀장 (조직/인사노무)</option>
+              <option value="EXTERNAL_EXAMINER">👩‍🏫 이선우 외부위원 (송곳압박/학술)</option>
+            </select>
+
+            <select id="qbank-diff-filter" class="form-select form-select-sm" onchange="app.filterQBank()">
+              <option value="ALL">전체 난이도 (Level 1~5)</option>
+              <option value="1">Level 1 (기본 소양)</option>
+              <option value="2">Level 2 (실무 리더십)</option>
+              <option value="3">Level 3 (실전 기관장 심사)</option>
+              <option value="4">Level 4 (심층 정책/갈등)</option>
+              <option value="5">Level 5 (송곳 압박/약점 검증)</option>
+            </select>
+
+            <button id="btn-toggle-bookmark-only" class="btn btn-sm btn-outline bookmark-filter-btn" onclick="app.toggleBookmarkFilter()">
+              <span id="lbl-bookmark-filter">★ 북마크 질문만 보기</span>
+            </button>
+
+            <button class="btn btn-sm btn-secondary" onclick="app.expandAllQBank(true)">
+              <span>전체 열기</span>
+            </button>
+            <button class="btn btn-sm btn-secondary" onclick="app.expandAllQBank(false)">
+              <span>전체 닫기</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 10대 카테고리 칩 선택기 -->
+        <div class="qbank-category-chips" id="qbank-category-chips">
+          <!-- Injected via JS -->
+        </div>
+
+        <!-- 질문 개수 안내 바 -->
+        <div class="qbank-result-status">
+          <span>검색된 질문: <strong id="qbank-filtered-count">300</strong>개</span>
+          <span class="qbank-tip-text">💡 카드를 클릭하면 [출제 의도], [1등 모범 답변 스크립트], [꼬리질문 방어 가이드]가 펼쳐집니다.</span>
+        </div>
+
+        <!-- 질문 목록 카드 컨테이너 -->
+        <div id="qbank-list-container" class="qbank-cards-grid">
+          <!-- Injected via JS -->
+        </div>
+      </section>
     </main>
 
     <!-- Global Footer -->
     <footer class="app-footer">
       <div class="footer-content">
         <p>초록우산 어린이재단 기관장 승진 실전 면접 시뮬레이터 | 경기남부가정위탁지원센터 신지애 팀장 특화 에디션</p>
-        <span class="tech-stack">보안 인증 시스템 활성화 (비밀번호: 1014) | Web Speech API (남/여 4인 멀티 보이스 TTS/STT) & Audio Recorder</span>
+        <span class="tech-stack">보안 인증 시스템 활성화 (비밀번호: 1014) | Web Speech API (남/여 4인 멀티 보이스 TTS/STT) & 300대 예상질문 도서관</span>
       </div>
     </footer>
   </div>
@@ -606,6 +700,7 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="questions_db.js"></script>
+  <script src="questions_300.js"></script>
   <script src="profile_and_rubric.js"></script>
   <script src="gemini_evaluator.js"></script>
   <script src="app.js"></script>

@@ -60,6 +60,19 @@ class InterviewSimulator {
     this.users = [];
     this.currentUser = null;
 
+    // 300대 실전 예상질문 도서관 상태
+    this.qbankState = {
+      selectedCategory: "ALL",
+      selectedPanel: "ALL",
+      selectedDiff: "ALL",
+      searchQuery: "",
+      bookmarkOnly: false,
+      expandedMap: {},
+      bookmarks: new Set(JSON.parse(localStorage.getItem("childfund_qbank_bookmarks") || "[]")),
+      readItems: new Set(JSON.parse(localStorage.getItem("childfund_qbank_read") || "[]")),
+      isInitialized: false
+    };
+
     this.init();
   }
 
@@ -72,6 +85,7 @@ class InterviewSimulator {
     this.setupVoices();
     this.bindEvents();
     this.renderHistoryTable();
+    this.initQBank();
   }
 
   // Multi-User Management System
@@ -888,12 +902,43 @@ class InterviewSimulator {
     });
   }
 
+  // Switch Top Level Tabs (Interview / Question Bank / History)
+  switchMainTab(tabName) {
+    if (tabName === "qbank") {
+      this.showView("view-qbank");
+      this.initQBank();
+    } else if (tabName === "history") {
+      this.showView("view-history-dash");
+    } else {
+      this.showView("view-setup");
+    }
+  }
+
   showView(viewId) {
     document.querySelectorAll(".view-panel").forEach(el => el.classList.remove("active"));
     const target = document.getElementById(viewId);
     if (target) {
       target.classList.add("active");
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Sync Navigation Tab States
+    const navInterview = document.getElementById("nav-btn-interview");
+    const navQBank = document.getElementById("nav-btn-qbank");
+    const navHistory = document.getElementById("nav-btn-history");
+
+    if (navInterview && navQBank && navHistory) {
+      navInterview.classList.remove("active");
+      navQBank.classList.remove("active");
+      navHistory.classList.remove("active");
+
+      if (viewId === "view-qbank") {
+        navQBank.classList.add("active");
+      } else if (viewId === "view-history-dash") {
+        navHistory.classList.add("active");
+      } else {
+        navInterview.classList.add("active");
+      }
     }
   }
 
@@ -1813,6 +1858,297 @@ class InterviewSimulator {
     } else {
       prompt("아래 주소를 복사하여 스마트폰이나 다른 기기에서 접속하세요:", url);
     }
+  }
+
+  // ==================== 📚 300대 실전 예상질문 도서관 (QBank) 엔진 ====================
+
+  initQBank() {
+    if (typeof QUESTIONS_300_DB === "undefined") return;
+    this.renderQBankCategoryChips();
+    this.renderQBankList();
+    this.updateQBankProgress();
+    this.qbankState.isInitialized = true;
+  }
+
+  renderQBankCategoryChips() {
+    const container = document.getElementById("qbank-category-chips");
+    if (!container || typeof QUESTIONS_300_CATEGORIES === "undefined") return;
+
+    let html = `
+      <button class="qbank-chip ${this.qbankState.selectedCategory === 'ALL' ? 'active' : ''}" onclick="app.selectQBankCategory('ALL')">
+        전체 보기 (300제)
+      </button>
+    `;
+
+    QUESTIONS_300_CATEGORIES.forEach(cat => {
+      const isActive = this.qbankState.selectedCategory === cat.id;
+      html += `
+        <button class="qbank-chip ${isActive ? 'active' : ''}" onclick="app.selectQBankCategory('${cat.id}')">
+          ${cat.name} <span class="chip-count">(${cat.count})</span>
+        </button>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  selectQBankCategory(catId) {
+    this.qbankState.selectedCategory = catId;
+    this.renderQBankCategoryChips();
+    this.filterQBank();
+  }
+
+  filterQBank() {
+    if (typeof QUESTIONS_300_DB === "undefined") return;
+
+    const searchInput = document.getElementById("qbank-search-input");
+    const panelFilter = document.getElementById("qbank-panel-filter");
+    const diffFilter = document.getElementById("qbank-diff-filter");
+
+    const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+    const panelVal = panelFilter ? panelFilter.value : "ALL";
+    const diffVal = diffFilter ? diffFilter.value : "ALL";
+
+    this.qbankState.searchQuery = query;
+    this.qbankState.selectedPanel = panelVal;
+    this.qbankState.selectedDiff = diffVal;
+
+    this.renderQBankList();
+  }
+
+  clearQBankSearch() {
+    const searchInput = document.getElementById("qbank-search-input");
+    if (searchInput) {
+      searchInput.value = "";
+      this.filterQBank();
+    }
+  }
+
+  toggleBookmarkFilter() {
+    this.qbankState.bookmarkOnly = !this.qbankState.bookmarkOnly;
+    const btn = document.getElementById("btn-toggle-bookmark-only");
+    const lbl = document.getElementById("lbl-bookmark-filter");
+    if (btn && lbl) {
+      if (this.qbankState.bookmarkOnly) {
+        btn.classList.add("active");
+        lbl.textContent = "★ 북마크 질문만 보는 중 (해제)";
+      } else {
+        btn.classList.remove("active");
+        lbl.textContent = "★ 북마크 질문만 보기";
+      }
+    }
+    this.renderQBankList();
+  }
+
+  getFilteredQBankList() {
+    if (typeof QUESTIONS_300_DB === "undefined") return [];
+
+    return QUESTIONS_300_DB.filter(q => {
+      // Category Filter
+      if (this.qbankState.selectedCategory !== "ALL" && q.categoryGroup !== this.qbankState.selectedCategory) {
+        return false;
+      }
+      // Panel Filter
+      if (this.qbankState.selectedPanel !== "ALL" && q.panel !== this.qbankState.selectedPanel) {
+        return false;
+      }
+      // Diff Filter
+      if (this.qbankState.selectedDiff !== "ALL" && String(q.difficulty) !== this.qbankState.selectedDiff) {
+        return false;
+      }
+      // Bookmark Filter
+      if (this.qbankState.bookmarkOnly && !this.qbankState.bookmarks.has(q.id)) {
+        return false;
+      }
+      // Search Query
+      if (this.qbankState.searchQuery) {
+        const qStr = `${q.qNumber} ${q.question} ${q.category} ${(q.keywords || []).join(' ')} ${q.intent || ''}`.toLowerCase();
+        if (!qStr.includes(this.qbankState.searchQuery)) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  renderQBankList() {
+    const container = document.getElementById("qbank-list-container");
+    const countLabel = document.getElementById("qbank-filtered-count");
+    if (!container) return;
+
+    const list = this.getFilteredQBankList();
+    if (countLabel) countLabel.textContent = list.length;
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div class="qbank-empty-state">
+          <span class="empty-icon">🔍</span>
+          <h4>일치하는 예상질문이 없습니다.</h4>
+          <p>검색어나 필터 조건을 변경해 보세요.</p>
+          <button class="btn btn-sm btn-primary" onclick="app.clearQBankFilters()">필터 초기화</button>
+        </div>
+      `;
+      return;
+    }
+
+    const panelMeta = {
+      CEO: { name: "정문기 대표 (CEO)", badge: "경영/비전", icon: "👔" },
+      EXEC_DIRECTOR: { name: "박서진 이사", badge: "전문성/거버넌스", icon: "👩‍💼" },
+      HR_DIRECTOR: { name: "김태호 인사팀장", badge: "조직/노무", icon: "👨‍💼" },
+      EXTERNAL_EXAMINER: { name: "이선우 교수", badge: "송곳검증/학술", icon: "👩‍🏫" }
+    };
+
+    container.innerHTML = list.map(q => {
+      const pInfo = panelMeta[q.panel] || { name: q.panel, badge: "면접관", icon: "👤" };
+      const isBookmarked = this.qbankState.bookmarks.has(q.id);
+      const isRead = this.qbankState.readItems.has(q.id);
+      const isExpanded = !!this.qbankState.expandedMap[q.id];
+
+      return `
+        <div class="qbank-card ${isExpanded ? 'expanded' : ''} ${isRead ? 'read' : ''}" id="qbank-card-${q.id}">
+          <div class="qbank-card-header" onclick="app.toggleQBankCard(${q.id})">
+            <div class="qbank-meta-row">
+              <span class="qbank-qnum">${q.qNumber}</span>
+              <span class="qbank-panel-tag"><span class="icon">${pInfo.icon}</span> ${pInfo.name}</span>
+              <span class="qbank-cat-tag">${q.category}</span>
+              <span class="qbank-diff-badge lvl-${q.difficulty}">Level ${q.difficulty}</span>
+              ${isRead ? '<span class="qbank-read-badge">학습 완료</span>' : ''}
+              
+              <div class="qbank-header-actions" onclick="event.stopPropagation();">
+                <button class="btn-qbank-audio" title="질문 음성 듣기" onclick="app.playQBankAudio(${q.id}, event)">
+                  <span>🔊 듣기</span>
+                </button>
+                <button class="btn-qbank-bookmark ${isBookmarked ? 'active' : ''}" title="북마크(중요) 표시" onclick="app.toggleQBankBookmark(${q.id}, event)">
+                  <span>${isBookmarked ? '★' : '☆'}</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="qbank-question-text">
+              ${q.question}
+            </div>
+
+            <div class="qbank-card-toggle-bar">
+              <span class="toggle-text">${isExpanded ? '▲ 상세 분석 & 모범 답변 접기' : '▼ 상세 분석 & 1등 모범답변 스크립트 열기'}</span>
+            </div>
+          </div>
+
+          <!-- Expanded Content -->
+          <div class="qbank-card-body" style="display: ${isExpanded ? 'block' : 'none'};">
+            <!-- 1. 출제 의도 및 필수 채점 잣대 -->
+            <div class="qbank-section-box intent-box">
+              <div class="box-title">🎯 1. 출제 의도 및 필수 채점 잣대</div>
+              <p class="box-desc">${q.intent || '기관장 승진 심사위원회의 거시적 경영 관점 및 리스크 대응 역량 검증.'}</p>
+              <div class="qbank-keywords-row">
+                <strong>필수 채점 키워드:</strong>
+                ${(q.keywords || []).map(k => `<span class="k-chip">${k}</span>`).join('')}
+              </div>
+            </div>
+
+            <!-- 2. 신지애 후보자 실전 1등 합격 모범 답변 스크립트 -->
+            <div class="qbank-section-box model-box">
+              <div class="box-title">🏆 2. 신지애 후보자 실전 1등 합격 모범 답변 스크립트 (1분 구술용)</div>
+              <div class="model-script-text">
+                "${q.modelAnswer || '안녕하십니까. 준비된 기관장 후보 신지애입니다. 사람이 남고 시스템으로 지켜지는 기관을 만들겠습니다.'}"
+              </div>
+            </div>
+
+            <!-- 3. 예상 송곳 꼬리질문 및 철벽 방어 가이드 -->
+            <div class="qbank-section-box defense-box">
+              <div class="box-title">🛡️ 3. 예상 송곳 꼬리질문 & 철벽 방어 가이드</div>
+              <div class="defense-script-text">
+                ${q.defense || '심사위원의 반박 시 당황하지 않고 지표와 데이터 기반으로 철벽 소명하십시오.'}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  toggleQBankCard(id) {
+    this.qbankState.expandedMap[id] = !this.qbankState.expandedMap[id];
+    this.qbankState.readItems.add(id);
+    localStorage.setItem("childfund_qbank_read", JSON.stringify(Array.from(this.qbankState.readItems)));
+
+    this.renderQBankList();
+    this.updateQBankProgress();
+  }
+
+  toggleQBankBookmark(id, event) {
+    if (event) event.stopPropagation();
+    if (this.qbankState.bookmarks.has(id)) {
+      this.qbankState.bookmarks.delete(id);
+    } else {
+      this.qbankState.bookmarks.add(id);
+    }
+    localStorage.setItem("childfund_qbank_bookmarks", JSON.stringify(Array.from(this.qbankState.bookmarks)));
+    this.renderQBankList();
+  }
+
+  expandAllQBank(open) {
+    if (typeof QUESTIONS_300_DB === "undefined") return;
+    QUESTIONS_300_DB.forEach(q => {
+      this.qbankState.expandedMap[q.id] = open;
+      if (open) this.qbankState.readItems.add(q.id);
+    });
+    if (open) {
+      localStorage.setItem("childfund_qbank_read", JSON.stringify(Array.from(this.qbankState.readItems)));
+    }
+    this.renderQBankList();
+    this.updateQBankProgress();
+  }
+
+  clearQBankFilters() {
+    this.qbankState.selectedCategory = "ALL";
+    this.qbankState.selectedPanel = "ALL";
+    this.qbankState.selectedDiff = "ALL";
+    this.qbankState.searchQuery = "";
+    this.qbankState.bookmarkOnly = false;
+
+    const searchInput = document.getElementById("qbank-search-input");
+    const panelFilter = document.getElementById("qbank-panel-filter");
+    const diffFilter = document.getElementById("qbank-diff-filter");
+    const btn = document.getElementById("btn-toggle-bookmark-only");
+    const lbl = document.getElementById("lbl-bookmark-filter");
+
+    if (searchInput) searchInput.value = "";
+    if (panelFilter) panelFilter.value = "ALL";
+    if (diffFilter) diffFilter.value = "ALL";
+    if (btn && lbl) {
+      btn.classList.remove("active");
+      lbl.textContent = "★ 북마크 질문만 보기";
+    }
+
+    this.renderQBankCategoryChips();
+    this.renderQBankList();
+  }
+
+  updateQBankProgress() {
+    const fill = document.getElementById("qbank-progress-fill");
+    const percentLabel = document.getElementById("qbank-progress-percent");
+    const countLabel = document.getElementById("qbank-progress-count");
+
+    const total = (typeof QUESTIONS_300_DB !== "undefined") ? QUESTIONS_300_DB.length : 300;
+    const readCount = this.qbankState.readItems.size;
+    const percent = Math.min(100, Math.round((readCount / total) * 100));
+
+    if (fill) fill.style.width = `${percent}%`;
+    if (percentLabel) percentLabel.textContent = `${percent}%`;
+    if (countLabel) countLabel.textContent = `${total}문항 중 ${readCount}개 학습 완료`;
+  }
+
+  playQBankAudio(id, event) {
+    if (event) event.stopPropagation();
+    if (typeof QUESTIONS_300_DB === "undefined") return;
+    const q = QUESTIONS_300_DB.find(item => item.id === id);
+    if (!q) return;
+
+    this.speakQuestion({
+      id: q.id,
+      panel: q.panel,
+      question: q.question
+    });
   }
 }
 

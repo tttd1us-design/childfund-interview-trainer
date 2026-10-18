@@ -2072,13 +2072,551 @@ body {
   }
 }
 
+/* ==================== 🌐 GLOBAL NAVIGATION TAB BAR ==================== */
+.app-navbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  padding: 8px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.nav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.nav-tab:hover {
+  background: var(--bg-main);
+  color: var(--text-main);
+}
+
+.nav-tab.active {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 133, 66, 0.25);
+}
+
+.nav-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.nav-tab:not(.active) .nav-badge {
+  background: var(--bg-main);
+  color: var(--primary);
+  border: 1px solid var(--border-color);
+}
+
+/* ==================== 📚 300 QUESTION BANK VIEW ==================== */
+.qbank-header-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 60%, #047857 100%);
+  color: #ffffff;
+  padding: 28px 32px;
+  border-radius: var(--radius-xl);
+  margin-bottom: 24px;
+  gap: 24px;
+  box-shadow: 0 8px 24px rgba(6, 78, 59, 0.25);
+  flex-wrap: wrap;
+}
+
+.qbank-title-group {
+  flex: 1;
+  min-width: 280px;
+}
+
+.qbank-badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  margin-bottom: 10px;
+}
+
+.qbank-title-group h2 {
+  font-size: 1.65rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.qbank-title-group p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  opacity: 0.92;
+  margin: 0;
+}
+
+.qbank-progress-card {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  min-width: 220px;
+  backdrop-filter: blur(8px);
+}
+
+.progress-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.progress-title strong {
+  font-size: 1.15rem;
+  color: #a7f3d0;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #34d399, #10b981);
+  border-radius: 9999px;
+  transition: width 0.4s ease;
+}
+
+.progress-sub {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+/* Toolbar & Filter Controls */
+.qbank-toolbar {
+  background: var(--bg-card);
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.qbank-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.qbank-search-wrap .search-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+}
+
+.qbank-search-wrap input {
+  width: 100%;
+  padding: 12px 40px 12px 42px;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  background: var(--bg-main);
+  color: var(--text-main);
+  transition: border-color var(--transition-fast);
+}
+
+.qbank-search-wrap input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 133, 66, 0.15);
+}
+
+.btn-clear-search {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px;
+}
+
+.qbank-filter-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.form-select-sm {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-main);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+.bookmark-filter-btn.active {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #f59e0b;
+  font-weight: 700;
+}
+
+/* Category Chips */
+.qbank-category-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.qbank-chip {
+  padding: 8px 14px;
+  border-radius: 9999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.qbank-chip:hover {
+  border-color: var(--primary);
+  color: var(--text-main);
+}
+
+.qbank-chip.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.chip-count {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+/* Result Status */
+.qbank-result-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  padding: 0 4px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.qbank-result-status strong {
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.qbank-tip-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Question Cards Grid */
+.qbank-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.qbank-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+  overflow: hidden;
+}
+
+.qbank-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-md);
+}
+
+.qbank-card.read {
+  border-left: 4px solid #10b981;
+}
+
+.qbank-card.expanded {
+  border-color: var(--primary);
+  box-shadow: 0 6px 18px rgba(0, 133, 66, 0.12);
+}
+
+.qbank-card-header {
+  padding: 18px 22px;
+  cursor: pointer;
+  background: var(--bg-card);
+  transition: background 0.2s;
+}
+
+.qbank-card-header:hover {
+  background: rgba(0, 133, 66, 0.02);
+}
+
+.qbank-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.qbank-qnum {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--primary);
+  background: rgba(0, 133, 66, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.qbank-panel-tag {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  background: var(--bg-main);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+}
+
+.qbank-cat-tag {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: var(--bg-main);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.qbank-diff-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.qbank-diff-badge.lvl-1 { background: #e0f2fe; color: #0369a1; }
+.qbank-diff-badge.lvl-2 { background: #ecfdf5; color: #047857; }
+.qbank-diff-badge.lvl-3 { background: #fef3c7; color: #b45309; }
+.qbank-diff-badge.lvl-4 { background: #ffedd5; color: #c2410c; }
+.qbank-diff-badge.lvl-5 { background: #fee2e2; color: #b91c1c; }
+
+.qbank-read-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #059669;
+  background: #d1fae5;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.qbank-header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-qbank-audio {
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-main);
+  transition: all 0.2s;
+}
+
+.btn-qbank-audio:hover {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.btn-qbank-bookmark {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+
+.btn-qbank-bookmark.active {
+  color: #f59e0b;
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.qbank-question-text {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.65;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.qbank-card-toggle-bar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.qbank-card-toggle-bar .toggle-text {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* Card Body (Expanded Content) */
+.qbank-card-body {
+  padding: 20px 22px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-main);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.qbank-section-box {
+  background: var(--bg-card);
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.qbank-section-box .box-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qbank-section-box.intent-box {
+  border-left: 4px solid #3b82f6;
+}
+.qbank-section-box.intent-box .box-title {
+  color: #1d4ed8;
+}
+
+.qbank-section-box.model-box {
+  border-left: 4px solid #10b981;
+  background: #f0fdf4;
+}
+.qbank-section-box.model-box .box-title {
+  color: #047857;
+}
+
+.qbank-section-box.defense-box {
+  border-left: 4px solid #f59e0b;
+  background: #fffbeb;
+}
+.qbank-section-box.defense-box .box-title {
+  color: #b45309;
+}
+
+.model-script-text {
+  font-size: 0.98rem;
+  line-height: 1.75;
+  color: #064e3b;
+  font-weight: 600;
+}
+
+.defense-script-text {
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: #78350f;
+}
+
+.qbank-keywords-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
+.k-chip {
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--text-main);
+}
+
+.qbank-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--border-color);
+}
+
+.qbank-empty-state .empty-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
 /* Print Styles for PDF Export */
 @media print {
   body {
     background: white !important;
     color: black !important;
   }
-  .security-gateway-overlay, .app-header, .app-footer, .room-top-bar, .report-export-bar, .history-dash-header {
+  .security-gateway-overlay, .app-header, .app-footer, .room-top-bar, .report-export-bar, .history-dash-header, .app-navbar {
     display: none !important;
   }
   .view-panel {
