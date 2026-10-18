@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>초록우산 어린이재단 기관장 승진 실전 AI 면접 시뮬레이터 (신지애 팀장 전용)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN for Evaluation Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div id="app" class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <span class="emblem">🌿</span>
+        <div class="title-group">
+          <span class="sub-badge">초록우산 2026 역량모델 기반</span>
+          <h1>기관장 승진 실전 AI 면접 시뮬레이터</h1>
+        </div>
+      </div>
+      <div class="candidate-tag">
+        <span class="rank-badge">심사 대상</span>
+        <span class="name">신지애 팀장</span>
+        <span class="center-name">경기남부가정위탁지원센터</span>
+      </div>
+    </header>
+
+    <!-- Main Dynamic Container -->
+    <main class="main-content">
+      <!-- VIEW 1: Interview Setup / Lobby -->
+      <section id="view-setup" class="view-panel active">
+        <div class="hero-banner">
+          <div class="hero-text">
+            <h2>실전과 100% 동일한 30분 기관장 심층 면접</h2>
+            <p>4인의 전문 면접관(대표, 실무이사, 인사팀장, 외부면접관)이 120개 기출 질문과 신지애 팀장의 포트폴리오를 기반으로 날카로운 질문과 꼬리 질문을 던집니다. 음성으로 질문을 듣고 실제 면접처럼 음성으로 답변해 보세요.</p>
+          </div>
+          <div class="quick-stats">
+            <div class="stat-card">
+              <span class="num">30분</span>
+              <span class="label">표준 면접시간</span>
+            </div>
+            <div class="stat-card">
+              <span class="num">4명</span>
+              <span class="label">면접관 패널</span>
+            </div>
+            <div class="stat-card">
+              <span class="num">10~15개</span>
+              <span class="label">심층 질문 수</span>
+            </div>
+            <div class="stat-card">
+              <span class="num">5단계</span>
+              <span class="label">난이도 레벨</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuration Form -->
+        <div class="config-grid">
+          <!-- Difficulty Card -->
+          <div class="card config-card">
+            <div class="card-title">
+              <span class="icon">🎯</span>
+              <h3>면접 난이도 설정</h3>
+            </div>
+            <p class="card-desc">1단계(기본)부터 5단계(최고난도 압박 및 경영 딜레마)까지 선택할 수 있습니다.</p>
+            <div class="difficulty-selector">
+              <label class="diff-option">
+                <input type="radio" name="difficulty" value="1">
+                <div class="diff-box">
+                  <span class="lvl">Level 1</span>
+                  <span class="txt">기본 소양 & 자기소개</span>
+                </div>
+              </label>
+              <label class="diff-option">
+                <input type="radio" name="difficulty" value="2">
+                <div class="diff-box">
+                  <span class="lvl">Level 2</span>
+                  <span class="txt">실무 성과 & 리더십</span>
+                </div>
+              </label>
+              <label class="diff-option">
+                <input type="radio" name="difficulty" value="3" checked>
+                <div class="diff-box">
+                  <span class="lvl">Level 3 (표준)</span>
+                  <span class="txt">실전 기관장 종합 심사</span>
+                </div>
+              </label>
+              <label class="diff-option">
+                <input type="radio" name="difficulty" value="4">
+                <div class="diff-box">
+                  <span class="lvl">Level 4</span>
+                  <span class="txt">심층 정책 & 돌발 상황</span>
+                </div>
+              </label>
+              <label class="diff-option">
+                <input type="radio" name="difficulty" value="5">
+                <div class="diff-box danger">
+                  <span class="lvl">Level 5 (송곳)</span>
+                  <span class="txt">최고난도 압박 & 약점 검증</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Mode & Voice Options -->
+          <div class="card config-card">
+            <div class="card-title">
+              <span class="icon">🎙️</span>
+              <h3>진행 및 음성 설정</h3>
+            </div>
+            <div class="setting-item">
+              <label for="q-count">출제 질문 개수</label>
+              <select id="q-count" class="form-select">
+                <option value="10">10문항 (표준 패스트트랙 - 문항당 약 3분)</option>
+                <option value="12" selected>12문항 (추천 실전 모의면접 - 문항당 2.5분)</option>
+                <option value="15">15문항 (고밀도 심층 검증 - 문항당 2분)</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label class="toggle-label">
+                <span>면접관 음성(TTS) 질문 듣기</span>
+                <input type="checkbox" id="toggle-tts" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <label class="toggle-label">
+                <span>면접자 마이크(STT) 자동 활성화</span>
+                <input type="checkbox" id="toggle-stt" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <label class="toggle-label">
+                <span>예상 모범 답안 가이드(힌트) 표시</span>
+                <input type="checkbox" id="toggle-hint">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Interviewers Showcase -->
+        <div class="panel-preview-area">
+          <h3 class="section-title">오늘의 4인 면접관 패널 소개</h3>
+          <div class="panel-grid">
+            <div class="interviewer-intro-card">
+              <div class="avatar">👔</div>
+              <h4>정문기 대표이사</h4>
+              <span class="badge">총괄 비전 & 경영</span>
+              <p>재단 2030 가치관, 기관 비전 제시, 경영 마인드, 최종 책임자 역량을 검증합니다.</p>
+            </div>
+            <div class="interviewer-intro-card">
+              <div class="avatar">📋</div>
+              <h4>박서진 실무이사</h4>
+              <span class="badge">복지사업 & 정책</span>
+              <p>무연고 영아 시범사업, 2027 국가사업 전환, 평가지표 TF 등 현장 전문성을 정밀 점검합니다.</p>
+            </div>
+            <div class="interviewer-intro-card">
+              <div class="avatar">👥</div>
+              <h4>김태호 인사기획팀장</h4>
+              <span class="badge">조직 & 인적자원</span>
+              <p>신입 9명 육성, 경력자 소진관리, 노무 및 세대 간 소통, 갈등 조정 능력을 파고듭니다.</p>
+            </div>
+            <div class="interviewer-intro-card">
+              <div class="avatar">⚖️</div>
+              <h4>이선우 외부면접관</h4>
+              <span class="badge">송곳 압박 & 윤리</span>
+              <p>위기관리 2점 자평의 약점, 8개월 보호조치 지연, 경력 적합성 등 날카로운 압박을 던집니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="start-bar">
+          <button id="btn-start-interview" class="btn btn-primary btn-large">
+            <span class="btn-icon">▶</span>
+            <span>30분 실전 모의면접 시작하기</span>
+          </button>
+          <button id="btn-view-history" class="btn btn-secondary">
+            <span class="btn-icon">📊</span>
+            <span>누적 평가 보고서 및 발전 추이 보기</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- VIEW 2: Active Interview Room -->
+      <section id="view-interview" class="view-panel">
+        <!-- Room Top Control Bar -->
+        <div class="room-top-bar">
+          <div class="progress-info">
+            <span class="badge" id="lbl-question-progress">질문 1 / 12</span>
+            <div class="progress-bar-bg">
+              <div id="progress-bar-fill" class="progress-bar-fill" style="width: 8%;"></div>
+            </div>
+          </div>
+          <div class="timer-display">
+            <span class="timer-icon">⏳</span>
+            <span id="timer-text" class="timer-digits">30:00</span>
+          </div>
+          <div class="room-actions">
+            <button id="btn-pause-resume" class="btn btn-sm btn-outline">
+              <span id="btn-pause-icon">⏸️</span>
+              <span id="btn-pause-text">일시정지</span>
+            </button>
+            <button id="btn-finish-early" class="btn btn-sm btn-danger">
+              <span>면접 종료 & 평가</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Interviewers Active Row -->
+        <div class="interviewers-active-row">
+          <div class="panel-chair" id="chair-ceo">
+            <div class="chair-avatar">👔</div>
+            <div class="chair-name">정문기 대표</div>
+            <div class="chair-role">대표이사 / 회장</div>
+            <div class="speaking-wave"><span></span><span></span><span></span></div>
+          </div>
+          <div class="panel-chair" id="chair-director">
+            <div class="chair-avatar">📋</div>
+            <div class="chair-name">박서진 이사</div>
+            <div class="chair-role">복지사업총괄</div>
+            <div class="speaking-wave"><span></span><span></span><span></span></div>
+          </div>
+          <div class="panel-chair" id="chair-hr">
+            <div class="chair-avatar">👥</div>
+            <div class="chair-name">김태호 팀장</div>
+            <div class="chair-role">인사기획팀장</div>
+            <div class="speaking-wave"><span></span><span></span><span></span></div>
+          </div>
+          <div class="panel-chair" id="chair-external">
+            <div class="chair-avatar">⚖️</div>
+            <div class="chair-name">이선우 교수</div>
+            <div class="chair-role">외부 전문면접관</div>
+            <div class="speaking-wave"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+
+        <!-- Main Question & Dialogue Card -->
+        <div class="dialogue-card">
+          <div class="interviewer-bubble-area">
+            <div class="bubble-header">
+              <span class="speaker-tag" id="current-speaker-tag">정문기 대표이사</span>
+              <span class="category-tag" id="current-category-tag">자기소개 및 포부</span>
+              <span class="diff-tag" id="current-diff-tag">Level 3</span>
+              <button id="btn-replay-tts" class="btn-text" title="질문 다시 듣기">🔊 다시 듣기</button>
+            </div>
+            <div class="question-text" id="current-question-text">
+              면접관 질문이 생성되고 있습니다...
+            </div>
+            
+            <!-- Optional Hint Drawer -->
+            <div id="hint-drawer" class="hint-drawer">
+              <div class="hint-header">💡 신지애 팀장 실전 모범답안 키포인트 & 핵심 수치</div>
+              <ul id="hint-list" class="hint-list">
+                <!-- Injected via JS -->
+              </ul>
+            </div>
+          </div>
+
+          <!-- Candidate Answer Section -->
+          <div class="candidate-response-area">
+            <div class="response-header">
+              <div class="user-meta">
+                <span class="user-badge">신지애 팀장 답변석</span>
+                <span id="stt-status-indicator" class="status-indicator">마이크 대기 중</span>
+              </div>
+              <div class="voice-controls">
+                <button id="btn-toggle-mic" class="btn btn-mic">
+                  <span class="mic-icon">🎙️</span>
+                  <span id="lbl-mic-text">음성 답변 시작</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Text / Speech Realtime Box -->
+            <div class="answer-box-wrap">
+              <textarea id="txt-candidate-answer" class="candidate-textarea" placeholder="[음성 답변 시작] 버튼을 누르고 말씀하시면 자동으로 실시간 텍스트 변환 및 저장됩니다. 필요 시 직접 텍스트로 보완·편집할 수 있습니다."></textarea>
+              <div class="char-count"><span id="lbl-char-count">0</span> 자</div>
+            </div>
+
+            <!-- Answer Submission Bar -->
+            <div class="answer-action-bar">
+              <span class="tip-msg">※ 답변을 마치신 후 [답변 완료 & 다음 질문]을 누르시면 평가 엔진이 실시간 분석 후 다음 질문으로 넘어갑니다.</span>
+              <button id="btn-submit-answer" class="btn btn-success btn-next">
+                <span>답변 완료 & 다음 질문</span>
+                <span class="arrow">➔</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: Comprehensive Evaluation Report -->
+      <section id="view-report" class="view-panel">
+        <div class="report-header-card">
+          <div class="report-top">
+            <div class="title-wrap">
+              <span class="report-badge" id="report-session-badge">제 1회차 실전 모의면접</span>
+              <h2>초록우산 기관장 승진 적격성 종합 평가 보고서</h2>
+              <p class="report-date" id="report-date-text">2026. 10. 18 | 총 면접 소요 시간: 28분 45초 | 출제 문항: 12문항</p>
+            </div>
+            <div class="final-score-badge">
+              <span class="score-title">최종 종합 평가 점수</span>
+              <div class="score-number-group">
+                <span class="big-score" id="report-final-score">88</span>
+                <span class="max-score">/ 100</span>
+              </div>
+              <span class="score-grade" id="report-final-grade">A (승진 우수 적격)</span>
+            </div>
+          </div>
+          <div class="report-summary-text" id="report-overall-comment">
+            종합 소견 분석 중...
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="report-charts-grid">
+          <!-- Common Competency Radar -->
+          <div class="card chart-card">
+            <div class="card-title">
+              <span class="icon">🌿</span>
+              <h3>초록우산 4대 공통역량 평가</h3>
+            </div>
+            <p class="card-desc">아동중심, 진정성, 전문성, 도전정신</p>
+            <div class="chart-canvas-wrap">
+              <canvas id="chart-common-competency"></canvas>
+            </div>
+          </div>
+
+          <!-- Leadership Competency Bar -->
+          <div class="card chart-card">
+            <div class="card-title">
+              <span class="icon">🏛️</span>
+              <h3>부서장·기관장 5대 리더십역량 달성도</h3>
+            </div>
+            <p class="card-desc">성과관리, 의사결정, 동기부여, 비전제시, 경영마인드</p>
+            <div class="chart-canvas-wrap">
+              <canvas id="chart-leadership-competency"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question-by-Question Detailed Review -->
+        <div class="card qa-details-card">
+          <div class="card-title">
+            <span class="icon">📝</span>
+            <h3>문항별 상세 질의응답 및 면접관 정밀 피드백 (총 <span id="report-qa-count">12</span>문항)</h3>
+          </div>
+          <div class="qa-accordion-list" id="report-qa-list">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- Historical Development Tracking -->
+        <div class="card history-card">
+          <div class="card-title">
+            <span class="icon">📈</span>
+            <h3>회차별 역량 발전(Develop) 추이 그래프</h3>
+          </div>
+          <p class="card-desc">반복 훈련에 따른 종합 점수 및 역량별 성장 궤적</p>
+          <div class="chart-canvas-wrap history-canvas-wrap">
+            <canvas id="chart-history-trend"></canvas>
+          </div>
+        </div>
+
+        <!-- Export & Backup Action Tools -->
+        <div class="report-export-bar">
+          <button id="btn-print-report" class="btn btn-secondary">
+            <span>🖨️ 인쇄 / PDF 저장</span>
+          </button>
+          <button id="btn-export-json" class="btn btn-secondary">
+            <span>💾 데이터 JSON 백업</span>
+          </button>
+          <button id="btn-github-backup" class="btn btn-secondary">
+            <span>🐙 GitHub Gist / 연동 안내</span>
+          </button>
+          <button id="btn-retry-interview" class="btn btn-primary">
+            <span>🔄 새로운 회차 실전 훈련 시작</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- VIEW 4: Cumulative History Dashboard -->
+      <section id="view-history-dash" class="view-panel">
+        <div class="history-dash-header">
+          <h2>누적 모의면접 회차별 기록 보관소</h2>
+          <button id="btn-back-to-setup" class="btn btn-secondary btn-sm">← 메인으로 돌아가기</button>
+        </div>
+        <div class="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>회차</th>
+                <th>면접 일시</th>
+                <th>난이도</th>
+                <th>문항 수</th>
+                <th>진행 시간</th>
+                <th>종합 점수</th>
+                <th>판정 등급</th>
+                <th>상세 보기</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p>어린이재단 기관장 승진 실전 면접 시뮬레이터 | 초록우산 2026 역량모델 & 경기남부가정위탁지원센터 포트폴리오 기준</p>
+        <span class="tech-stack">Powered by Web Speech API (TTS/STT) & Responsive Client AI Engine</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="questions_db.js"></script>
+  <script src="profile_and_rubric.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
