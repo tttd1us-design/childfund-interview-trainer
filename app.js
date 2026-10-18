@@ -41,24 +41,260 @@ class InterviewSimulator {
       history: null
     };
 
-    // Storage Key
-    this.STORAGE_KEY = "childfund_interview_sessions_shin";
+    // Storage Keys
     this.THEME_KEY = "childfund_interview_theme";
     this.FONT_KEY = "childfund_interview_fontsize";
     this.AUTH_KEY = "childfund_security_auth_shin";
+    this.USERS_KEY = "childfund_interview_users_list";
+    this.CURRENT_USER_KEY = "childfund_current_user_id";
     this.CORRECT_PASSCODE = "1014"; // 보안 인증 비밀번호
+
+    // User Profile State
+    this.users = [];
+    this.currentUser = null;
 
     this.init();
   }
 
   init() {
     this.checkAuthentication();
+    this.loadUsers();
     this.loadThemeAndFont();
     this.loadHistory();
     this.setupSpeechRecognition();
     this.setupVoices();
     this.bindEvents();
     this.renderHistoryTable();
+  }
+
+  // Multi-User Management System
+  loadUsers() {
+    try {
+      const savedUsers = localStorage.getItem(this.USERS_KEY);
+      if (savedUsers) {
+        this.users = JSON.parse(savedUsers);
+      } else {
+        // Default Primary User (신지애 팀장)
+        this.users = [
+          {
+            id: "user_shin",
+            name: "신지애 팀장",
+            dept: "경기남부센터 복지사업1팀",
+            badge: "본 면접자",
+            createdAt: new Date().toISOString()
+          }
+        ];
+        this.saveUsers();
+      }
+
+      // Load or default current user
+      const savedCurrentId = localStorage.getItem(this.CURRENT_USER_KEY);
+      this.currentUser = this.users.find(u => u.id === savedCurrentId) || this.users[0];
+      this.updateHeaderUserDisplay();
+    } catch (e) {
+      this.users = [{ id: "user_shin", name: "신지애 팀장", dept: "경기남부센터", badge: "본 면접자" }];
+      this.currentUser = this.users[0];
+    }
+  }
+
+  saveUsers() {
+    localStorage.setItem(this.USERS_KEY, JSON.stringify(this.users));
+    if (this.currentUser) {
+      localStorage.setItem(this.CURRENT_USER_KEY, this.currentUser.id);
+    }
+  }
+
+  updateHeaderUserDisplay() {
+    if (!this.currentUser) return;
+    const nameOnly = this.currentUser.name.replace(" 팀장", "");
+    const headerUserName = document.getElementById("lbl-header-user-name");
+    const candidateName = document.getElementById("lbl-header-candidate-name");
+    const centerName = document.getElementById("lbl-header-center-name");
+    const userBadge = document.getElementById("lbl-header-user-badge");
+
+    if (headerUserName) headerUserName.textContent = nameOnly;
+    if (candidateName) candidateName.textContent = this.currentUser.name;
+    if (centerName) centerName.textContent = this.currentUser.dept || "초록우산";
+    if (userBadge) userBadge.textContent = this.currentUser.badge || "면접자";
+  }
+
+  openUserModal() {
+    this.renderUserProfiles();
+    const modal = document.getElementById("user-modal");
+    if (modal) modal.style.display = "flex";
+  }
+
+  closeUserModal() {
+    const modal = document.getElementById("user-modal");
+    if (modal) modal.style.display = "none";
+  }
+
+  renderUserProfiles() {
+    const container = document.getElementById("user-profiles-list");
+    if (!container) return;
+
+    container.innerHTML = this.users.map(u => {
+      const isActive = this.currentUser && this.currentUser.id === u.id;
+      const historyKey = `childfund_interview_sessions_${u.id}`;
+      const sessions = JSON.parse(localStorage.getItem(historyKey) || "[]");
+      const sessionCount = sessions.length;
+
+      // Allow deleting if more than 1 user
+      const deleteBtn = this.users.length > 1 ? `
+        <button class="btn-delete-user" onclick="event.stopPropagation(); app.deleteUser('${u.id}')" title="사용자 및 면접 기록 삭제">삭제</button>
+      ` : '';
+
+      return `
+        <div class="user-chip ${isActive ? 'active-user' : ''}" onclick="app.switchUser('${u.id}')">
+          <div class="user-chip-left">
+            <span class="user-avatar-icon">${u.name.includes("테스터") || u.name.includes("test") ? '🧪' : '👤'}</span>
+            <div>
+              <div class="user-name-text">${u.name} ${isActive ? '<span style="color:var(--primary); font-size:0.85rem;">(선택됨)</span>' : ''}</div>
+              <div class="user-dept-text">${u.dept || '소속 미지정'}</div>
+            </div>
+          </div>
+          <div class="user-chip-right">
+            <span class="user-sessions-count">누적 ${sessionCount}회차</span>
+            ${deleteBtn}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  switchUser(userId) {
+    const target = this.users.find(u => u.id === userId);
+    if (!target) return;
+
+    this.currentUser = target;
+    localStorage.setItem(this.CURRENT_USER_KEY, target.id);
+    this.updateHeaderUserDisplay();
+    this.loadHistory(); // Load target user's isolated history
+    this.renderHistoryTable();
+    this.closeUserModal();
+  }
+
+  addNewUser() {
+    const nameInp = document.getElementById("new-user-name");
+    const deptInp = document.getElementById("new-user-dept");
+    const name = nameInp ? nameInp.value.trim() : "";
+    const dept = deptInp ? deptInp.value.trim() : "";
+
+    if (!name) return;
+
+    const newUser = {
+      id: `user_${Date.now()}`,
+      name: name,
+      dept: dept || (name.includes("테스트") ? "테스트 환경" : "초록우산 복지부서"),
+      badge: name.includes("테스트") ? "테스터" : "심사 대상",
+      createdAt: new Date().toISOString()
+    };
+
+    this.users.push(newUser);
+    this.saveUsers();
+    this.switchUser(newUser.id); // Automatically switch to the newly created user
+
+    if (nameInp) nameInp.value = "";
+    if (deptInp) deptInp.value = "";
+  }
+
+  deleteUser(userId) {
+    if (this.users.length <= 1) {
+      alert("최소 1명의 면접자 프로필은 유지되어야 합니다.");
+      return;
+    }
+
+    const target = this.users.find(u => u.id === userId);
+    if (!target) return;
+
+    if (confirm(`'${target.name}' 사용자와 축적된 모든 모의면접 기록을 삭제하시겠습니까?\n(테스트 기록을 정리할 때 유용합니다.)`)) {
+      // Remove isolated session data
+      localStorage.removeItem(`childfund_interview_sessions_${userId}`);
+      
+      // Filter out user
+      this.users = this.users.filter(u => u.id !== userId);
+      
+      // If deleted active user, fallback to first user
+      if (this.currentUser && this.currentUser.id === userId) {
+        this.currentUser = this.users[0];
+        localStorage.setItem(this.CURRENT_USER_KEY, this.currentUser.id);
+      }
+
+      this.saveUsers();
+      this.updateHeaderUserDisplay();
+      this.loadHistory();
+      this.renderHistoryTable();
+      this.renderUserProfiles();
+    }
+  }
+
+  // Full Data Backup & Restore
+  exportAllDataBackup() {
+    const backupBundle = {
+      backupDate: new Date().toISOString(),
+      version: "2.0.0",
+      users: this.users,
+      sessionsByUser: {}
+    };
+
+    this.users.forEach(u => {
+      const key = `childfund_interview_sessions_${u.id}`;
+      backupBundle.sessionsByUser[u.id] = JSON.parse(localStorage.getItem(key) || "[]");
+    });
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupBundle, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", `childfund_interview_FULL_BACKUP_${new Date().toISOString().slice(0,10)}.json`);
+    dlAnchor.click();
+  }
+
+  importDataBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const bundle = JSON.parse(e.target.result);
+        if (!bundle.users || !bundle.sessionsByUser) {
+          alert("유효한 초록우산 면접 백업 파일 형식이 아닙니다.");
+          return;
+        }
+
+        if (confirm("백업 파일의 데이터를 불러오시겠습니까? 기존의 데이터와 안전하게 병합됩니다.")) {
+          // Merge users
+          bundle.users.forEach(impUser => {
+            if (!this.users.some(u => u.id === impUser.id)) {
+              this.users.push(impUser);
+            }
+            // Restore sessions for this user
+            const key = `childfund_interview_sessions_${impUser.id}`;
+            const existing = JSON.parse(localStorage.getItem(key) || "[]");
+            const imported = bundle.sessionsByUser[impUser.id] || [];
+            
+            // Deduplicate by sessionId
+            const merged = [...existing];
+            imported.forEach(impSess => {
+              if (!merged.some(m => m.sessionId === impSess.sessionId)) {
+                merged.push(impSess);
+              }
+            });
+            localStorage.setItem(key, JSON.stringify(merged));
+          });
+
+          this.saveUsers();
+          this.loadHistory();
+          this.renderHistoryTable();
+          this.renderUserProfiles();
+          alert("데이터가 성공적으로 복원 및 동기화되었습니다!");
+        }
+      } catch (err) {
+        alert("백업 파일을 읽는 중 오류가 발생했습니다: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = ""; // Reset file input
   }
 
   // Security Passcode (1014) Verification
@@ -150,10 +386,21 @@ class InterviewSimulator {
     localStorage.setItem(this.FONT_KEY, size);
   }
 
-  // Load Saved Sessions
+  // Load Saved Sessions for Current Active User
   loadHistory() {
     try {
-      const data = localStorage.getItem(this.STORAGE_KEY);
+      const userId = this.currentUser ? this.currentUser.id : "user_shin";
+      const userKey = `childfund_interview_sessions_${userId}`;
+      
+      // Auto-migrate legacy data to user_shin if present
+      if (userId === "user_shin" && !localStorage.getItem(userKey)) {
+        const legacyData = localStorage.getItem("childfund_interview_sessions_shin");
+        if (legacyData) {
+          localStorage.setItem(userKey, legacyData);
+        }
+      }
+
+      const data = localStorage.getItem(userKey);
       this.historySessions = data ? JSON.parse(data) : [];
       this.sessionState.sessionNumber = this.historySessions.length + 1;
     } catch (e) {
@@ -162,16 +409,20 @@ class InterviewSimulator {
   }
 
   saveHistory(reportData) {
-    // Avoid saving oversized audio blob urls to localStorage
+    const userId = this.currentUser ? this.currentUser.id : "user_shin";
+    const userKey = `childfund_interview_sessions_${userId}`;
+
     const storableReport = {
       ...reportData,
+      candidateId: userId,
+      candidateName: this.currentUser ? this.currentUser.name : "신지애 팀장",
       answers: reportData.answers.map(a => ({
         ...a,
-        audioBlobUrl: null // Blob URLs are transient in local storage
+        audioBlobUrl: null
       }))
     };
     this.historySessions.push(storableReport);
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.historySessions));
+    localStorage.setItem(userKey, JSON.stringify(this.historySessions));
   }
 
   // Setup Web Speech Recognition
@@ -344,6 +595,14 @@ class InterviewSimulator {
     document.getElementById("btn-print-report").addEventListener("click", () => window.print());
     document.getElementById("btn-export-json").addEventListener("click", () => this.exportHistoryJSON());
     document.getElementById("btn-copy-url").addEventListener("click", () => this.copyAppUrl());
+
+    // User Modal Backdrop Click
+    const userModal = document.getElementById("user-modal");
+    if (userModal) {
+      userModal.addEventListener("click", (e) => {
+        if (e.target === userModal) this.closeUserModal();
+      });
+    }
   }
 
   showView(viewId) {
