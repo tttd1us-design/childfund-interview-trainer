@@ -2610,6 +2610,244 @@ body {
   margin-bottom: 12px;
 }
 
+/* ==================== 🚨 5-TIER PRIORITY BADGES & HIGHLIGHTS ==================== */
+.qbank-priority-tag {
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  letter-spacing: -0.01em;
+}
+
+.qbank-priority-tag.p1 {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #b91c1c;
+  border: 1.5px solid #ef4444;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
+}
+
+.qbank-priority-tag.p2 {
+  background: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fdba74;
+}
+
+.qbank-priority-tag.p3 {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+
+.qbank-priority-tag.p4 {
+  background: #e0e7ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+}
+
+.qbank-priority-tag.p5 {
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.qbank-card.priority-p1 {
+  border-left: 5px solid #ef4444;
+  background: linear-gradient(to right, rgba(239, 68, 68, 0.02), var(--bg-card) 15%);
+}
+
+.qbank-card.priority-p2 {
+  border-left: 5px solid #f97316;
+}
+
+.quick-p1-btn {
+  background: #fff1f2;
+  color: #be123c;
+  border-color: #f43f5e;
+  font-weight: 700;
+}
+
+.quick-p1-btn.active {
+  background: #e11d48;
+  color: #ffffff;
+  border-color: #be123c;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.35);
+}
+
+.mastery-filter-btn.active {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #3b82f6;
+  font-weight: 700;
+}
+
+/* ==================== 🟢 3-STAGE MASTERY CONTROLS ==================== */
+.mastery-pill-group {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-main);
+  padding: 2px 4px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-color);
+  gap: 2px;
+}
+
+.btn-mastery {
+  background: transparent;
+  border: none;
+  border-radius: 9999px;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-mastery:hover {
+  color: var(--text-main);
+  background: var(--bg-card);
+}
+
+.btn-mastery.active {
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  color: #111827;
+  font-weight: 700;
+}
+
+/* ==================== 💡 1분 구술 3단 뼈대 박스 ==================== */
+.qbank-section-box.skeleton-box {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 1.5px solid #a7f3d0;
+  border-left: 5px solid #059669;
+}
+
+.qbank-section-box.skeleton-box .box-title {
+  color: #065f46;
+  font-size: 0.95rem;
+}
+
+.skeleton-steps-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.skeleton-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #d1fae5;
+  box-shadow: 0 1px 3px rgba(6, 95, 70, 0.05);
+}
+
+.skeleton-step-item .step-bullet {
+  color: #059669;
+  font-weight: 900;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.skeleton-step-item .step-text {
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #064e3b;
+}
+
+/* ==================== 🎙️ 1분 실전 구술 연습기 인라인 패널 ==================== */
+.btn-qbank-practice {
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  color: #4338ca;
+  font-weight: 700;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-qbank-practice:hover {
+  background: #4338ca;
+  color: #ffffff;
+}
+
+.qbank-practice-panel {
+  background: #1e1b4b;
+  color: #ffffff;
+  padding: 18px 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: practiceFadeIn 0.3s ease;
+}
+
+@keyframes practiceFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.practice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.practice-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: #c7d2fe;
+}
+
+.pulse-mic {
+  animation: pulseMic 1.2s infinite;
+  display: inline-block;
+}
+
+@keyframes pulseMic {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.practice-timer {
+  font-size: 0.95rem;
+  color: #e0e7ff;
+}
+
+.practice-timer strong {
+  font-size: 1.2rem;
+  color: #fbbf24;
+}
+
+.practice-stt-box {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  min-height: 80px;
+  max-height: 140px;
+  overflow-y: auto;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: #ffffff;
+}
+
+.practice-stt-box .placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
 /* Print Styles for PDF Export */
 @media print {
   body {

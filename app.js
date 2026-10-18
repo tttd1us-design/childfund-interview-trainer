@@ -63,13 +63,20 @@ class InterviewSimulator {
     // 300대 실전 예상질문 도서관 상태
     this.qbankState = {
       selectedCategory: "ALL",
+      selectedPriority: "ALL",
       selectedPanel: "ALL",
       selectedDiff: "ALL",
       searchQuery: "",
       bookmarkOnly: false,
+      unmasteredOnly: false,
       expandedMap: {},
       bookmarks: new Set(JSON.parse(localStorage.getItem("childfund_qbank_bookmarks") || "[]")),
       readItems: new Set(JSON.parse(localStorage.getItem("childfund_qbank_read") || "[]")),
+      masteryMap: JSON.parse(localStorage.getItem("childfund_qbank_mastery") || "{}"),
+      activePracticeId: null,
+      practiceTranscript: "",
+      practiceSeconds: 60,
+      practiceTimer: null,
       isInitialized: false
     };
 
@@ -1902,17 +1909,38 @@ class InterviewSimulator {
     if (typeof QUESTIONS_300_DB === "undefined") return;
 
     const searchInput = document.getElementById("qbank-search-input");
+    const priorityFilter = document.getElementById("qbank-priority-filter");
     const panelFilter = document.getElementById("qbank-panel-filter");
     const diffFilter = document.getElementById("qbank-diff-filter");
 
     const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+    const priorityVal = priorityFilter ? priorityFilter.value : "ALL";
     const panelVal = panelFilter ? panelFilter.value : "ALL";
     const diffVal = diffFilter ? diffFilter.value : "ALL";
 
     this.qbankState.searchQuery = query;
+    this.qbankState.selectedPriority = priorityVal;
     this.qbankState.selectedPanel = panelVal;
     this.qbankState.selectedDiff = diffVal;
 
+    this.renderQBankList();
+  }
+
+  quickFilterPriority(level) {
+    const priorityFilter = document.getElementById("qbank-priority-filter");
+    if (priorityFilter) {
+      if (this.qbankState.selectedPriority === String(level)) {
+        priorityFilter.value = "ALL";
+        this.qbankState.selectedPriority = "ALL";
+      } else {
+        priorityFilter.value = String(level);
+        this.qbankState.selectedPriority = String(level);
+      }
+    }
+    const btn = document.getElementById("btn-quick-p1");
+    if (btn) {
+      btn.classList.toggle("active", this.qbankState.selectedPriority === "1");
+    }
     this.renderQBankList();
   }
 
@@ -1929,21 +1957,39 @@ class InterviewSimulator {
     const btn = document.getElementById("btn-toggle-bookmark-only");
     const lbl = document.getElementById("lbl-bookmark-filter");
     if (btn && lbl) {
-      if (this.qbankState.bookmarkOnly) {
-        btn.classList.add("active");
-        lbl.textContent = "★ 북마크 질문만 보는 중 (해제)";
-      } else {
-        btn.classList.remove("active");
-        lbl.textContent = "★ 북마크 질문만 보기";
-      }
+      btn.classList.toggle("active", this.qbankState.bookmarkOnly);
+      lbl.textContent = this.qbankState.bookmarkOnly ? "★ 북마크 보는 중 (해제)" : "★ 북마크 모아보기";
     }
     this.renderQBankList();
+  }
+
+  toggleUnmasteredFilter() {
+    this.qbankState.unmasteredOnly = !this.qbankState.unmasteredOnly;
+    const btn = document.getElementById("btn-toggle-unmastered");
+    const lbl = document.getElementById("lbl-unmastered-filter");
+    if (btn && lbl) {
+      btn.classList.toggle("active", this.qbankState.unmasteredOnly);
+      lbl.textContent = this.qbankState.unmasteredOnly ? "⏳ 미체화 보는 중 (해제)" : "⏳ 미체화 질문만 보기";
+    }
+    this.renderQBankList();
+  }
+
+  setQBankMastery(id, state, event) {
+    if (event) event.stopPropagation();
+    this.qbankState.masteryMap[id] = state;
+    localStorage.setItem("childfund_qbank_mastery", JSON.stringify(this.qbankState.masteryMap));
+    this.renderQBankList();
+    this.updateQBankProgress();
   }
 
   getFilteredQBankList() {
     if (typeof QUESTIONS_300_DB === "undefined") return [];
 
     return QUESTIONS_300_DB.filter(q => {
+      // Priority Filter
+      if (this.qbankState.selectedPriority !== "ALL" && String(q.priority) !== this.qbankState.selectedPriority) {
+        return false;
+      }
       // Category Filter
       if (this.qbankState.selectedCategory !== "ALL" && q.categoryGroup !== this.qbankState.selectedCategory) {
         return false;
@@ -1960,9 +2006,14 @@ class InterviewSimulator {
       if (this.qbankState.bookmarkOnly && !this.qbankState.bookmarks.has(q.id)) {
         return false;
       }
+      // Unmastered Only Filter
+      if (this.qbankState.unmasteredOnly) {
+        const mState = this.qbankState.masteryMap[q.id] || "unlearned";
+        if (mState === "mastered") return false;
+      }
       // Search Query
       if (this.qbankState.searchQuery) {
-        const qStr = `${q.qNumber} ${q.question} ${q.category} ${(q.keywords || []).join(' ')} ${q.intent || ''}`.toLowerCase();
+        const qStr = `${q.qNumber} ${q.question} ${q.category} ${(q.keywords || []).join(' ')} ${q.intent || ''} ${q.priorityBadge || ''}`.toLowerCase();
         if (!qStr.includes(this.qbankState.searchQuery)) {
           return false;
         }
@@ -1985,7 +2036,7 @@ class InterviewSimulator {
           <span class="empty-icon">🔍</span>
           <h4>일치하는 예상질문이 없습니다.</h4>
           <p>검색어나 필터 조건을 변경해 보세요.</p>
-          <button class="btn btn-sm btn-primary" onclick="app.clearQBankFilters()">필터 초기화</button>
+          <button class="btn btn-sm btn-primary" onclick="app.clearQBankFilters()">필터 전체 초기화</button>
         </div>
       `;
       return;
@@ -2003,20 +2054,36 @@ class InterviewSimulator {
       const isBookmarked = this.qbankState.bookmarks.has(q.id);
       const isRead = this.qbankState.readItems.has(q.id);
       const isExpanded = !!this.qbankState.expandedMap[q.id];
+      const mastery = this.qbankState.masteryMap[q.id] || "unlearned";
+      const isPracticing = this.qbankState.activePracticeId === q.id;
+
+      // Priority Badge CSS Class
+      const prioClass = `priority-p${q.priority}`;
 
       return `
-        <div class="qbank-card ${isExpanded ? 'expanded' : ''} ${isRead ? 'read' : ''}" id="qbank-card-${q.id}">
+        <div class="qbank-card ${isExpanded ? 'expanded' : ''} ${isRead ? 'read' : ''} ${prioClass}" id="qbank-card-${q.id}">
           <div class="qbank-card-header" onclick="app.toggleQBankCard(${q.id})">
             <div class="qbank-meta-row">
               <span class="qbank-qnum">${q.qNumber}</span>
+              <span class="qbank-priority-tag p${q.priority}">${q.priorityBadge || `P${q.priority}`}</span>
               <span class="qbank-panel-tag"><span class="icon">${pInfo.icon}</span> ${pInfo.name}</span>
               <span class="qbank-cat-tag">${q.category}</span>
               <span class="qbank-diff-badge lvl-${q.difficulty}">Level ${q.difficulty}</span>
-              ${isRead ? '<span class="qbank-read-badge">학습 완료</span>' : ''}
-              
+
+              <!-- Mastery Toggle Controller -->
+              <div class="mastery-pill-group" onclick="event.stopPropagation();">
+                <button class="btn-mastery ${mastery === 'unlearned' ? 'active' : ''}" title="미학습 상태" onclick="app.setQBankMastery(${q.id}, 'unlearned', event)">⚪ 미학습</button>
+                <button class="btn-mastery ${mastery === 'learning' ? 'active' : ''}" title="연습 중" onclick="app.setQBankMastery(${q.id}, 'learning', event)">🟡 연습중</button>
+                <button class="btn-mastery ${mastery === 'mastered' ? 'active' : ''}" title="완전 체화" onclick="app.setQBankMastery(${q.id}, 'mastered', event)">🟢 완전체화</button>
+              </div>
+
+              <!-- Action Buttons -->
               <div class="qbank-header-actions" onclick="event.stopPropagation();">
+                <button class="btn-qbank-practice" title="1분 구술 연습하기" onclick="app.toggle1MinPractice(${q.id}, event)">
+                  <span>🎙️ ${isPracticing ? '연습 중단' : '1분 연습'}</span>
+                </button>
                 <button class="btn-qbank-audio" title="질문 음성 듣기" onclick="app.playQBankAudio(${q.id}, event)">
-                  <span>🔊 듣기</span>
+                  <span>🔊 질문 듣기</span>
                 </button>
                 <button class="btn-qbank-bookmark ${isBookmarked ? 'active' : ''}" title="북마크(중요) 표시" onclick="app.toggleQBankBookmark(${q.id}, event)">
                   <span>${isBookmarked ? '★' : '☆'}</span>
@@ -2029,12 +2096,45 @@ class InterviewSimulator {
             </div>
 
             <div class="qbank-card-toggle-bar">
-              <span class="toggle-text">${isExpanded ? '▲ 상세 분석 & 모범 답변 접기' : '▼ 상세 분석 & 1등 모범답변 스크립트 열기'}</span>
+              <span class="toggle-text">${isExpanded ? '▲ 상세 분석 & 3단 뼈대 접기' : '▼ 3초 암기 뼈대 & 1등 모범답변 스크립트 열기'}</span>
             </div>
           </div>
 
+          <!-- 1분 실전 구술 연습기 인라인 패널 -->
+          ${isPracticing ? `
+            <div class="qbank-practice-panel">
+              <div class="practice-header">
+                <div class="practice-title">
+                  <span class="pulse-mic">🎙️</span>
+                  <strong>1분 실전 구술 스피치 연습 중...</strong>
+                </div>
+                <div class="practice-timer">
+                  <span>남은 시간: </span>
+                  <strong id="practice-timer-num-${q.id}">${this.qbankState.practiceSeconds}초</strong>
+                </div>
+                <button class="btn btn-sm btn-danger" onclick="app.stop1MinPractice(${q.id})">답변 완료 및 분석</button>
+              </div>
+              <div class="practice-stt-box" id="practice-stt-box-${q.id}">
+                ${this.qbankState.practiceTranscript || '<span class="placeholder">마이크에 대고 답변을 말씀해 주세요. 실시간으로 음성이 텍스트로 기록됩니다...</span>'}
+              </div>
+            </div>
+          ` : ''}
+
           <!-- Expanded Content -->
           <div class="qbank-card-body" style="display: ${isExpanded ? 'block' : 'none'};">
+            <!-- 💡 1분 구술 핵심 3단 뼈대 (구술 가이드) -->
+            <div class="qbank-section-box skeleton-box">
+              <div class="box-title">💡 1분 구술 핵심 3단 뼈대 (말문 막힘 방지용 암기 키트)</div>
+              <div class="skeleton-steps-grid">
+                ${(q.keywordSkeleton || []).map(step => `
+                  <div class="skeleton-step-item">
+                    <span class="step-bullet">✓</span>
+                    <span class="step-text">${step}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
             <!-- 1. 출제 의도 및 필수 채점 잣대 -->
             <div class="qbank-section-box intent-box">
               <div class="box-title">🎯 1. 출제 의도 및 필수 채점 잣대</div>
@@ -2047,7 +2147,7 @@ class InterviewSimulator {
 
             <!-- 2. 신지애 후보자 실전 1등 합격 모범 답변 스크립트 -->
             <div class="qbank-section-box model-box">
-              <div class="box-title">🏆 2. 신지애 후보자 실전 1등 합격 모범 답변 스크립트 (1분 구술용)</div>
+              <div class="box-title">🏆 2. 신지애 후보자 실전 1등 합격 모범 답변 스크립트 (1분 구술 대본)</div>
               <div class="model-script-text">
                 "${q.modelAnswer || '안녕하십니까. 준비된 기관장 후보 신지애입니다. 사람이 남고 시스템으로 지켜지는 기관을 만들겠습니다.'}"
               </div>
@@ -2101,24 +2201,28 @@ class InterviewSimulator {
 
   clearQBankFilters() {
     this.qbankState.selectedCategory = "ALL";
+    this.qbankState.selectedPriority = "ALL";
     this.qbankState.selectedPanel = "ALL";
     this.qbankState.selectedDiff = "ALL";
     this.qbankState.searchQuery = "";
     this.qbankState.bookmarkOnly = false;
+    this.qbankState.unmasteredOnly = false;
 
     const searchInput = document.getElementById("qbank-search-input");
+    const priorityFilter = document.getElementById("qbank-priority-filter");
     const panelFilter = document.getElementById("qbank-panel-filter");
     const diffFilter = document.getElementById("qbank-diff-filter");
-    const btn = document.getElementById("btn-toggle-bookmark-only");
-    const lbl = document.getElementById("lbl-bookmark-filter");
+    const btnQuickP1 = document.getElementById("btn-quick-p1");
+    const btnBookmark = document.getElementById("btn-toggle-bookmark-only");
+    const btnUnmastered = document.getElementById("btn-toggle-unmastered");
 
     if (searchInput) searchInput.value = "";
+    if (priorityFilter) priorityFilter.value = "ALL";
     if (panelFilter) panelFilter.value = "ALL";
     if (diffFilter) diffFilter.value = "ALL";
-    if (btn && lbl) {
-      btn.classList.remove("active");
-      lbl.textContent = "★ 북마크 질문만 보기";
-    }
+    if (btnQuickP1) btnQuickP1.classList.remove("active");
+    if (btnBookmark) btnBookmark.classList.remove("active");
+    if (btnUnmastered) btnUnmastered.classList.remove("active");
 
     this.renderQBankCategoryChips();
     this.renderQBankList();
@@ -2130,12 +2234,16 @@ class InterviewSimulator {
     const countLabel = document.getElementById("qbank-progress-count");
 
     const total = (typeof QUESTIONS_300_DB !== "undefined") ? QUESTIONS_300_DB.length : 300;
-    const readCount = this.qbankState.readItems.size;
-    const percent = Math.min(100, Math.round((readCount / total) * 100));
+    let masteredCount = 0;
+    Object.values(this.qbankState.masteryMap).forEach(v => {
+      if (v === "mastered") masteredCount++;
+    });
+
+    const percent = Math.min(100, Math.round((masteredCount / total) * 100));
 
     if (fill) fill.style.width = `${percent}%`;
     if (percentLabel) percentLabel.textContent = `${percent}%`;
-    if (countLabel) countLabel.textContent = `${total}문항 중 ${readCount}개 학습 완료`;
+    if (countLabel) countLabel.textContent = `300문항 중 ${masteredCount}개 완전체화 완료 (열람 ${this.qbankState.readItems.size}개)`;
   }
 
   playQBankAudio(id, event) {
@@ -2149,6 +2257,109 @@ class InterviewSimulator {
       panel: q.panel,
       question: q.question
     });
+  }
+
+  // ==================== 🎙️ 1분 실전 구술 연습 & AI 즉시 분석 엔진 ====================
+
+  toggle1MinPractice(id, event) {
+    if (event) event.stopPropagation();
+    if (this.qbankState.activePracticeId === id) {
+      this.stop1MinPractice(id);
+    } else {
+      this.start1MinPractice(id);
+    }
+  }
+
+  start1MinPractice(id) {
+    if (typeof QUESTIONS_300_DB === "undefined") return;
+    const q = QUESTIONS_300_DB.find(item => item.id === id);
+    if (!q) return;
+
+    // 만약 이미 진행 중인 다른 연습이 있다면 중단
+    if (this.qbankState.activePracticeId) {
+      this.stop1MinPractice(this.qbankState.activePracticeId);
+    }
+
+    this.qbankState.activePracticeId = id;
+    this.qbankState.practiceTranscript = "";
+    this.qbankState.practiceSeconds = 60;
+    this.qbankState.expandedMap[id] = true; // 카드 열기
+
+    this.renderQBankList();
+
+    // 60초 타이머 가동
+    clearInterval(this.qbankState.practiceTimer);
+    this.qbankState.practiceTimer = setInterval(() => {
+      this.qbankState.practiceSeconds--;
+      const timerEl = document.getElementById(`practice-timer-num-${id}`);
+      if (timerEl) timerEl.textContent = `${this.qbankState.practiceSeconds}초`;
+
+      if (this.qbankState.practiceSeconds <= 0) {
+        this.stop1MinPractice(id);
+      }
+    }, 1000);
+
+    // STT 시작
+    if (this.recognition) {
+      try {
+        this.recognition.onresult = (event) => {
+          let text = "";
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            text += event.results[i][0].transcript;
+          }
+          this.qbankState.practiceTranscript = text;
+          const box = document.getElementById(`practice-stt-box-${id}`);
+          if (box) box.textContent = text;
+        };
+        this.recognition.start();
+      } catch (e) {
+        console.warn("STT Start note:", e);
+      }
+    }
+  }
+
+  stop1MinPractice(id) {
+    clearInterval(this.qbankState.practiceTimer);
+    if (this.recognition) {
+      try { this.recognition.stop(); } catch (e) {}
+    }
+
+    const transcript = this.qbankState.practiceTranscript.trim();
+    const q = (typeof QUESTIONS_300_DB !== "undefined") ? QUESTIONS_300_DB.find(item => item.id === id) : null;
+
+    this.qbankState.activePracticeId = null;
+    this.renderQBankList();
+
+    if (q && transcript) {
+      // 키워드 적중률 계산
+      const keywords = q.keywords || [];
+      let hitCount = 0;
+      keywords.forEach(k => {
+        if (transcript.includes(k) || transcript.includes(k.replace(/\s+/g, ""))) {
+          hitCount++;
+        }
+      });
+      const hitRate = keywords.length > 0 ? Math.round((hitCount / keywords.length) * 100) : 100;
+
+      // 실무자 어휘 검출
+      const hasStaffWords = transcript.includes("내가 직접") || transcript.includes("제가 직접") || transcript.includes("열심히 뛰어서");
+
+      let feedbackMsg = `🎯 [1분 구술 스피치 분석 결과]\n\n`;
+      feedbackMsg += `• 녹음된 답변: "${transcript.slice(0, 150)}..."\n`;
+      feedbackMsg += `• 필수 키워드 적중률: ${hitCount}/${keywords.length}개 (${hitRate}%)\n`;
+      if (hasStaffWords) {
+        feedbackMsg += `⚠️ 주의: '내가 직접 했다'는 실무자 어휘가 감지되었습니다. '조직이 시스템으로 돌아가게 구조화했다'는 기관장 어휘로 교정해 보세요.\n`;
+      } else {
+        feedbackMsg += `✨ 훌륭합니다! 경영자 관점의 균형 잡힌 어휘를 구사하셨습니다.\n`;
+      }
+      feedbackMsg += `\n이 질문을 '🟢 완전체화' 상태로 등록하시겠습니까?`;
+
+      if (confirm(feedbackMsg)) {
+        this.setQBankMastery(id, "mastered");
+      } else {
+        this.setQBankMastery(id, "learning");
+      }
+    }
   }
 }
 

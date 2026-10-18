@@ -640,6 +640,16 @@
           </div>
 
           <div class="qbank-filter-controls">
+            <!-- 5단계 우선순위 필터 -->
+            <select id="qbank-priority-filter" class="form-select form-select-sm" onchange="app.filterQBank()">
+              <option value="ALL">전체 우선순위 (P1~P5)</option>
+              <option value="1">🚨 P1 [출제 확실 99% - 무조건 출제]</option>
+              <option value="2">🔥 P2 [출제 유력 85% - 고득점 분수령]</option>
+              <option value="3">⭐ P3 [핵심 필수 70% - 상위권 차별화]</option>
+              <option value="4">📌 P4 [상위권 심화 50% - 종합 소양]</option>
+              <option value="5">💡 P5 [배경 소양 30% - 돌발 대비]</option>
+            </select>
+
             <select id="qbank-panel-filter" class="form-select form-select-sm" onchange="app.filterQBank()">
               <option value="ALL">전체 면접관 (4인)</option>
               <option value="CEO">👔 정문기 대표이사 (경영/비전)</option>
@@ -657,8 +667,17 @@
               <option value="5">Level 5 (송곳 압박/약점 검증)</option>
             </select>
 
+            <!-- 퀵 필터 버튼 그룹 -->
+            <button id="btn-quick-p1" class="btn btn-sm btn-outline quick-p1-btn" onclick="app.quickFilterPriority(1)">
+              <span>🚨 출제확실(P1) 40선</span>
+            </button>
+
             <button id="btn-toggle-bookmark-only" class="btn btn-sm btn-outline bookmark-filter-btn" onclick="app.toggleBookmarkFilter()">
-              <span id="lbl-bookmark-filter">★ 북마크 질문만 보기</span>
+              <span id="lbl-bookmark-filter">★ 북마크 모아보기</span>
+            </button>
+
+            <button id="btn-toggle-unmastered" class="btn btn-sm btn-outline mastery-filter-btn" onclick="app.toggleUnmasteredFilter()">
+              <span id="lbl-unmastered-filter">⏳ 미체화 질문만 보기</span>
             </button>
 
             <button class="btn btn-sm btn-secondary" onclick="app.expandAllQBank(true)">
