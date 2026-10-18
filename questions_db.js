@@ -6,45 +6,53 @@ const INTERVIEW_PANEL = {
     id: "ceo",
     title: "대표이사 / 회장",
     name: "정문기 대표",
-    gender: "male", // 남성 (중후하고 깊은 저음)
+    gender: "male", // 남성 (따뜻하고 편안한 중저음)
+    geminiVoice: "Charon", // Google Gemini Neural Voice (깊고 부드러운 남성 보이스)
+    voicePrompt: "따뜻하고 인자하며 신뢰감을 주는 부드러운 목소리로 편안하게 질문해 주세요: ",
     role: "기관 총괄 비전, 재단 2030 가치관, 경영 마인드, 최종 책임자 검증",
     avatar: "👔",
-    voicePitch: 0.82,  // 묵직한 중저음
-    voiceRate: 0.94,   // 신중하고 무게감 있는 속도
-    personality: "중후하고 깊이 있는 어조로 조직의 철학과 아동 권리, 재단과 기관의 미래 비전과 방향성을 엄중히 묻습니다."
+    voicePitch: 0.96,  // 인위적 변조 없는 자연스럽고 편안한 중저음
+    voiceRate: 0.92,   // 여유롭고 편안하게 들리는 속도
+    personality: "따뜻하고 품격 있는 어조로 조직의 철학과 아동 권리, 재단과 기관의 미래 비전과 방향성을 편안하게 묻습니다."
   },
   EXEC_DIRECTOR: {
     id: "director",
     title: "실무진 이사 (복지사업총괄)",
     name: "박서진 이사",
-    gender: "female", // 여성 (명확하고 단호한 복지 전문성 톤)
+    gender: "female", // 여성 (부드럽고 친근한 아나운서 톤)
+    geminiVoice: "Aoede", // Google Gemini Neural Voice (온화하고 자연스러운 여성 보이스)
+    voicePrompt: "부드럽고 친절하며 귀에 편안하게 들리는 아나운서 톤으로 질문해 주세요: ",
     role: "가정위탁 전문성, 국가사업 전환 대응, 현장 위기사례 개입, 평가지표 TF 검증",
     avatar: "👩‍💼",
-    voicePitch: 1.18,  // 명확하고 또렷한 여성 톤
-    voiceRate: 1.02,   // 정확하고 단호한 속도
-    personality: "복지 현장과 정책 변화의 디테일을 날카롭게 파고들며 사업의 실효성과 근거, 전문적 대처 능력을 집요하게 검증합니다."
+    voicePitch: 1.02,  // 까칠함 없이 맑고 자연스러운 여성 톤
+    voiceRate: 0.94,   // 듣기 편안하고 안정적인 속도
+    personality: "복지 현장과 정책 변화의 핵심을 부드럽고 차분한 목소리로 물으며, 면접자가 편안하게 역량을 펼칠 수 있도록 유도합니다."
   },
   HR_DIRECTOR: {
     id: "hr",
     title: "인사기획팀장",
     name: "김태호 팀장",
-    gender: "male", // 남성 (차분하고 논리적인 인사 행정 톤)
+    gender: "male", // 남성 (차분하고 온화한 남성 톤)
+    geminiVoice: "Orus", // Google Gemini Neural Voice (차분하고 정돈된 남성 보이스)
+    voicePrompt: "차분하고 정중하며 편안한 남성 목소리로 질문해 주세요: ",
     role: "직원 육성, 신입 9명 조직관리, 경력자 소진, 노무·처우, 조직 갈등 조정",
     avatar: "👨‍💼",
-    voicePitch: 0.95,  // 지적이고 차분한 남성 톤
-    voiceRate: 1.00,   // 안정적인 속도
-    personality: "조직 내 인적 자원 관리, 직원들과의 소통, 원칙과 배려의 균형, 후계 인재 육성 등 인사·조직운영 관점에서 조명합니다."
+    voicePitch: 0.98,  // 자연스러운 표준 남성 톤
+    voiceRate: 0.94,   // 차분하고 또렷한 속도
+    personality: "조직 내 인적 자원 관리와 직원 소통, 후계 인재 육성 등을 온화하고 차분한 어조로 질문합니다."
   },
   EXTERNAL_EXAMINER: {
     id: "external",
     title: "외부 전문 면접관 (사회복지학 교수/평가위원)",
     name: "이선우 교수",
-    gender: "female", // 여성 (지적이고 예리한 학자/평가위원 톤)
-    role: "객관적 검증, 윤리의식, 투명성, 취약점(위기관리 2점) 및 모순점 압박 검증",
+    gender: "female", // 여성 (차분하고 지적인 따뜻한 여성 톤)
+    geminiVoice: "Kore", // Google Gemini Neural Voice (차분하고 맑은 여성 보이스)
+    voicePrompt: "차분하고 지적이면서도 부드럽고 편안한 어조로 질문해 주세요: ",
+    role: "객관적 검증, 윤리의식, 투명성, 취약점(위기관리 2점) 및 모순점 심층 검증",
     avatar: "👩‍🏫",
-    voicePitch: 1.28,  // 예리하고 지적인 고음 톤
-    voiceRate: 0.97,   // 서두르지 않고 핵심을 찌르는 템포
-    personality: "객관적인 외부 시각에서 날카로운 압박 질문과 반대 사례를 던지며, 지원자의 논리성과 자기객관화 수준을 시험합니다."
+    voicePitch: 1.04,  // 날카롭지 않고 품격 있는 자연스러운 여성 톤
+    voiceRate: 0.93,   // 서두르지 않고 편안하게 전달되는 템포
+    personality: "객관적인 외부 시각에서 핵심을 짚어주되, 차분하고 품위 있는 목소리로 지원자의 논리성을 경청합니다."
   }
 };
 
@@ -70,14 +78,14 @@ const QUESTIONS_DB = [
       "우수기관 3회 선정",
       "아동이 안전하고 직원이 성장하는 기관"
     ],
-    "followUp": null
+    "followUp": "말씀하신 '구조로 풀어 온 팀장'이라는 정체성이, 실무자가 아닌 기관장 위치에서는 구체적으로 어떤 조직 운영 방식으로 구현됩니까?"
   },
   {
     "id": 2,
     "qNumber": "Q2",
     "category": "리더십 철학",
     "panel": "CEO",
-    "difficulty": 2,
+    "difficulty": 1,
     "question": "본인의 리더십을 한마디로 표현하면 무엇입니까?",
     "keywords": [
       "방향과 기준을 세우고 동행하는 리더",
@@ -91,7 +99,7 @@ const QUESTIONS_DB = [
       "필요성과 효율성 기준",
       "선배 동행"
     ],
-    "followUp": null
+    "followUp": "'방향과 기준을 세우고 동행한다'고 하셨는데, 직원이 그 기준에 강하게 저항하거나 납득하지 못할 때는 어떻게 동행하시겠습니까?"
   },
   {
     "id": 3,
@@ -114,7 +122,7 @@ const QUESTIONS_DB = [
       "양육가이드 양육일지",
       "실행 구조 설계"
     ],
-    "followUp": null
+    "followUp": "만약 시범사업 운영 중 위탁가정에서 아동 방임이나 안전사고 의심 민원이 제기된다면, 기관장으로서 어떤 우선순위로 개입하시겠습니까?"
   },
   {
     "id": 4,
@@ -137,7 +145,7 @@ const QUESTIONS_DB = [
       "아동용품 지원",
       "결과보고 완료"
     ],
-    "followUp": null
+    "followUp": "후원자가 당초 지정된 7명 외의 잔여금 분할 사용에 대해 사후에 불만을 표출한다면, 재단의 신뢰도를 지키기 위해 어떻게 소통하시겠습니까?"
   },
   {
     "id": 5,
@@ -158,7 +166,7 @@ const QUESTIONS_DB = [
       "공적입양체계 지자체장 후견",
       "현장 근거와 정책"
     ],
-    "followUp": null
+    "followUp": "2025년 공적입양체계 개편 후 지자체의 후견 개입이 강화되면, 현장 위탁지원센터와의 권한 충돌 문제를 어떻게 조율하시겠습니까?"
   },
   {
     "id": 6,
@@ -183,7 +191,7 @@ const QUESTIONS_DB = [
       "자리 배치",
       "우수기관 3회 달성"
     ],
-    "followUp": "신입 9명에게 비교적 쉬운 친인척 사례만 주면, 경력 직원들의 업무 피로도와 불만이 극에 달하지 않았습니까?"
+    "followUp": "신입 9명에게 비교적 평이한 친인척 사례만 배정하면, 고난도 비혈연 사례를 전담하는 경력 직원들의 업무 피로도와 상대적 박탈감은 어떻게 해소하셨습니까?"
   },
   {
     "id": 7,
@@ -206,14 +214,14 @@ const QUESTIONS_DB = [
       "조직활성화 활동",
       "소진 예방"
     ],
-    "followUp": null
+    "followUp": "만약 핵심 경력직 2명이 업무 과중과 소진을 이유로 동시 사직서를 제출한다면, 기관장으로서 당장 오늘 오후에 어떻게 대응하시겠습니까?"
   },
   {
     "id": 8,
     "qNumber": "Q8",
     "category": "위기 개입",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 4,
+    "difficulty": 5,
     "question": "8개월 동안 보호조치 변경이 안 되었는데, 그동안 아동은 위험했던 건 아닌지? 더 빨리 개입할 수 없었습니까?",
     "keywords": [
       "아동 위험 방치 안 함",
@@ -231,7 +239,7 @@ const QUESTIONS_DB = [
       "심리평가 법률의견",
       "아동 안전 최우선"
     ],
-    "followUp": null
+    "followUp": "지자체나 언론에서 '센터가 지자체 눈치를 보느라 8개월 동안 아동을 위험에 방치했다'고 비판한다면, 기관장으로서 도의적 책임을 어떻게 지시겠습니까?"
   },
   {
     "id": 9,
@@ -252,7 +260,7 @@ const QUESTIONS_DB = [
       "기관 협의 및 법원 출석",
       "실무자 몫 인정"
     ],
-    "followUp": null
+    "followUp": "기여도 4점 중 팀장의 몫으로 돌린 1점의 리더십 행동이 실제로 현장 결과물에 어떤 결정적 차이를 만들었습니까?"
   },
   {
     "id": 10,
@@ -273,14 +281,14 @@ const QUESTIONS_DB = [
       "현장 상황과 사업안내 기준",
       "아동권리보장원 최종 논의"
     ],
-    "followUp": null
+    "followUp": "지자체 담당 공무원이 관례라며 규정에 어긋나는 예산 전용이나 편법 처리를 암묵적으로 요구한다면 어떻게 대처하시겠습니까?"
   },
   {
     "id": 11,
     "qNumber": "Q11",
     "category": "고객지향",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 1,
     "question": "기관장에게 고객은 누구이고 이해가 충돌하면 누구를 우선합니까?",
     "keywords": [
       "아동, 위탁부모, 친부모, 직원, 지자체, 후원자",
@@ -292,7 +300,7 @@ const QUESTIONS_DB = [
       "아동의 안전과 최선의 이익 최우선",
       "아이를 위해라는 공통 목표"
     ],
-    "followUp": null
+    "followUp": "위탁부모의 양육 고충과 아동의 권리가 첨예하게 대립할 때, 기관장으로서 고객지향의 최종 나침반은 어디에 두시겠습니까?"
   },
   {
     "id": 12,
@@ -336,14 +344,14 @@ const QUESTIONS_DB = [
       "직원 보호",
       "사후 재발방지책"
     ],
-    "followUp": null
+    "followUp": "야간이나 주말에 긴급 분리 아동이 발생했을 때, 담당 직원의 안전과 쉼터 연계를 위해 기관장이 직접 챙겨야 할 제1수칙은 무엇입니까?"
   },
   {
     "id": 14,
     "qNumber": "Q14",
     "category": "비전 실행",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "관장님의 방향을 현장의 구체적인 실행전략으로 옮긴 경험을 말씀해 주십시오.",
     "keywords": [
       "위기 대응 체크리스트",
@@ -359,7 +367,7 @@ const QUESTIONS_DB = [
       "3개 팀 분담",
       "SNS 성착취 피해 사례 적용"
     ],
-    "followUp": null
+    "followUp": "재단 2030 가치관이 일선 실무자들에게는 피부에 와닿지 않는 구호로 느껴질 때, 주간 회의에서 이를 어떻게 일상 업무로 연결하시겠습니까?"
   },
   {
     "id": 15,
@@ -382,14 +390,14 @@ const QUESTIONS_DB = [
       "통합사례회의 의료·상담·법률 지원",
       "정해진 절차 즉각 대처"
     ],
-    "followUp": null
+    "followUp": "전문가와 협력하는 과정에서 지자체 아동보호전담요원과 센터 실무자 간 의견이 평행선을 달린다면 기관장으로서 최종 결정을 어떻게 내리시겠습니까?"
   },
   {
     "id": 16,
     "qNumber": "Q16",
     "category": "성과목표 관리",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "기관장으로 기관의 성과목표를 어떻게 세우고 관리하겠습니까?",
     "keywords": [
       "재단 경영목표-기관-팀-개인 연계",
@@ -405,7 +413,7 @@ const QUESTIONS_DB = [
       "반기 전 직원 공유",
       "총괄팀장 경험 확장"
     ],
-    "followUp": null
+    "followUp": "직원이 제시된 연간 성과목표에 대해 '현실적으로 달성 불가능하다'며 냉소적인 반응을 보일 때 어떻게 동기부여하시겠습니까?"
   },
   {
     "id": 17,
@@ -426,7 +434,7 @@ const QUESTIONS_DB = [
       "팀 간 강약점 상호 보완",
       "기관 전체 기준 조율"
     ],
-    "followUp": null
+    "followUp": "성과가 저조한 팀의 팀장이 '부서원들의 역량 부족 탓'이라며 책임을 전가할 때, 기관장으로서 그 팀장을 어떻게 코칭하시겠습니까?"
   },
   {
     "id": 18,
@@ -447,7 +455,7 @@ const QUESTIONS_DB = [
       "기관 전체 목표와 예산 균형",
       "팀 간 예산 조정"
     ],
-    "followUp": null
+    "followUp": "본부 차원의 지원금이 전년 대비 15% 삭감되어 모든 부서의 사업비를 줄여야 하는 상황이라면, 어떤 철학적 기준으로 감축안을 확정하시겠습니까?"
   },
   {
     "id": 19,
@@ -468,14 +476,14 @@ const QUESTIONS_DB = [
       "변동 시 재조정 약속",
       "안심과 합의 도출"
     ],
-    "followUp": null
+    "followUp": "가정위탁팀과 복지사업팀 간에 차량 이용 및 후원물품 배분 문제로 감정싸움이 번졌을 때, 양 팀장을 소집해 어떤 질문으로 대화를 시작하시겠습니까?"
   },
   {
     "id": 20,
     "qNumber": "Q20",
     "category": "의사결정 투명성",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "전 직원에게 설명할 수 있는가가 모든 영역을 커버할 수 없을 텐데 어떻게 하겠습니까?",
     "keywords": [
       "세부 내용은 비공개 가능",
@@ -489,7 +497,7 @@ const QUESTIONS_DB = [
       "법과 보안 규정 준수",
       "동일 기준 동일 절차"
     ],
-    "followUp": null
+    "followUp": "인사 평가나 인센티브 배분 결과에 대해 실무진 일각에서 불공정하다는 뒷말이 나올 때, 기관장으로서 투명성을 어떻게 입증하시겠습니까?"
   },
   {
     "id": 21,
@@ -514,7 +522,7 @@ const QUESTIONS_DB = [
       "패들렛 전 직원 참여",
       "소그룹 및 온라인 다각화"
     ],
-    "followUp": null
+    "followUp": "10년 넘게 관행적으로 이어져 온 지역 복지 축제 사업을 전면 폐지하려 할 때, 지역 후원회와 원로 자원봉사자들의 거센 반발을 어떻게 돌파하시겠습니까?"
   },
   {
     "id": 22,
@@ -539,14 +547,14 @@ const QUESTIONS_DB = [
       "자원봉사 활용 대안",
       "인재원 강의 반영"
     ],
-    "followUp": null
+    "followUp": "규정을 엄격히 적용할 경우 당장 위기 아동에 대한 긴급 생계비 지급이 2주간 지연되는 상황이라면, 원칙과 아동 안전 사이에서 무엇을 택하시겠습니까?"
   },
   {
     "id": 23,
     "qNumber": "Q23",
     "category": "실패 성찰",
     "panel": "CEO",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "본인의 결정이나 판단이 틀렸던 경험이 있습니까?",
     "keywords": [
       "방향은 맞았으나 현장 수용성 미흡",
@@ -562,14 +570,14 @@ const QUESTIONS_DB = [
       "완벽보다 현장 실용성",
       "위기관리 2점 자평 이유"
     ],
-    "followUp": null
+    "followUp": "지난 23년간의 근무 중 '내 독단적인 판단 때문에 후배 직원이나 사업에 상처를 주었다'고 뼈아프게 반성한 실패 사례는 무엇입니까?"
   },
   {
     "id": 24,
     "qNumber": "Q24",
     "category": "동기부여",
     "panel": "HR_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "직원들의 동기를 어떻게 높여왔습니까?",
     "keywords": [
       "자유로운 의견 개진",
@@ -583,14 +591,14 @@ const QUESTIONS_DB = [
       "자립 프로그램 재편 워크숍",
       "신입 9명 잔류"
     ],
-    "followUp": null
+    "followUp": "반복되는 행정 서류와 사례 관리로 완전히 매너리즘에 빠져 무기력해진 5년차 주임에게 다시 열정을 불어넣기 위해 어떤 시도를 하시겠습니까?"
   },
   {
     "id": 25,
     "qNumber": "Q25",
     "category": "사기 진작",
     "panel": "HR_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "고난도 사례로 지친 직원들의 사기를 어떻게 지키겠습니까?",
     "keywords": [
       "워크숍과 조직문화 활동",
@@ -604,14 +612,14 @@ const QUESTIONS_DB = [
       "기관의 문제로 해결",
       "기관장이 대외 민원 앞장서서 보호"
     ],
-    "followUp": null
+    "followUp": "재단 평가에서 기대 이하의 등급을 받아 기관 전체의 사기가 바닥으로 떨어졌을 때, 전 직원을 모아놓고 첫 마디로 무엇을 전하시겠습니까?"
   },
   {
     "id": 26,
     "qNumber": "Q26",
     "category": "선배 통솔",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 4,
+    "difficulty": 5,
     "question": "본인보다 연차가 높거나 경험 많은 팀장을 어떻게 이끌겠습니까?",
     "keywords": [
       "경험을 기관의 자산으로 활용",
@@ -627,7 +635,7 @@ const QUESTIONS_DB = [
       "판단 기준 사전 공유",
       "최종 책임은 기관장"
     ],
-    "followUp": null
+    "followUp": "나이도 많고 입사 기수도 훨씬 높은 선배 과장이 신임 기관장의 업무 지시에 비협조적이거나 냉소적인 태도를 보인다면 어떻게 통솔하시겠습니까?"
   },
   {
     "id": 27,
@@ -650,14 +658,14 @@ const QUESTIONS_DB = [
       "근무 기록 관리",
       "인사 규정 절차 준수"
     ],
-    "followUp": null
+    "followUp": "지속적인 면담과 교육에도 불구하고 아동 사례관리 기록을 상습적으로 누락하는 저성과 직원을 상대로 어떤 단계적 인사 조치를 밟으시겠습니까?"
   },
   {
     "id": 28,
     "qNumber": "Q28",
     "category": "비전 연계",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "재단의 중장기 비전과 경영방향은 기관에 어떻게 연결하겠습니까?",
     "keywords": [
       "어린이가 행복한 세상",
@@ -673,7 +681,7 @@ const QUESTIONS_DB = [
       "자립준비청년 연계",
       "가족돌봄아동 발굴 연계"
     ],
-    "followUp": null
+    "followUp": "경기남부센터의 연간 사업계획서에서 재단의 미래 전략 방향이 가장 잘 드러나는 대표적인 핵심 지표 하나를 꼽아주십시오."
   },
   {
     "id": 29,
@@ -696,14 +704,14 @@ const QUESTIONS_DB = [
       "위탁가정 발굴 및 교육",
       "위기 예방 적극 개입"
     ],
-    "followUp": null
+    "followUp": "출생률 급감으로 관내 위탁 필요 아동 수가 급격히 줄어들 경우, 기관의 존립과 역할 재정립을 위해 어떤 미래형 복지 모델을 선제 기획하시겠습니까?"
   },
   {
     "id": 30,
     "qNumber": "Q30",
     "category": "비전 공감대",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "비전을 제시해도 직원들이 공감하지 않는다면 어떻게 하겠습니까?",
     "keywords": [
       "비전은 함께 만드는 것",
@@ -717,7 +725,7 @@ const QUESTIONS_DB = [
       "내가 만든 방향이라는 체감",
       "실행력 확보"
     ],
-    "followUp": null
+    "followUp": "기관장이 제시한 미래 비전에 대해 '현장 업무도 벅찬데 또 이상적인 숙제만 늘어난다'고 불평하는 직원들을 어떻게 설득하시겠습니까?"
   },
   {
     "id": 31,
@@ -738,14 +746,14 @@ const QUESTIONS_DB = [
       "마지막 40일 실행(시급 과제 1~2개 집중)",
       "이해가 우선"
     ],
-    "followUp": null
+    "followUp": "취임 후 100일 동안 가장 먼저 단행할 '버려야 할 비효율적 관행 1가지'와 '새로 도입할 시스템 1가지'는 무엇입니까?"
   },
   {
     "id": 32,
     "qNumber": "Q32",
     "category": "미래 비전",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "지원자가 이끄는 센터의 3년 뒤 모습은 어떤 모습입니까?",
     "keywords": [
       "아동이 안전하고 직원이 성장하는 기관",
@@ -759,14 +767,14 @@ const QUESTIONS_DB = [
       "동행형 신입 육성 정착",
       "재단 중점사업 선도 기여"
     ],
-    "followUp": null
+    "followUp": "신지애 팀장님이 이끄는 경기남부센터는 3년 뒤 전국 18개 가정위탁지원센터 중 어떤 독보적인 브랜드로 기억되기를 원하십니까?"
   },
   {
     "id": 33,
     "qNumber": "Q33",
     "category": "재단 기여",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 2,
     "question": "센터만이 아니라 재단 전체를 위해서 기여한 일은 무엇입니까?",
     "keywords": [
       "가정위탁사업 직무기술서 정리",
@@ -780,7 +788,7 @@ const QUESTIONS_DB = [
       "평가지표 TF 및 평가위원",
       "재단 산하 6개 센터 우수사례 공유"
     ],
-    "followUp": null
+    "followUp": "지방 사업장의 기관장으로서 재단 중앙본부의 정책 결정 과정에 실질적으로 기여할 수 있는 가장 효과적인 소통 창구는 무엇이라고 보십니까?"
   },
   {
     "id": 34,
@@ -801,14 +809,14 @@ const QUESTIONS_DB = [
       "정기적 행정업무 줄이기",
       "직원 의견 수렴"
     ],
-    "followUp": null
+    "followUp": "중복 보고서와 형식적인 결재 단계를 줄여 실무자들의 주당 현장 출장 시간을 20% 늘리기 위한 구체적인 행정 다이어트 복안이 있습니까?"
   },
   {
     "id": 35,
     "qNumber": "Q35",
     "category": "재원 확보",
     "panel": "CEO",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "예산이 부족할 때 어떻게 재원을 만들겠습니까?",
     "keywords": [
       "무연고 영아 지정후원 1000만원 유치 경험",
@@ -822,7 +830,7 @@ const QUESTIONS_DB = [
       "지자체 제안사업",
       "외부 지원사업 연계 다각화"
     ],
-    "followUp": null
+    "followUp": "지자체 보조금 외에 기업 CSR이나 고액 후원자 발굴을 통해 자립준비청년 전용 장학기금을 자체적으로 조성할 구체적인 전략이 있습니까?"
   },
   {
     "id": 36,
@@ -841,14 +849,14 @@ const QUESTIONS_DB = [
       "개별 식별 정보 및 점수 철저한 비밀 유지",
       "일반화 가능한 우수 운영 방식과 전체 흐름만 공유"
     ],
-    "followUp": null
+    "followUp": "부서원 간 역량 차이가 뚜렷할 때, 결과 중심 평가와 과정 중심 평가 사이에서 발생할 수 있는 위화감을 어떻게 최소화하시겠습니까?"
   },
   {
     "id": 37,
     "qNumber": "Q37",
     "category": "관점의 전환",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "팀장과 기관장의 조직을 보는 눈은 어떻게 달라야 합니까?",
     "keywords": [
       "팀장은 팀 성과와 실적",
@@ -860,14 +868,14 @@ const QUESTIONS_DB = [
       "기관장은 팀 간 관계와 기관 안팎 흐름",
       "정책 변화가 미치는 파급효과 거시적 조망"
     ],
-    "followUp": null
+    "followUp": "실무자의 눈으로 보던 '어려운 복지 사례'를 기관장의 눈으로 보았을 때 '제도와 조례 개정의 대상'으로 시야를 전환한 최근의 사례가 있습니까?"
   },
   {
     "id": 38,
     "qNumber": "Q38",
     "category": "신입 육성",
     "panel": "HR_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "신입이 많은 조직에서 협력 체계를 어떻게 구축했습니까?",
     "keywords": [
       "연초 워크숍 매뉴얼 스터디",
@@ -881,7 +889,7 @@ const QUESTIONS_DB = [
       "선임 4개월 동행 방문",
       "고난도 사례 팀장 직접 개입"
     ],
-    "followUp": null
+    "followUp": "새로 부임한 기관에서 또다시 신입 직원이 대거 채용된다면, 6개월 만에 독립적인 사례관리자로 안착시키기 위한 온보딩 핵심 로드맵은 무엇입니까?"
   },
   {
     "id": 39,
@@ -900,7 +908,7 @@ const QUESTIONS_DB = [
       "구조적 문제면 자원 재분배",
       "사람의 문제면 조직 공동 목표 기준 합의점 도출"
     ],
-    "followUp": null
+    "followUp": "선임 팀장과 후임 팀장 간의 주도권 다툼으로 기관 내부 정보가 단절되고 팀 간 협업이 멈추었을 때 기관장으로서 어떻게 개입하시겠습니까?"
   },
   {
     "id": 40,
@@ -921,14 +929,14 @@ const QUESTIONS_DB = [
       "변동 시 재조정 약속으로 안심",
       "불가 시 아동 영향 기준으로 기관장 최종 결정 및 책임"
     ],
-    "followUp": null
+    "followUp": "한정된 인센티브 예산을 특정 성과 부서에 몰아줄 것인지, 고생한 전 부서에 균등 분배할 것인지에 대한 기관장님의 확고한 원칙은 무엇입니까?"
   },
   {
     "id": 41,
     "qNumber": "Q41",
     "category": "상급자 의견 조율",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "관장님의 방향이 현장 현실과 맞지 않아 현장의 목소리를 모아 설득한 적이 있습니까?",
     "keywords": [
       "방향은 맞았으나 실행 방식 조정",
@@ -942,14 +950,14 @@ const QUESTIONS_DB = [
       "3개 팀 분담 설계로 부담 분산",
       "관장님 목표 지키며 현실적 대안 도출"
     ],
-    "followUp": null
+    "followUp": "본부 임원진이 지시한 전국 통일 사업 방향이 관내 지역 현실과 맞지 않아 현장 혼란이 예상될 때, 상급자를 어떻게 논리적으로 설득하시겠습니까?"
   },
   {
     "id": 42,
     "qNumber": "Q42",
     "category": "권한 밖 협력",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "권한이 없는 상대를 움직인 대표적인 경험은 무엇입니까?",
     "keywords": [
       "학대 위기사례 구청 및 법원 협의",
@@ -963,14 +971,14 @@ const QUESTIONS_DB = [
       "아동 안전 최우선 공통 원칙",
       "6개 기관 합의 조율"
     ],
-    "followUp": null
+    "followUp": "관내 경찰서, 아동보호전문기관, 교육청 등 타 공공기관이 협조에 미온적일 때, 기관장의 네트워크를 활용해 협조를 이끌어낸 노하우가 있습니까?"
   },
   {
     "id": 43,
     "qNumber": "Q43",
     "category": "이해관계 조율",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "타 기관과의 극심한 이해충돌 상황에서 어떻게 합의를 이끌어냈습니까?",
     "keywords": [
       "권한이 아닌 객관적 근거",
@@ -982,7 +990,7 @@ const QUESTIONS_DB = [
       "아동의 안전과 최선의 이익 대의 제시",
       "각 기관의 역할 존중과 공통 합의 도출"
     ],
-    "followUp": null
+    "followUp": "위탁부모 단체의 집단 민원과 아동 권리 옹호 사이에서 타협점을 찾지 못할 때, 기관장으로서 어떤 기준으로 최종 결단을 내리시겠습니까?"
   },
   {
     "id": 44,
@@ -1001,7 +1009,7 @@ const QUESTIONS_DB = [
       "본부 방침 준수 원칙",
       "현장 어려움은 객관적 근거로 본부와 소통 설득"
     ],
-    "followUp": null
+    "followUp": "본부의 행정 감사 요구와 현장의 과중한 긴급 사례 출장이 겹쳐 직원들이 한계에 부딪혔을 때, 본부와 일정을 어떻게 조율하시겠습니까?"
   },
   {
     "id": 45,
@@ -1020,14 +1028,14 @@ const QUESTIONS_DB = [
       "법·규정·아동보호에 위배 시 근거 갖춰 정중히 대안 제시",
       "원칙 준수"
     ],
-    "followUp": null
+    "followUp": "상급자의 구두 지시가 재단 윤리 강령의 경계선에 걸쳐 있을 때, 실무자 시절과 달리 기관장으로서 어떻게 행동하시겠습니까?"
   },
   {
     "id": 46,
     "qNumber": "Q46",
     "category": "리더십 3대 원칙",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 1,
     "question": "본인의 리더십 원칙을 경험과 연결하여 설명해 주십시오.",
     "keywords": [
       "1. 기준 먼저 공개(자립프로그램 재편)",
@@ -1041,7 +1049,7 @@ const QUESTIONS_DB = [
       "3. 권한이 아닌 근거로 소통(행정보조인력, 6개 기관)",
       "최우선은 아동 안전"
     ],
-    "followUp": null
+    "followUp": "기관장으로서 절대 양보할 수 없는 리더십 3대 원칙 중, 위기 상황에서 가장 먼저 버려야 할 것과 끝까지 지켜야 할 것은 각각 무엇입니까?"
   },
   {
     "id": 47,
@@ -1060,14 +1068,14 @@ const QUESTIONS_DB = [
       "먼저 나서서 직원 판단 기회 축소 우려",
       "팀원이 먼저 계획 세우고 점검 지원하는 코칭 방식으로 전환 노력"
     ],
-    "followUp": null
+    "followUp": "평소 신지애 팀장님의 꼼꼼하고 완벽주의적인 성향이 기관장이 되었을 때는 직원들에게 과도한 마이크로매니징으로 작용할 우려는 없습니까?"
   },
   {
     "id": 48,
     "qNumber": "Q48",
     "category": "조직 기여 레거시",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 1,
     "question": "23년 동안 조직에 남긴 단 하나의 가장 큰 기여를 꼽는다면?",
     "keywords": [
       "조직에 남는 기준 구축",
@@ -1083,14 +1091,14 @@ const QUESTIONS_DB = [
       "가정위탁 직무기술서(역량모델 반영)",
       "내가 없어도 돌아가는 구조"
     ],
-    "followUp": null
+    "followUp": "기관장 퇴임 시점에 후배 사회복지사들에게 '신지애 관장은 우리 센터에 이것 하나만큼은 완전히 뿌리내려 주었다'고 듣고 싶은 레거시는 무엇입니까?"
   },
   {
     "id": 49,
     "qNumber": "Q49",
     "category": "팀장 vs 기관장 성과",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 4,
+    "difficulty": 2,
     "question": "포트폴리오 성과들은 팀장이면 당연히 해야 하는 것 아닙니까?",
     "keywords": [
       "팀장의 몫 맞음",
@@ -1106,14 +1114,14 @@ const QUESTIONS_DB = [
       "위기사례가 공동 대응 원칙으로",
       "TF가 18개 센터 공통 기준으로 확산"
     ],
-    "followUp": null
+    "followUp": "팀장의 성과는 '팀원들의 직접적 실적'이지만 기관장의 성과는 무엇이어야 한다고 정의하십니까?"
   },
   {
     "id": 50,
     "qNumber": "Q50",
     "category": "제도 개선 제안",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "재단이나 가정위탁사업에서 지금 가장 시급히 바꿔야 할 것은 무엇입니까?",
     "keywords": [
       "사례관리자의 지속성",
@@ -1127,7 +1135,7 @@ const QUESTIONS_DB = [
       "신입 OJT 외 신규 경력직원 육성 체계 필요",
       "과장·대리도 가정위탁 처음인 현실 대응"
     ],
-    "followUp": null
+    "followUp": "가정위탁 양육보조금의 현실화나 위탁부모 자격 기준과 관련하여 보건복지부에 제안하고 싶은 가장 시급한 제도 개선안은 무엇입니까?"
   },
   {
     "id": 51,
@@ -1148,14 +1156,14 @@ const QUESTIONS_DB = [
       "본부의 연초 계획 불변 결정 수용",
       "결정 전에는 분명히 소신, 결정 후에는 철저히 실행"
     ],
-    "followUp": null
+    "followUp": "본인이 확신을 갖고 추진한 혁신 사업에 대해 이사회나 본부가 전면 재검토 결정을 내린다면, 소신을 굽히지 않고 재도전하시겠습니까, 즉시 수용하시겠습니까?"
   },
   {
     "id": 52,
     "qNumber": "Q52",
     "category": "승진 당위성",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 1,
     "question": "본인을 이번에 반드시 기관장으로 승진시켜야 하는 결정적인 이유는 무엇입니까?",
     "keywords": [
       "비전제시와 경영마인드 사전 실천",
@@ -1171,14 +1179,14 @@ const QUESTIONS_DB = [
       "가정위탁 직무기술서 역량모델 반영",
       "준비된 기관장"
     ],
-    "followUp": null
+    "followUp": "다른 쟁쟁한 팀장급 후보자들에 비해, 왜 '지금 이 시점의 경기남부센터'에는 반드시 신지애 팀장이 기관장이 되어야 합니까?"
   },
   {
     "id": 53,
     "qNumber": "Q53",
     "category": "추천 사유",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 1,
     "question": "본인의 어떤 점을 기관장님이 높이 평가해서 추천했다고 생각합니까?",
     "keywords": [
       "1. 가정위탁 현장 전문성(11년, 고난도 사례)",
@@ -1192,14 +1200,14 @@ const QUESTIONS_DB = [
       "3. 외부 활동의 시야(TF, 평가위원, 인재원 강의)",
       "결과로 보답"
     ],
-    "followUp": null
+    "followUp": "만약 전임 기관장이나 부서 동료 3명에게 신지애 팀장님에 대한 레퍼런스 체크를 한다면, 그분들이 한목소리로 칭찬할 장점은 무엇이겠습니까?"
   },
   {
     "id": 54,
     "qNumber": "Q54",
     "category": "원칙의 진정성",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 4,
+    "difficulty": 1,
     "question": "원칙을 지킨다는 말이 뻔한 교과서 이야기 아닙니까?",
     "keywords": [
       "뻔하지 않은 현실",
@@ -1215,14 +1223,14 @@ const QUESTIONS_DB = [
       "자원봉사 대안 제시",
       "기준 먼저 공개는 일하는 방식"
     ],
-    "followUp": null
+    "followUp": "원칙을 지키는 과정에서 '융통성이 없고 차갑다'는 오해를 받았던 경험이 있다면, 그 오해를 진정성으로 어떻게 회복하셨습니까?"
   },
   {
     "id": 55,
     "qNumber": "Q55",
     "category": "비영리 성과 정의",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "비영리 조직에서 '성과'란 무엇이라고 생각합니까?",
     "keywords": [
       "사람의 변화",
@@ -1238,14 +1246,14 @@ const QUESTIONS_DB = [
       "변화를 이끄는 직원의 성장",
       "임팩트 중심 성과관리"
     ],
-    "followUp": null
+    "followUp": "기업의 성과는 매출과 영업이익이지만, 우리 비영리 아동복지 기관에서 말하는 진정한 성과는 어떤 지표로 측정되어야 합니까?"
   },
   {
     "id": 56,
     "qNumber": "Q56",
     "category": "후계 리더 육성",
     "panel": "HR_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "본인이 승진해 자리를 비우면 팀은 누가 이끕니까? 다음 리더를 키우고 있습니까?",
     "keywords": [
       "이미 준비 중",
@@ -1259,7 +1267,7 @@ const QUESTIONS_DB = [
       "사람 아닌 시스템(육성체계/위기관리)으로 돌아가는 구조",
       "팀장 업무 경험 기회 부여"
     ],
-    "followUp": null
+    "followUp": "기관장이 부임한 후 2~3년 내에 자신의 뒤를 이을 차세대 리더를 발굴하고 훈련시키기 위한 구체적인 인재 육성 방안이 있습니까?"
   },
   {
     "id": 57,
@@ -1280,14 +1288,14 @@ const QUESTIONS_DB = [
       "지표별 원인 정밀 분석",
       "투명한 공유 및 차기 평가 전략 수립 점검"
     ],
-    "followUp": null
+    "followUp": "재단 기관 평가에서 우리 센터가 최하위 C등급을 받는 초유의 사태가 발생한다면, 기관장으로서 직원들과 본부에 어떤 방식으로 책임을 표명하시겠습니까?"
   },
   {
     "id": 58,
     "qNumber": "Q58",
     "category": "세대 소통",
     "panel": "HR_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "신입 및 세대가 다른 젊은 직원들과 어떻게 소통하고 이끌겠습니까?",
     "keywords": [
       "Why에 대한 설명",
@@ -1303,14 +1311,14 @@ const QUESTIONS_DB = [
       "행정보조인력 거절 시에도 법과 사례 공유",
       "창증감제 동등 참여"
     ],
-    "followUp": null
+    "followUp": "MZ세대 신입 사회복지사들의 워라밸 요구와 선배 사회복지사들의 헌신적 사명감 사이의 세대 갈등을 기관장으로서 어떻게 융합하시겠습니까?"
   },
   {
     "id": 59,
     "qNumber": "Q59",
     "category": "관행 개선",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "오랜 관행이지만 규정에 맞지 않는 일을 발견하면 어떻게 하겠습니까?",
     "keywords": [
       "관행 이유 먼저 확인",
@@ -1324,14 +1332,14 @@ const QUESTIONS_DB = [
       "행정보조인력 대신 자원봉사 활용",
       "원칙을 지켜도 손해 보지 않는 쉬운 길 마련"
     ],
-    "followUp": null
+    "followUp": "과거부터 '어쩔 수 없다'며 묵인되어 온 불필요한 야근이나 형식적 문서작성 관행을 없애기 위해 어떤 혁신적 결단을 내리시겠습니까?"
   },
   {
     "id": 60,
     "qNumber": "Q60",
     "category": "위기 극복",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 4,
     "question": "리더로서 가장 힘들었던 시기는 언제였고, 어떻게 견뎠습니까?",
     "keywords": [
       "8개월 보호조치 변경 교착기",
@@ -1347,14 +1355,14 @@ const QUESTIONS_DB = [
       "혼자가 아니었기에 극복",
       "실무자를 혼자 두지 않는 원칙의 기원"
     ],
-    "followUp": null
+    "followUp": "당시 8개월 보호조치 지연으로 가장 힘들었을 때, 본인의 멘탈 관리뿐만 아니라 함께 흔들리던 실무자를 어떻게 정서적으로 지탱해 주셨습니까?"
   },
   {
     "id": 61,
     "qNumber": "Q61",
     "category": "탈락 시 대처",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 5,
     "question": "이번에 승진하지 못한다면 결과를 어떻게 받아들이겠습니까?",
     "keywords": [
       "결과 겸허히 수용",
@@ -1370,14 +1378,14 @@ const QUESTIONS_DB = [
       "재단 권고사항 충실 이행",
       "흔들림 없는 현장 지킴"
     ],
-    "followUp": null
+    "followUp": "만약 이번 기관장 승진 심사에서 아쉽게 탈락하신다면, 재단에 남아서 어떤 자세로 다음 도전을 준비하시겠습니까, 혹시 다른 거취를 고려하시겠습니까?"
   },
   {
     "id": 62,
     "qNumber": "Q62",
     "category": "디지털 혁신",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "디지털 도구나 새로운 방식으로 일하는 방식을 바꾼 경험과 계획은?",
     "keywords": [
       "패들렛 구글 설문지 워크숍 활용",
@@ -1391,14 +1399,14 @@ const QUESTIONS_DB = [
       "AI 도구 행정 보조 활용 계획",
       "절대 기준은 아동 개인정보 보호 철저"
     ],
-    "followUp": null
+    "followUp": "AI 기술이나 모바일 협업 툴을 활용하여 위탁부모 상담일지 작성이나 아동 모니터링 업무를 스마트하게 자동화할 구상이 있으십니까?"
   },
   {
     "id": 63,
     "qNumber": "Q63",
     "category": "정책 주목점",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "최근 아동보호정책 변화 중 기관장으로 가장 주목하는 것은 무엇입니까?",
     "keywords": [
       "가정형 보호 확대",
@@ -1412,14 +1420,14 @@ const QUESTIONS_DB = [
       "전국 단위 기준 통일",
       "평가지표 TF 경험 살려 선제적 기준 준수"
     ],
-    "followUp": null
+    "followUp": "정부의 아동 기본법 제정 움직임과 출생통보제·보호출산제 시행이 가정위탁 현장에 가져올 가장 결정적인 변화는 무엇이라고 보십니까?"
   },
   {
     "id": 64,
     "qNumber": "Q64",
     "category": "법정대리권 제도",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "위탁부모에게 제한적 법정대리권을 주는 방안이 추진되고 있는데 어떻게 보십니까?",
     "keywords": [
       "현장 숙원 반영 의미 큼",
@@ -1433,14 +1441,14 @@ const QUESTIONS_DB = [
       "기관들 인지도 부족 및 친권 갈등 과제",
       "기관장으로서 보완 의견 개진 및 제도 안내"
     ],
-    "followUp": null
+    "followUp": "친부모의 연락 두절로 수술 동의나 통장 개설 등 법정대리권 행사가 불가능한 위탁 아동을 위해 기관장이 선제적으로 개입할 수 있는 법적 경로를 알고 계십니까?"
   },
   {
     "id": 65,
     "qNumber": "Q65",
     "category": "신규 아동보호제도",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "출생통보제, 보호출산제, 공적 입양체계 시행 이후 가정위탁의 역할은 어떻게 달라졌습니까?",
     "keywords": [
       "입양 전 아동의 가정형 보호 새 역할",
@@ -1454,14 +1462,14 @@ const QUESTIONS_DB = [
       "서울센터 영아 시범사업 경험 활용",
       "영아 전문 위탁가정 발굴 및 교육 주력"
     ],
-    "followUp": null
+    "followUp": "새로 도입되는 공적 아동보호 제도 하에서, 민간 위탁센터가 지자체 아동보호전담요원에 종속되지 않고 전문성을 주도할 수 있는 방안은 무엇입니까?"
   },
   {
     "id": 66,
     "qNumber": "Q66",
     "category": "사회적 이슈 대응",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 4,
     "question": "아동학대 사망 같은 사건이 사회적 이슈가 될 때 기관장으로 무엇을 하겠습니까?",
     "keywords": [
       "사례관리 아동 위기상황 전면 재점검",
@@ -1473,14 +1481,14 @@ const QUESTIONS_DB = [
       "위기대응체계 철저 가동 지원",
       "직원들이 위축되지 않도록 혼자 판단하지 않는 체계 재공유"
     ],
-    "followUp": null
+    "followUp": "관내에서 촉법소년 범죄나 아동학대 사건이 터져 여론이 들끓을 때, 재단의 입장을 지키면서도 아동인권을 보호하기 위해 기관장은 언론에 어떻게 대응해야 합니까?"
   },
   {
     "id": 67,
     "qNumber": "Q67",
     "category": "특수욕구 아동",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "경계선 지능이나 ADHD처럼 특별한 지원이 필요한 아동이 늘고 있는데 어떻게 대응하겠습니까?",
     "keywords": [
       "위탁부모 전문 교육 지원",
@@ -1492,7 +1500,7 @@ const QUESTIONS_DB = [
       "정신건강복지센터 업무 협약",
       "연령별 필수 교육 + 특수욕구별 선택 교육 제안 반영"
     ],
-    "followUp": null
+    "followUp": "발달장애나 심각한 심리 정서적 외상을 겪는 특수욕구 아동을 일반 가정에서 위탁하기를 꺼릴 때, 전문위탁가정 매칭을 위한 특별 대책이 있습니까?"
   },
   {
     "id": 68,
@@ -1511,7 +1519,7 @@ const QUESTIONS_DB = [
       "사례관리 프로그램 자원연계 개별화 지원",
       "자립 프로그램 실질 참여 중심 재편"
     ],
-    "followUp": null
+    "followUp": "만 18세로 보호 종료되어 사회로 나가는 자립준비청년들이 전세사기나 사회적 고립에 빠지지 않도록 센터 차원에서 가동할 사후 안전망은 무엇입니까?"
   },
   {
     "id": 69,
@@ -1532,14 +1540,14 @@ const QUESTIONS_DB = [
       "역부양 아동 조기 발견",
       "재단 가족돌봄 지원 적극 연계"
     ],
-    "followUp": null
+    "followUp": "재단의 중점 사업인 '아동 권리 옹호'와 현장 위탁센터의 일상적 '사례관리' 업무가 따로 놀지 않고 시너지를 내게 할 기관장의 복안은 무엇입니까?"
   },
   {
     "id": 70,
     "qNumber": "Q70",
     "category": "위탁부모 학대 의심",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 4,
+    "difficulty": 5,
     "question": "부임 후 위탁아동이 위탁부모에게 학대받았다고 했을 때 어떻게 조치하겠습니까?",
     "keywords": [
       "1. 아동 안전 확인 및 긴급 분리 요청",
@@ -1553,14 +1561,14 @@ const QUESTIONS_DB = [
       "3. 담당 직원 동행 및 민원 분담 보호",
       "절차 준수 및 사후평가 점검"
     ],
-    "followUp": null
+    "followUp": "10년간 모범적으로 활동해 온 베테랑 위탁부모 가정에서 신체적 학대 정황이 신고되었다면, 신중한 진상 조사와 아동 즉시 분리 조치 중 무엇을 먼저 행하시겠습니까?"
   },
   {
     "id": 71,
     "qNumber": "Q71",
     "category": "경력자 퇴사",
     "panel": "HR_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 4,
     "question": "핵심 경력직원이 퇴사 의사를 밝히면 어떻게 하겠습니까?",
     "keywords": [
       "개별 면담으로 원인 경청(개인/조직)",
@@ -1576,7 +1584,7 @@ const QUESTIONS_DB = [
       "사례 분담으로 아동 공백 방지",
       "위기사례 팀장 지원"
     ],
-    "followUp": null
+    "followUp": "기관 내 핵심 역할을 하던 7년차 주임이 번아웃으로 퇴사를 고집할 때, 기관장으로서 그 직원의 마음을 되돌리기 위해 어떤 마지막 대화를 나누시겠습니까?"
   },
   {
     "id": 72,
@@ -1597,14 +1605,14 @@ const QUESTIONS_DB = [
       "직원들에게 사업 필요성 설명",
       "인력 일정 상황 근거 갖춰 본부와 협의 조율"
     ],
-    "followUp": null
+    "followUp": "기존 업무만으로도 야근이 잦은 상황에서 중앙본부의 핵심 시범사업 공모가 내려왔을 때, 직원들의 반발을 누르고 공모에 참여하시겠습니까, 아니면 반려하시겠습니까?"
   },
   {
     "id": 73,
     "qNumber": "Q73",
     "category": "언론 부정 보도",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 4,
+    "difficulty": 5,
     "question": "언론에서 우리 센터 위탁가정 관련 부정적인 보도를 하겠다고 취재를 걸어오면?",
     "keywords": [
       "1. 사실관계 정확 확인",
@@ -1620,14 +1628,14 @@ const QUESTIONS_DB = [
       "잘못 인정 및 개선책 발표",
       "직원 위축 방지"
     ],
-    "followUp": null
+    "followUp": "공중파 탐사보도 프로그램에서 '어린이재단 위탁센터의 관리 부실'을 헤드라인으로 다루겠다고 취재 요청이 왔을 때, 기관장으로서 초기 1시간 대응 프로토콜은 무엇입니까?"
   },
   {
     "id": 74,
     "qNumber": "Q74",
     "category": "지정후원금 딜레마",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 4,
     "question": "후원자가 이미 지원이 충분한 특정 아동에게만 지정후원금을 주겠다고 고집하면?",
     "keywords": [
       "후원자 뜻 존중",
@@ -1643,14 +1651,14 @@ const QUESTIONS_DB = [
       "동일 목적 내 타 아동 확대 정중 권유",
       "사전 합의 원칙"
     ],
-    "followUp": null
+    "followUp": "고액 후원자가 특정 아동에게만 특혜성 해외연수 기회를 주겠다고 조건을 걸었을 때, 후원자의 선의와 아동 간 형평성 사이에서 어떻게 조율하시겠습니까?"
   },
   {
     "id": 75,
     "qNumber": "Q75",
     "category": "동료 간 형평성",
     "panel": "HR_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 4,
     "question": "한 직원이 개인 사정으로 성과가 크게 떨어져 동료들의 불만이 쌓인다면?",
     "keywords": [
       "해당 직원 면담 및 상황 파악",
@@ -1666,14 +1674,14 @@ const QUESTIONS_DB = [
       "대신 맡은 동료의 기여 성과 인정",
       "배려와 공정의 조화"
     ],
-    "followUp": null
+    "followUp": "동일 직급 내에서 고난도 위기 사례를 도맡아 하는 직원과 상대적으로 평이한 행정만 담당하는 직원 간의 급여 차이가 없을 때, 공정성을 어떻게 보상하시겠습니까?"
   },
   {
     "id": 76,
     "qNumber": "Q76",
     "category": "역할 전환",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 1,
     "question": "팀장 리더십과 기관장 리더십의 본질적 차이점은 무엇입니까?",
     "keywords": [
       "팀장은 팀 성과와 문제 직접 해결",
@@ -1685,14 +1693,14 @@ const QUESTIONS_DB = [
       "기관장은 비전 위기관리 대외관계 및 문제 해결 구조 구축",
       "총괄팀장 경험으로 전환 준비 완료"
     ],
-    "followUp": null
+    "followUp": "실무형 팀장에서 전권을 쥔 기관장으로 신분이 바뀔 때, 본인의 일상적 업무 습관 중 가장 먼저 내려놓아야 할 것은 무엇이라고 생각하십니까?"
   },
   {
     "id": 77,
     "qNumber": "Q77",
     "category": "리더십 학습",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "최근 읽은 리더십 관련 책이나 교육을 업무에 적용한 점은 무엇입니까?",
     "keywords": [
       "책 두려움 없는 조직",
@@ -1706,14 +1714,14 @@ const QUESTIONS_DB = [
       "워크숍 조별 논의 및 창증감제 반영",
       "코칭 교육 경청과 질문"
     ],
-    "followUp": null
+    "followUp": "그동안 재직하면서 모셨던 역대 기관장님들 중 '이분의 이 장점은 반드시 배우고, 이 단점은 절대 답습하지 않겠다'고 다짐한 점은 무엇입니까?"
   },
   {
     "id": 78,
     "qNumber": "Q78",
     "category": "절대 원칙",
     "panel": "CEO",
-    "difficulty": 2,
+    "difficulty": 1,
     "question": "기관장으로서 절대 타협하지 않을 단 하나의 원칙은 무엇입니까?",
     "keywords": [
       "아동의 안전",
@@ -1723,7 +1731,7 @@ const QUESTIONS_DB = [
       "아동의 안전",
       "예산 민원 기관 이견보다 아동 안전 최우선 원칙 고수"
     ],
-    "followUp": null
+    "followUp": "복지 현장에서 수많은 현실적 유혹과 타협 압박이 있을 텐데, 신지애라는 사회복지사가 목숨처럼 지켜온 절대 불가침의 윤리적 선은 무엇입니까?"
   },
   {
     "id": 79,
@@ -1742,7 +1750,7 @@ const QUESTIONS_DB = [
       "사람과 구조를 세우는 리더",
       "아동이 안전하고 직원이 성장하는 선순환 기관 구축"
     ],
-    "followUp": null
+    "followUp": "면접이 끝나기 전, 오늘 심사위원들에게 '신지애를 기관장으로 뽑지 않으면 재단이 후회할 이유'를 확신에 찬 어조로 말씀해 주십시오."
   },
   {
     "id": 80,
@@ -1763,7 +1771,7 @@ const QUESTIONS_DB = [
       "면접교섭비 예산 조정",
       "자원 재배치가 성과관리"
     ],
-    "followUp": null
+    "followUp": "숫자 중심의 양적 실적(위탁 건수)과 질적 성과(아동의 심리적 안정)가 상충할 때, 기관장으로서 연말 성과지표 달성을 어떻게 관리하시겠습니까?"
   },
   {
     "id": 81,
@@ -1784,14 +1792,14 @@ const QUESTIONS_DB = [
       "희망이음 행정보조인력 미투입 결정",
       "당장 편의보다 아동정보보호"
     ],
-    "followUp": null
+    "followUp": "아동의 시설 퇴소 후 원가정 복귀와 장기 가정위탁 연장 사이에서 전문가들의 의견이 팽팽히 맞설 때, 기관장의 직관과 전문적 근거 중 어디에 무게를 두시겠습니까?"
   },
   {
     "id": 82,
     "qNumber": "Q82",
     "category": "동기부여 역량",
     "panel": "HR_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "지친 직원의 동기를 지키고 자발적 참여를 이끈 경험은?",
     "keywords": [
       "8개월 교착 위기사례 실무자 격려",
@@ -1805,7 +1813,7 @@ const QUESTIONS_DB = [
       "민원 전담 분담",
       "통합사례회의 성과 구체적 칭찬"
     ],
-    "followUp": null
+    "followUp": "공무원 시험 준비나 이직을 고민하며 마음이 떠나 있는 2년차 실무자에게 사회복지사로서의 비전과 재단에서의 성장 기회를 어떻게 설득하시겠습니까?"
   },
   {
     "id": 83,
@@ -1826,14 +1834,14 @@ const QUESTIONS_DB = [
       "위기영아 자립청년 가족돌봄 사례 매칭",
       "우리 센터 아동 실행 방안 전환"
     ],
-    "followUp": null
+    "followUp": "기관장이 제시하는 중장기 비전이 탁상공론이 되지 않고 현장 팀원들의 일일 다이어리에 반영되도록 만드는 실행 담보 메커니즘은 무엇입니까?"
   },
   {
     "id": 84,
     "qNumber": "Q84",
     "category": "경영마인드 역량",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "우리 센터를 넘어 재단 전체를 위해 일하는 방식을 바꾼 경험은?",
     "keywords": [
       "가정위탁 직무기술서 체계화",
@@ -1847,14 +1855,14 @@ const QUESTIONS_DB = [
       "평가지표 TF 및 전국 6개 센터 공유",
       "기안 간소화 양식"
     ],
-    "followUp": null
+    "followUp": "재단 산하 기관장에게 요구되는 '경영 마인드'란 구체적으로 예산 절감입니까, 아니면 자원의 재투자입니까? 신지애 팀장님의 정의를 들려주십시오."
   },
   {
     "id": 85,
     "qNumber": "Q85",
     "category": "아동중심 역량",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 1,
     "question": "업무 전 과정에서 '아동중심' 가치를 실천한 대표 사례는?",
     "keywords": [
       "학대 위기사례 아동 안전 최우선",
@@ -1868,14 +1876,14 @@ const QUESTIONS_DB = [
       "성착취 피해 아동 추가 피해 차단",
       "행정보조인력 미투입 정보보호"
     ],
-    "followUp": null
+    "followUp": "위탁부모의 양육권 주장과 행정 기관의 절차적 지침 속에서, '아동 중심'이라는 가치가 실제 의사결정의 1순위로 지켜졌던 구체적 일화를 소개해 주십시오."
   },
   {
     "id": 86,
     "qNumber": "Q86",
     "category": "진정성 역량",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 3,
+    "difficulty": 1,
     "question": "원칙을 지키고 정확한 정보를 투명하게 제공한 경험은?",
     "keywords": [
       "희망이음 거절 시 법과 경고 사례 공유",
@@ -1889,14 +1897,14 @@ const QUESTIONS_DB = [
       "평가위원 비밀 준수",
       "위기관리 2점 솔직한 자평"
     ],
-    "followUp": null
+    "followUp": "후배 직원들이 신지애 팀장님의 지시를 따르는 이유가 직급의 권위 때문입니까, 아니면 인간적·전문적 진정성 때문이라고 생각하십니까?"
   },
   {
     "id": 87,
     "qNumber": "Q87",
     "category": "전문성 역량",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "가정위탁 전문성을 높이고 대외적으로 활용한 경험은?",
     "keywords": [
       "실무 6년 팀장 6년 경험",
@@ -1910,14 +1918,14 @@ const QUESTIONS_DB = [
       "매뉴얼 및 평가지표 TF",
       "4분기 위기관리 사후평가 보완"
     ],
-    "followUp": null
+    "followUp": "가정위탁 분야에서 타 기관 전문가들이 신지애 팀장님을 자문위원이나 강사로 초빙하는 가장 핵심적인 독보적 전문성은 무엇입니까?"
   },
   {
     "id": 88,
     "qNumber": "Q88",
     "category": "도전정신 역량",
     "panel": "CEO",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "어려운 목표에 도전하거나 새로운 방식을 과감히 받아들인 경험은?",
     "keywords": [
       "지침 없던 2021년 무연고 영아 시범사업",
@@ -1931,14 +1939,14 @@ const QUESTIONS_DB = [
       "창증감제 패들렛 도입",
       "체크리스트 간소화 수용"
     ],
-    "followUp": null
+    "followUp": "전례가 없어 모두가 실패할 것이라며 꺼리던 사업을 맡아 성공적인 롤모델로 정착시킨 가장 도전적인 경험은 무엇입니까?"
   },
   {
     "id": 89,
     "qNumber": "Q89",
     "category": "탁월성 입증",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "본인이 다른 경쟁자들보다 탁월하다고 자부하는 점은 무엇입니까?",
     "keywords": [
       "현장 문제를 기준과 제도로 전환",
@@ -1952,14 +1960,14 @@ const QUESTIONS_DB = [
       "기관 전체 자원 조율 총괄팀장 경험",
       "18개 센터 공통 기준 구축"
     ],
-    "followUp": null
+    "followUp": "재단 2030 핵심 전략 과제 중 경기남부센터가 전국 1위로 선도해 나갈 수 있는 가장 자신 있는 사업 분야는 무엇입니까?"
   },
   {
     "id": 90,
     "qNumber": "Q90",
     "category": "재단 목표 부합",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "재단의 중장기 목표와 조직 방향에 본인이 어떻게 부합합니까?",
     "keywords": [
       "임팩트 중심 성과관리",
@@ -1973,14 +1981,14 @@ const QUESTIONS_DB = [
       "자립 프로그램 실질 수혜 재편",
       "복지와 모금 결합 경험"
     ],
-    "followUp": null
+    "followUp": "초록우산 어린이재단이 정의하는 4대 인재상(도전, 전문성, 소통, 진정성) 중 본인을 가장 잘 설명하는 단어 하나와 그 이유는 무엇입니까?"
   },
   {
     "id": 91,
     "qNumber": "Q91",
     "category": "인재상 실천",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "재단의 미션과 인재상은 무엇이고, 업무에 어떻게 녹여냈습니까?",
     "keywords": [
       "어린이가 행복한 세상",
@@ -1990,14 +1998,14 @@ const QUESTIONS_DB = [
       "어린이가 행복한 세상",
       "아동중심 진정성 전문성 도전정신 4대 공통역량 실천 사례"
     ],
-    "followUp": null
+    "followUp": "경기도 관내 유관 복지 기관장 모임에서 초록우산의 발언권과 리더십을 확고히 세우기 위한 대외 네트워킹 전략은 무엇입니까?"
   },
   {
     "id": 92,
     "qNumber": "Q92",
     "category": "대외 위상 제고",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "재단의 대외 위상과 신뢰도를 높인 구체적인 사례는 무엇입니까?",
     "keywords": [
       "평가지표 TF 18개 센터 의견 수렴",
@@ -2011,14 +2019,14 @@ const QUESTIONS_DB = [
       "복지부 평가위원",
       "우수기관 3회 선정 신뢰"
     ],
-    "followUp": null
+    "followUp": "팀 내에서 특정 직원에 대한 편애나 차별 의혹이 제기되었을 때, 팀 분위기를 쇄신하기 위해 기관장으로서 어떤 열린 대화를 주재하시겠습니까?"
   },
   {
     "id": 93,
     "qNumber": "Q93",
     "category": "소통 및 갈등",
     "panel": "HR_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 2,
     "question": "소통 부재, 갈등, 저성과 문제를 성공적으로 해결한 경험은?",
     "keywords": [
       "팀 간 예산 갈등 구조적 해결",
@@ -2030,14 +2038,14 @@ const QUESTIONS_DB = [
       "투명한 공유 및 재조정 약속",
       "8개월 교착 실무자 짐 덜어주기"
     ],
-    "followUp": null
+    "followUp": "상담 역량이 부족해 현장에서 위탁부모에게 휘둘리는 후배 사회복지사를 위해 어떤 맞춤형 슈퍼비전 체계를 가동하시겠습니까?"
   },
   {
     "id": 94,
     "qNumber": "Q94",
     "category": "후배 코칭",
     "panel": "HR_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 4,
     "question": "후배의 역량 강화를 위해 어떤 코칭과 지도를 했습니까?",
     "keywords": [
       "함께 해보기, 점검, 단계적 배정",
@@ -2049,7 +2057,7 @@ const QUESTIONS_DB = [
       "선생님이라면 어떻게 하겠어요 코칭 질문",
       "스스로 판단하는 힘 육성"
     ],
-    "followUp": null
+    "followUp": "어제까지 동료 팀장으로 편하게 지내던 동기들이 신임 기관장 취임 후 겪게 될 관계의 어색함을 어떻게 허물고 영도력을 세우시겠습니까?"
   },
   {
     "id": 95,
@@ -2070,7 +2078,7 @@ const QUESTIONS_DB = [
       "동일 기준 동일 절차 적용",
       "최종 책임은 기관장"
     ],
-    "followUp": null
+    "followUp": "경기도 및 산하 시·군 아동보호 부서장들과 정례적인 정책 간담회를 이끌어내기 위한 신임 기관장의 구체적인 제안 카드는 무엇입니까?"
   },
   {
     "id": 96,
@@ -2091,14 +2099,14 @@ const QUESTIONS_DB = [
       "아동 안전 공통 목표",
       "원칙과 대안 제시"
     ],
-    "followUp": null
+    "followUp": "도 감사나 보건복지부 감사에서 회계 처리나 사업비 집행의 미세한 절차적 오류가 적발되었을 때, 기관장으로서 어떻게 투명하게 수습하시겠습니까?"
   },
   {
     "id": 97,
     "qNumber": "Q97",
     "category": "감사 및 투명성",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 3,
+    "difficulty": 5,
     "question": "지도점검이나 감사에 대비해 투명성을 강화하거나 개선한 사례는?",
     "keywords": [
       "보조금 후원금 분기별 사전 점검",
@@ -2112,14 +2120,14 @@ const QUESTIONS_DB = [
       "지정후원 잔액 사전합의 보고",
       "사후평가 정례화"
     ],
-    "followUp": null
+    "followUp": "직원이 내부 고발 형식으로 기관 내 부정행위를 투서했을 때, 고발자 색출이나 축소 은폐 없이 객관적으로 처리할 윤리 프로토콜이 있습니까?"
   },
   {
     "id": 98,
     "qNumber": "Q98",
     "category": "윤리 위반 대처",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "기관 내 심각한 규정 위반이나 비윤리적 문제가 생기면 어떻게 대처하겠습니까?",
     "keywords": [
       "1. 피해자 아동 보호",
@@ -2135,14 +2143,14 @@ const QUESTIONS_DB = [
       "4. 공정한 절차",
       "5. 재발 방지"
     ],
-    "followUp": null
+    "followUp": "부임 첫해에 달성할 3대 핵심 성과지표(KPI)를 구체적인 수치(정량 목표)와 함께 제시해 주십시오."
   },
   {
     "id": 99,
     "qNumber": "Q99",
     "category": "핵심 과제 로드맵",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 4,
     "question": "기관장 취임 후 우선 추진할 3대 핵심 과제와 실행 방안은?",
     "keywords": [
       "1. 사람(동행형 신입육성 표준화)",
@@ -2156,14 +2164,14 @@ const QUESTIONS_DB = [
       "3. 성과(재단 3대 중점사업 연계)",
       "첫 100일 진단 후 실행"
     ],
-    "followUp": null
+    "followUp": "재단 인사이동으로 원치 않는 타 지역 센터로 발령받거나 직무가 변경된 직원이 출근을 거부하며 반발할 때 어떻게 면담하시겠습니까?"
   },
   {
     "id": 100,
     "qNumber": "Q100",
     "category": "전보 수용성",
     "panel": "HR_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 5,
     "question": "다른 지역이나 다른 사업 부서 기관장으로 발령 나면 어떻게 하겠습니까?",
     "keywords": [
       "어디든 수용",
@@ -2177,14 +2185,14 @@ const QUESTIONS_DB = [
       "일하는 구조(기준 공개, 동행, 근거 협의)는 동일",
       "직원들과 함께 비전 수립"
     ],
-    "followUp": null
+    "followUp": "실적이 뛰어난 핵심 과장에 대해 부하 직원들이 직장 내 괴롭힘으로 노조와 고용노동부에 진정을 넣었다면 기관장으로서 어떻게 분리 및 조사하시겠습니까?"
   },
   {
     "id": 101,
     "qNumber": "Q101",
     "category": "괴롭힘 신고 대응",
     "panel": "HR_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 2,
     "question": "직원이 직장 내 괴롭힘이나 성희롱을 신고하면 어떻게 처리하겠습니까?",
     "keywords": [
       "독단 판단 금지",
@@ -2200,14 +2208,14 @@ const QUESTIONS_DB = [
       "인사부서 보고 및 공식 조사",
       "불이익 차단 및 재발방지"
     ],
-    "followUp": null
+    "followUp": "전임 관장님이 오랜 기간 다져놓은 기관의 고유 문화 중 계승해야 할 미덕과, 과감하게 시대에 맞게 리셋해야 할 관행은 무엇입니까?"
   },
   {
     "id": 102,
     "qNumber": "Q102",
     "category": "전임 관장 계승",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 4,
     "question": "전임 기관장님의 운영 방식과 본인의 생각이 다를 때 어떻게 조율하겠습니까?",
     "keywords": [
       "전임 관장님의 기반과 강점 계승",
@@ -2219,14 +2227,14 @@ const QUESTIONS_DB = [
       "첫 30일 이유 경청 이해",
       "보완 사항은 기준과 근거 공유하며 단계적 수정"
     ],
-    "followUp": null
+    "followUp": "출장 현장에서 술에 취한 친부모가 흉기를 들고 사회복지사를 위협하는 긴급 사태가 발생했을 때, 현장 직원을 보호하기 위한 긴급 안전망은 무엇입니까?"
   },
   {
     "id": 103,
     "qNumber": "Q103",
     "category": "직원 안전 보호",
     "panel": "HR_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "가정방문 중 직원이 폭언이나 신체적 위협을 당하면 어떻게 조치하겠습니까?",
     "keywords": [
       "직원 안전도 기관 책임",
@@ -2242,14 +2250,14 @@ const QUESTIONS_DB = [
       "심리 지원",
       "2인 동행 원칙 및 체크리스트 추가"
     ],
-    "followUp": null
+    "followUp": "학대피해아동이나 영아를 전담하는 '전문가정위탁' 부모를 관내에서 30% 이상 확충하기 위한 획기적인 인센티브나 발굴 전략이 있습니까?"
   },
   {
     "id": 104,
     "qNumber": "Q104",
     "category": "전문가정위탁",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "전문가정위탁 확대 정책에 대해 기관장으로서 어떻게 준비하겠습니까?",
     "keywords": [
       "1. 발굴(기존 우수 위탁부모 및 전문인력)",
@@ -2261,14 +2269,14 @@ const QUESTIONS_DB = [
       "2. 교육(특수욕구별 전문 과정)",
       "3. 지원 및 소진관리(전문기관 협약 치료 및 지지)"
     ],
-    "followUp": null
+    "followUp": "2027년 국가사업 전환으로 지자체 직영 체계가 본격화되면, 민간 위탁지원센터의 역할 축소 우려를 딛고 센터를 어떻게 재도약시키시겠습니까?"
   },
   {
     "id": 105,
     "qNumber": "Q105",
     "category": "2027 국가사업 전환",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "2027년 가정위탁 국가사업 전환 시 센터는 무엇이 달라지고 어떻게 준비합니까?",
     "keywords": [
       "지역별 지원금 편차 해소",
@@ -2280,14 +2288,14 @@ const QUESTIONS_DB = [
       "위탁부모 풀 전국 단위 통합 관리",
       "체계적 풀 관리 및 매칭 연계 준비"
     ],
-    "followUp": null
+    "followUp": "일반 가정에서 위탁부모 지원을 망설이는 가장 큰 진입장벽은 무엇이며, 이를 허물기 위한 지역 밀착형 홍보 전략은 무엇입니까?"
   },
   {
     "id": 106,
     "qNumber": "Q106",
     "category": "위탁부모 발굴",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "위탁부모 지원자가 줄고 있는데 신규 위탁가정을 어떻게 발굴하겠습니까?",
     "keywords": [
       "위탁 결정률 20% 미만 한계",
@@ -2299,14 +2307,14 @@ const QUESTIONS_DB = [
       "아동권리보장원 공익 홍보 요청",
       "교통수단, 지자체, 종교기관 등 다각적 경로 발굴"
     ],
-    "followUp": null
+    "followUp": "경기도의 시설보호 대비 가정형 보호율을 현재 수준에서 향후 3년 내에 몇 퍼센트까지 끌어올릴 수 있다고 자신하십니까?"
   },
   {
     "id": 107,
     "qNumber": "Q107",
     "category": "가정형 보호율 제고",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 3,
     "question": "보호아동 중 가정위탁 비율이 44.7%로 절반도 안 됩니다. 원인과 센터의 역할은?",
     "keywords": [
       "즉시 연결 가능한 위탁가정 부족",
@@ -2318,7 +2326,7 @@ const QUESTIONS_DB = [
       "시군 간담회 적극 의뢰 요청",
       "위탁부모 풀 충분 확충으로 가정형 보호율 극대화"
     ],
-    "followUp": null
+    "followUp": "현재 경기남부센터 관내 위탁 아동 수, 신규 배치 건수, 원가정 복귀율 등 핵심 통계 데이터를 면접관에게 1분 브리핑으로 요약해 주십시오."
   },
   {
     "id": 108,
@@ -2339,14 +2347,14 @@ const QUESTIONS_DB = [
       "친인척 대리양육 86%",
       "사망 26%, 이혼, 별거 순"
     ],
-    "followUp": null
+    "followUp": "향후 3년 뒤 지자체 재수탁 심사에서 타 대형 복지법인이 경기남부센터 운영권에 도전해 올 때, 초록우산의 비교우위 제안서는 어떤 차별점을 담아야 합니까?"
   },
   {
     "id": 109,
     "qNumber": "Q109",
     "category": "재수탁 심사 대비",
     "panel": "CEO",
-    "difficulty": 4,
+    "difficulty": 5,
     "question": "지자체 수탁 계약 갱신이나 재수탁 심사를 앞두고 무엇을 준비하겠습니까?",
     "keywords": [
       "5년 단위 수탁(2024~2028)",
@@ -2360,7 +2368,7 @@ const QUESTIONS_DB = [
       "2. 우수기관 3회 객관적 실적",
       "3. 2027 국가전환 반영 향후 5년 비전"
     ],
-    "followUp": null
+    "followUp": "주 52시간 근로시간 준수와 24시간 야간 위기아동 긴급 출동이라는 법적·현실적 모순을 기관장으로서 어떻게 합법적으로 돌파하시겠습니까?"
   },
   {
     "id": 110,
@@ -2381,14 +2389,14 @@ const QUESTIONS_DB = [
       "대체휴무 및 수당 보상",
       "24시간 유관기관 연계망 활용 분담"
     ],
-    "followUp": null
+    "followUp": "지자체 보조금 테이블의 한계로 타 사회복지 시설 대비 열악한 센터 직원들의 실질적 처우와 후생복지를 개선할 현실적인 자구책은 무엇입니까?"
   },
   {
     "id": 111,
     "qNumber": "Q111",
     "category": "처우 개선 대책",
     "panel": "HR_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 5,
     "question": "직원 처우가 낮아 이직이 반복되는데, 추가 예산 없이 할 수 있는 것은 무엇입니까?",
     "keywords": [
       "혼자 두지 않는 구조(신입 동행)",
@@ -2402,7 +2410,7 @@ const QUESTIONS_DB = [
       "인정과 의견 반영",
       "국가전환 시 인건비 현실화 요청"
     ],
-    "followUp": null
+    "followUp": "센터 직원의 업무용 PC 랜섬웨어 감염으로 위탁 아동 및 친부모의 주민번호와 상담일지가 다크웹에 유출되었다면 초기 2시간 내에 어떤 조치를 밟으시겠습니까?"
   },
   {
     "id": 112,
@@ -2425,14 +2433,14 @@ const QUESTIONS_DB = [
       "창구 단일화",
       "사후 보안체계 전면 쇄신"
     ],
-    "followUp": null
+    "followUp": "지역 유력 인사나 지자체 고위 관계자가 자격이 미달하는 지인의 자녀를 센터 계약직으로 채용해달라며 은근한 압력을 행사한다면 어떻게 거절하시겠습니까?"
   },
   {
     "id": 113,
     "qNumber": "Q113",
     "category": "기관장 채용 철학",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 5,
     "question": "기관장이 되면 첫 채용 면접에서 지원자의 어떤 점을 가장 중점적으로 보겠습니까?",
     "keywords": [
       "아동을 중심에 두는 태도와 진정성",
@@ -2446,14 +2454,14 @@ const QUESTIONS_DB = [
       "지식은 교육으로 채우나 가치관은 불변",
       "4대 공통역량 검증"
     ],
-    "followUp": null
+    "followUp": "오랫동안 정이 든 위탁부모와 살기를 원하는 아동과, 친권을 내세워 무리하게 아동 반환을 요구하는 친부모 사이에서 기관장은 어떤 법적·윤리적 입장을 취하시겠습니까?"
   },
   {
     "id": 114,
     "qNumber": "Q114",
     "category": "복귀 vs 장기위탁",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 5,
     "question": "원가정 복귀와 장기위탁 중 하나를 판단해야 할 때 기관장의 기준은 무엇입니까?",
     "keywords": [
       "아동의 최선의 이익",
@@ -2465,14 +2473,14 @@ const QUESTIONS_DB = [
       "아동 의사, 친부모 양육 의지 및 경제·건강 상황 종합 검토",
       "통합사례회의 및 심의위원회 절차"
     ],
-    "followUp": null
+    "followUp": "사례관리 과정에서 아동 본인의 의사와 위탁부모의 양육 방침이 정면으로 충돌할 때, UN 아동권리협약의 정신을 기관장은 현장에서 어떻게 구현하시겠습니까?"
   },
   {
     "id": 115,
     "qNumber": "Q115",
     "category": "아동 권리 참여",
     "panel": "CEO",
-    "difficulty": 3,
+    "difficulty": 5,
     "question": "위탁아동의 의견을 사업 기획과 사례 결정에 어떻게 실질적으로 반영합니까?",
     "keywords": [
       "UN아동권리협약 기반 주체적 권리",
@@ -2484,14 +2492,14 @@ const QUESTIONS_DB = [
       "사례 결정 시 연령별 직접 경청",
       "사업 운영 시 참여율 만족도 피드백 반영"
     ],
-    "followUp": null
+    "followUp": "고령의 조부모가 위탁수당에 의존하며 손자녀의 진학과 자립을 가로막는 '역부양'의 비극적 현장을 목격했을 때 기관장으로서 어떤 단호한 조치를 내리시겠습니까?"
   },
   {
     "id": 116,
     "qNumber": "Q116",
     "category": "역부양 대응",
     "panel": "EXEC_DIRECTOR",
-    "difficulty": 4,
+    "difficulty": 5,
     "question": "조부모 위탁이 많아 아동이 도리어 조부모를 간병하는 역부양 현상은 어떻게 풀겠습니까?",
     "keywords": [
       "위탁부모 60% 이상 조부모 현실",
@@ -2505,7 +2513,7 @@ const QUESTIONS_DB = [
       "조부모 노인돌봄 연계",
       "아동 재단 가족돌봄사업 매칭"
     ],
-    "followUp": null
+    "followUp": "오늘 이 자리에 올라온 모든 승진 후보자 중 '내가 기관장이 되지 않으면 경기남부센터의 이 혁신은 멈춘다'고 단언할 수 있는 본인만의 비장의 카드는 무엇입니까?"
   },
   {
     "id": 117,
@@ -2526,14 +2534,14 @@ const QUESTIONS_DB = [
       "지역본부 9.5년 복지관 3년의 모금·협력 접목",
       "통섭형 기관장 적임자"
     ],
-    "followUp": "만약 이번 심사에서 탈락하여 승진하지 못하신다면, 앞으로의 거취와 향후 계획은 어떻게 되십니까?"
+    "followUp": "가정위탁 11년 외에 복지관 3년과 지역본부 9년 반의 경력이 오히려 가정위탁 전문 기관장으로서의 집중도를 떨어뜨린다는 우려에 대해 어떻게 반박하시겠습니까?"
   },
   {
     "id": 118,
     "qNumber": "Q118",
     "category": "차별화 한 문장",
     "panel": "EXTERNAL_EXAMINER",
-    "difficulty": 4,
+    "difficulty": 2,
     "question": "다른 쟁쟁한 후보들보다 본인이 나은 점을 '단 한 문장'으로 정의해 보십시오.",
     "keywords": [
       "현장의 문제를 제도로 바꿔 왔고 어려운 여건에서도 사람이 남는 구조를 만들어 온 리더"
@@ -2541,14 +2549,14 @@ const QUESTIONS_DB = [
     "idealPoints": [
       "현장의 문제를 제도로 바꿔 왔고 어려운 여건에서도 사람이 남는 구조를 만들어 온 리더"
     ],
-    "followUp": null
+    "followUp": "방금 말씀하신 '단 한 문장'의 정의를 실현하기 위해, 취임 첫날 직원 조회에서 전할 가장 핵심적인 당부의 말은 무엇입니까?"
   },
   {
     "id": 119,
     "qNumber": "Q119",
     "category": "소진 및 스트레스",
     "panel": "HR_DIRECTOR",
-    "difficulty": 3,
+    "difficulty": 1,
     "question": "23년 동안 지치지 않고 버틴 본인만의 스트레스 관리 노하우는 무엇입니까?",
     "keywords": [
       "혼자 안고 가지 않음",
@@ -2562,14 +2570,14 @@ const QUESTIONS_DB = [
       "산책과 운동으로 일과 삶 분리",
       "나 자신도 혼자 두지 않음"
     ],
-    "followUp": null
+    "followUp": "지난 23년간의 치열한 복지 현장 속에서 번아웃이나 회의감이 찾아왔을 때, 신지애라는 사람을 다시 일으켜 세운 가장 따뜻했던 아동의 한마디는 무엇이었습니까?"
   },
   {
     "id": 120,
     "qNumber": "Q120",
     "category": "역질문",
     "panel": "CEO",
-    "difficulty": 2,
+    "difficulty": 1,
     "question": "오늘 면접위원들에게 꼭 묻고 싶은 질문 하나를 해 주십시오.",
     "keywords": [
       "2027 국가사업 전환 과정에서 재단이 산하 센터에 가장 기대하는 역할",
@@ -2579,35 +2587,118 @@ const QUESTIONS_DB = [
       "2027 국가사업 전환 과정에서 재단이 산하 센터에 가장 기대하는 역할",
       "말씀을 기관 경영목표에 최우선 반영"
     ],
-    "followUp": null
+    "followUp": "면접위원들의 답변을 경청하신 후, 그 기대에 부응하기 위해 신임 기관장으로서 취임 첫 달에 결재할 제1호 사업 계획은 무엇입니까?"
   }
 ];
 
 
-// 레벨별 질문 필터링 및 10~15문항 자동 추출 엔진
+// 실전형 6단계 서사 아키텍처 및 레벨별 적응형 질문 추출 엔진
 function generateInterviewSet(difficultyLevel = 3, questionCount = 12) {
-  let pool = QUESTIONS_DB.filter(q => {
-    if (difficultyLevel === 1) return q.difficulty <= 2;
-    if (difficultyLevel === 2) return q.difficulty <= 3;
-    if (difficultyLevel === 3) return q.difficulty >= 2 && q.difficulty <= 4;
-    if (difficultyLevel === 4) return q.difficulty >= 3;
-    if (difficultyLevel === 5) return q.difficulty >= 4; // 최고난도 및 압박
-    return true;
-  });
+  // 난이도별 대상 풀 구성
+  let primaryPool = [];
+  if (difficultyLevel === 1) {
+    // Level 1 (기본 소양/워밍업): Level 1 & 2 중심
+    primaryPool = QUESTIONS_DB.filter(q => q.difficulty <= 2);
+  } else if (difficultyLevel === 2) {
+    // Level 2 (실무 리더십): Level 2 & 3 중심
+    primaryPool = QUESTIONS_DB.filter(q => q.difficulty >= 2 && q.difficulty <= 3);
+  } else if (difficultyLevel === 3) {
+    // Level 3 (실전 기관장 표준): Level 2, 3, 4 표준 믹스
+    primaryPool = QUESTIONS_DB.filter(q => q.difficulty >= 2 && q.difficulty <= 4);
+  } else if (difficultyLevel === 4) {
+    // Level 4 (심층 정책/돌발): Level 3, 4, 5 고난도 믹스
+    primaryPool = QUESTIONS_DB.filter(q => q.difficulty >= 3);
+  } else if (difficultyLevel === 5) {
+    // Level 5 (송곳 압박): Level 4 & 5 최고난도
+    primaryPool = QUESTIONS_DB.filter(q => q.difficulty >= 4);
+  }
 
-  if (pool.length < questionCount) pool = QUESTIONS_DB;
+  if (primaryPool.length < questionCount) {
+    primaryPool = [...QUESTIONS_DB];
+  }
 
-  // 필수 시작 질문 Q1 (자기소개) 포함
-  const introQ = QUESTIONS_DB.find(q => q.qNumber === "Q1") || pool[0];
-  // 필수 마무리 질문 Q120 (역질문) 포함
-  const closingQ = QUESTIONS_DB.find(q => q.qNumber === "Q120") || pool[pool.length - 1];
+  // 필수 시작 질문 Q1 (자기소개) 및 마무리 질문 Q120 (역질문) 보장
+  const introQ = QUESTIONS_DB.find(q => q.qNumber === "Q1") || primaryPool[0];
+  const closingQ = QUESTIONS_DB.find(q => q.qNumber === "Q120") || primaryPool[primaryPool.length - 1];
 
-  let remaining = pool.filter(q => q.id !== introQ.id && q.id !== closingQ.id);
-  remaining.sort(() => 0.5 - Math.random());
+  // 4인 면접관별 균형 풀 구성 (CEO, EXEC_DIRECTOR, HR_DIRECTOR, EXTERNAL_EXAMINER)
+  const getFromPool = (panel, excludeIds) => {
+    const candidates = primaryPool.filter(q => q.panel === panel && !excludeIds.has(q.id));
+    if (candidates.length > 0) {
+      return candidates[Math.floor(Math.random() * candidates.length)];
+    }
+    const fallbackCandidates = QUESTIONS_DB.filter(q => q.panel === panel && !excludeIds.has(q.id));
+    return fallbackCandidates[Math.floor(Math.random() * fallbackCandidates.length)] || null;
+  };
 
-  let selected = [introQ];
-  let targetCount = Math.min(questionCount - 2, remaining.length);
-  selected = selected.concat(remaining.slice(0, targetCount));
+  const selected = [introQ];
+  const selectedIds = new Set([introQ.id, closingQ.id]);
+
+  // 서사적 면접 진행 템플릿 (10문항, 12문항, 15문항 대응)
+  // [도입 -> 인사/조직 -> 실무정책 -> 외부압박/위기 -> 미래비전 -> 마무리]
+  let panelSequence = [];
+  if (questionCount === 10) {
+    panelSequence = [
+      "HR_DIRECTOR",       // Q2: 인사 및 팀워크
+      "EXEC_DIRECTOR",     // Q3: 실무 전문성
+      "EXTERNAL_EXAMINER", // Q4: 객관적 검증
+      "HR_DIRECTOR",       // Q5: 소진 및 조직문화
+      "EXEC_DIRECTOR",     // Q6: 2027 정책 대책
+      "EXTERNAL_EXAMINER", // Q7: 위기관리 압박
+      "CEO",               // Q8: 경영 비전
+      "EXTERNAL_EXAMINER"  // Q9: 취약점 송곳 질문
+    ];
+  } else if (questionCount === 15) {
+    panelSequence = [
+      "CEO",               // Q2: 경영철학
+      "HR_DIRECTOR",       // Q3: 인재육성
+      "EXEC_DIRECTOR",     // Q4: 사업전문성
+      "EXTERNAL_EXAMINER", // Q5: 객관적 성과
+      "HR_DIRECTOR",       // Q6: 팀간 갈등
+      "EXEC_DIRECTOR",     // Q7: 지자체 거버넌스
+      "EXTERNAL_EXAMINER", // Q8: 위기개입 8개월
+      "EXTERNAL_EXAMINER", // Q9: 위기관리 2점 자평
+      "EXEC_DIRECTOR",     // Q10: 2027 국가사업
+      "HR_DIRECTOR",       // Q11: 세대소통/노무
+      "CEO",               // Q12: 2030 미래전략
+      "EXTERNAL_EXAMINER", // Q13: 최후의 송곳검증
+      "CEO"                // Q14: 기관장 결단력
+    ];
+  } else {
+    // 기본 12문항 (표준)
+    panelSequence = [
+      "HR_DIRECTOR",       // Q2: 신입 육성 및 팀장 리더십
+      "EXEC_DIRECTOR",     // Q3: 무연고 영아 및 가정위탁 전문성
+      "EXTERNAL_EXAMINER", // Q4: 객관적 실적 검증
+      "HR_DIRECTOR",       // Q5: 경력자 소진 및 조직관리
+      "EXEC_DIRECTOR",     // Q6: 2027 국가사업 전환
+      "EXTERNAL_EXAMINER", // Q7: 8개월 보호조치 지연 위기
+      "EXTERNAL_EXAMINER", // Q8: 위기관리 2점 자평 약점
+      "EXEC_DIRECTOR",     // Q9: 지자체 협력 및 평가지표 TF
+      "HR_DIRECTOR",       // Q10: 세대 소통 및 노무 이슈
+      "CEO"                // Q11: 기관장 경영 철학 및 2030 비전
+    ];
+  }
+
+  // 순서대로 질문 선발
+  for (const panel of panelSequence) {
+    const q = getFromPool(panel, selectedIds);
+    if (q) {
+      selected.push(q);
+      selectedIds.add(q.id);
+    }
+  }
+
+  // 만약 목표 문항 수보다 부족하면 남은 풀에서 보충
+  while (selected.length < questionCount - 1) {
+    const available = primaryPool.filter(q => !selectedIds.has(q.id));
+    if (available.length === 0) break;
+    const randomPick = available[Math.floor(Math.random() * available.length)];
+    selected.push(randomPick);
+    selectedIds.add(randomPick.id);
+  }
+
+  // 마지막 질문으로 Q120(역질문) 추가
   selected.push(closingQ);
 
   return selected;

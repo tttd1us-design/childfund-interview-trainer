@@ -8,8 +8,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&family=Noto+Serif+KR:wght@600;700;900&display=swap" rel="stylesheet">
-  <!-- Chart.js CDN for Evaluation Charts -->
+  <!-- Open Source Libraries from GitHub -->
+  <!-- Chart.js (chartjs/Chart.js) for Comprehensive Competency Radar & Trend Charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- html2pdf.js (eKoopmans/html2pdf.js) for 1-Click Official Promotion Report PDF Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- canvas-confetti (catdad/canvas-confetti) for Passing Celebration Ceremony -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
@@ -252,31 +257,43 @@
 
         <!-- 4 Interviewers Showcase -->
         <div class="panel-preview-area">
-          <h3 class="section-title">오늘의 4인 남/여 전문 면접관 패널</h3>
+          <h3 class="section-title">오늘의 4인 남/여 전문 면접관 패널 (아나운서급 자연스러운 육성)</h3>
           <div class="panel-grid">
             <div class="interviewer-intro-card">
               <div class="avatar">👔</div>
               <h4>정문기 대표이사 <span class="gender-tag male">남성 음성</span></h4>
               <span class="badge">총괄 비전 & 경영</span>
-              <p>중후하고 묵직한 중저음으로 재단 2030 가치관, 조직 비전 제시, 경영 마인드를 검증합니다.</p>
+              <p>따뜻하고 신뢰감 있는 편안한 중저음으로 재단 2030 가치관, 조직 비전 제시, 경영 마인드를 질문합니다.</p>
+              <button type="button" class="btn-voice-preview" onclick="app.previewInterviewerVoice('CEO')">
+                <span>🔊 따뜻한 목소리 미리듣기</span>
+              </button>
             </div>
             <div class="interviewer-intro-card">
               <div class="avatar">👩‍💼</div>
               <h4>박서진 실무이사 <span class="gender-tag female">여성 음성</span></h4>
               <span class="badge">복지사업 & 정책</span>
-              <p>명확하고 단호한 어조로 무연고 영아 시범사업, 2027 국가사업 전환, 평가지표 TF를 파고듭니다.</p>
+              <p>부드럽고 맑은 아나운서 톤으로 무연고 영아 시범사업, 2027 국가사업 전환, 평가지표 TF를 질문합니다.</p>
+              <button type="button" class="btn-voice-preview" onclick="app.previewInterviewerVoice('EXEC_DIRECTOR')">
+                <span>🔊 부드러운 목소리 미리듣기</span>
+              </button>
             </div>
             <div class="interviewer-intro-card">
               <div class="avatar">👨‍💼</div>
               <h4>김태호 인사기획팀장 <span class="gender-tag male">남성 음성</span></h4>
               <span class="badge">조직 & 인적자원</span>
-              <p>차분하고 논리적인 어조로 신입 9명 육성, 경력자 소진관리, 노무 및 세대 소통을 검증합니다.</p>
+              <p>차분하고 온화한 남성 톤으로 신입 9명 육성, 경력자 소진관리, 노무 및 세대 소통을 편안하게 묻습니다.</p>
+              <button type="button" class="btn-voice-preview" onclick="app.previewInterviewerVoice('HR_DIRECTOR')">
+                <span>🔊 차분한 목소리 미리듣기</span>
+              </button>
             </div>
             <div class="interviewer-intro-card">
               <div class="avatar">👩‍🏫</div>
               <h4>이선우 외부면접관 <span class="gender-tag female">여성 음성</span></h4>
               <span class="badge">송곳 압박 & 객관성</span>
-              <p>지적이고 예리한 고음 톤으로 위기관리 2점 자평의 약점, 8개월 보호조치 지연을 날카롭게 압박합니다.</p>
+              <p>지적이고 차분한 여성 톤으로 위기관리 2점 자평의 약점, 8개월 보호조치 지연의 핵심을 날카롭게 짚어줍니다.</p>
+              <button type="button" class="btn-voice-preview" onclick="app.previewInterviewerVoice('EXTERNAL_EXAMINER')">
+                <span>🔊 지적인 목소리 미리듣기</span>
+              </button>
             </div>
           </div>
         </div>
@@ -400,15 +417,10 @@
               </div>
             </div>
 
-            <!-- Realtime Audio Waveform Visualizer Bar -->
+            <!-- Realtime Audio Waveform Visualizer Bar (Web Audio API Live Visualizer) -->
             <div id="recording-visual-bar" class="recording-visual-bar" style="display:none;">
-              <span class="wave-bar"></span>
-              <span class="wave-bar"></span>
-              <span class="wave-bar"></span>
-              <span class="wave-bar"></span>
-              <span class="wave-bar"></span>
-              <span class="wave-bar"></span>
-              <span class="wave-text">마이크로 소리를 감지하고 있습니다. 소리 내어 말씀하시면 아래에 실시간 텍스트로 적힙니다.</span>
+              <canvas id="canvas-mic-visualizer" width="180" height="28" class="canvas-mic-wave"></canvas>
+              <span class="wave-text">실시간 마이크 음파를 감지하고 있습니다. 소리 내어 말씀하시면 아래에 실시간 텍스트로 적힙니다.</span>
             </div>
 
             <!-- Text / Speech Realtime Box -->
@@ -534,10 +546,13 @@
           </div>
         </div>
 
-        <!-- Export & Backup Action Tools -->
+        <!-- Export & Backup Action Tools (Powered by GitHub Open-Source html2pdf.js & canvas-confetti) -->
         <div class="report-export-bar">
+          <button id="btn-download-pdf" class="btn btn-primary" title="공식 양식의 PDF 평가보고서 파일 즉시 다운로드">
+            <span>📄 공식 심사보고서 PDF 다운로드</span>
+          </button>
           <button id="btn-print-report" class="btn btn-secondary">
-            <span>🖨️ 인쇄 / PDF 저장</span>
+            <span>🖨️ 인쇄 / 브라우저 출력</span>
           </button>
           <button id="btn-export-json" class="btn btn-secondary">
             <span>💾 데이터 JSON 백업</span>
@@ -545,8 +560,8 @@
           <button id="btn-copy-url" class="btn btn-secondary">
             <span>🔗 웹 주소 복사하기</span>
           </button>
-          <button id="btn-retry-interview" class="btn btn-primary">
-            <span>🔄 새로운 회차 실전 훈련 시작</span>
+          <button id="btn-retry-interview" class="btn btn-secondary">
+            <span>🔄 새 회차 훈련 시작</span>
           </button>
         </div>
       </section>
